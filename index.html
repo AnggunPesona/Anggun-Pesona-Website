@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggun Pesona — Elevating Your Basics, For Your Inner Chics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* =====================================================
+       BRAND COLOURS — edit hex values to restyle
+       ===================================================== */
+    :root {
+      --maroon:       #6B0F1A;
+      --maroon-deep:  #420810;
+      --maroon-light: #9B1B30;
+      --pink:         #F2A4BB;
+      --pink-soft:    #FAD4DE;
+      --pink-pale:    #FEF0F4;
+      --green:        #5A8A75;
+      --green-light:  #8FBD9D;
+      --green-pale:   #EBF4EF;
+      --cream:        #FDF6E3;
+      --cream-dark:   #F5EDD4;
+      --off-white:    #FEFAF5;
+      --gold:         #C9A96E;
+      --text-dark:    #1A0508;
+      --text-mid:     #4A2030;
+      --text-light:   #7A5060;
+      --border:       #E8D0D8;
+    }
+
+    /* =====================================================
+       TYPOGRAPHY
+         Headings → 'PT Serif' (elegant serif)
+         Body     → 'Montserrat' (clean sans-serif)
+       ===================================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--off-white); color: var(--text-dark); overflow-x: hidden; }
+
+    /* ===== NAVIGATION ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--maroon); padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; box-shadow: 0 2px 20px rgba(66,8,16,0.4);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.65rem;
+      cursor: pointer; user-select: none;
+    }
+    .nav-brand-text { font-family: 'PT Serif', serif; font-size: 1.15rem; font-weight: 700; color: var(--cream); letter-spacing: 0.05em; }
+    .nav-links { display: flex; gap: 0.1rem; list-style: none; }
+    .nav-links a {
+      color: rgba(250,212,222,0.85); text-decoration: none;
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.4rem 0.75rem;
+      border-radius: 50px; transition: all 0.25s; white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--cream); background: rgba(242,164,187,0.2); }
+    .nav-links a.soon-link { opacity: 0.55; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 0.5rem; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cream); }
+
+    /* ===== PAGES ===== */
+    .page { display: none; padding-top: 64px; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.82rem 1.85rem; border-radius: 50px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; text-decoration: none;
+      cursor: pointer; border: none; transition: all 0.28s; justify-content: center;
+    }
+    .btn-primary   { background: var(--pink); color: var(--maroon-deep); }
+    .btn-primary:hover   { background: #f5bece; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,164,187,0.45); }
+    .btn-outline   { background: transparent; color: var(--cream); border: 2px solid rgba(253,246,227,0.38); }
+    .btn-outline:hover   { background: rgba(253,246,227,0.1); transform: translateY(-2px); }
+    .btn-maroon    { background: var(--maroon); color: var(--cream); }
+    .btn-maroon:hover    { background: var(--maroon-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107,15,26,0.4); }
+    .btn-green     { background: var(--green); color: #fff; }
+    .btn-green:hover     { background: #4a7a65; transform: translateY(-2px); }
+    .btn-whatsapp  { background: #25D366; color: #fff; }
+    .btn-whatsapp:hover  { background: #1da855; transform: translateY(-2px); }
+    .btn-instagram { background: linear-gradient(45deg,#F09433,#E6683C,#DC2743,#CC2366,#BC1888); color: #fff; }
+    .btn-instagram:hover { opacity: 0.88; transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--maroon); border: 2px solid var(--border); }
+    .btn-ghost:hover { background: var(--pink-pale); border-color: var(--pink); }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(150deg, var(--maroon-deep) 0%, var(--maroon) 55%, #8B0F22 100%);
+      min-height: calc(100vh - 64px);
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 5rem 2rem; position: relative; overflow: hidden;
+    }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(242,164,187,0.12) 0%, transparent 70%); }
+    .hero::after  { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 80px; background: linear-gradient(to bottom, transparent, var(--off-white)); }
+    .hero-content { position: relative; z-index: 1; max-width: 720px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(242,164,187,0.18); border: 1px solid rgba(242,164,187,0.35); color: var(--pink); font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; padding: 0.45rem 1.25rem; border-radius: 50px; margin-bottom: 1.75rem; }
+    .hero h1 { font-family: 'PT Serif', serif; font-size: clamp(2.8rem,7vw,5rem); font-weight: 700; color: var(--cream); line-height: 1.05; margin-bottom: 1.1rem; }
+    .hero h1 em { font-style: italic; color: var(--pink); }
+    .hero-slogan { font-family: 'PT Serif', serif; font-style: italic; font-size: 1.05rem; color: var(--pink-soft); margin-bottom: 2.75rem; letter-spacing: 0.04em; }
+    .hero-ctas { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ===== HOME SECTIONS ===== */
+    .section { padding: 5.5rem 2rem; }
+    .section-label { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--green); margin-bottom: 0.75rem; }
+    .section-title { font-family: 'PT Serif', serif; font-size: clamp(1.75rem,3.5vw,2.6rem); color: var(--maroon); text-align: center; margin-bottom: 0.65rem; }
+    .section-sub { text-align: center; color: var(--text-light); font-size: 0.88rem; margin-bottom: 3.25rem; font-style: italic; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .offerings-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .offering-card { background: #fff; border-radius: 18px; padding: 2.25rem 1.75rem; text-align: center; box-shadow: 0 4px 22px rgba(107,15,26,0.07); cursor: pointer; transition: all 0.3s; border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .offering-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .offering-card.c-pre::before { background: var(--maroon); }
+    .offering-card.c-in::before  { background: var(--green); }
+    .offering-card.c-br::before  { background: var(--pink); }
+    .offering-card.c-sh::before  { background: var(--gold); }
+    .offering-card:hover { transform: translateY(-7px); box-shadow: 0 16px 44px rgba(107,15,26,0.14); }
+    .offering-icon { font-size: 2.6rem; margin-bottom: 1rem; }
+    .offering-card h3 { font-family: 'PT Serif', serif; font-size: 1.2rem; color: var(--text-dark); margin-bottom: 0.7rem; }
+    .offering-card p { font-size: 0.83rem; color: var(--text-light); line-height: 1.75; margin-bottom: 1.5rem; }
+    .cs-strip { background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 100%); padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden; }
+    .cs-strip::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 80% at 80% 50%, rgba(242,164,187,0.08), transparent); }
+    .cs-inner { position: relative; z-index: 1; }
+    .cs-strip h2 { font-family: 'PT Serif', serif; font-size: clamp(1.6rem,3.5vw,2.5rem); color: var(--cream); margin-bottom: 0.4rem; }
+    .cs-date { font-size: 1rem; color: var(--pink); font-style: italic; margin-bottom: 1rem; font-family: 'PT Serif', serif; }
+    .cs-strip p { color: var(--pink-soft); font-size: 0.88rem; max-width: 480px; margin: 0 auto 2.25rem; line-height: 1.8; }
+    .email-row { display: flex; gap: 0.75rem; justify-content: center; max-width: 420px; margin: 0 auto; flex-wrap: wrap; }
+    .email-row input { flex: 1; min-width: 190px; padding: 0.82rem 1.25rem; border-radius: 50px; border: 1px solid rgba(242,164,187,0.35); background: rgba(255,255,255,0.1); color: var(--cream); font-family: 'Montserrat', sans-serif; font-size: 0.83rem; outline: none; }
+    .email-row input::placeholder { color: rgba(253,246,227,0.45); }
+    .email-row input:focus { border-color: var(--pink); }
+    .signup-msg { margin-top: 0.9rem; font-size: 0.8rem; color: var(--pink); display: none; }
+    .about-snippet { max-width: 620px; margin: 0 auto; text-align: center; }
+    .about-snippet p { color: var(--text-mid); font-size: 0.9rem; line-height: 1.9; margin-bottom: 1.5rem; }
+
+    /* ===== PAGE HERO ===== */
+    .page-hero { background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 100%); padding: 3.75rem 2rem; text-align: center; }
+    .page-hero h1 { font-family: 'PT Serif', serif; font-size: clamp(1.9rem,5vw,3.2rem); color: var(--cream); margin-bottom: 0.5rem; }
+    .page-hero p { color: var(--pink-soft); font-size: 0.88rem; font-style: italic; }
+
+    /* ===== CATEGORY FILTER TABS ===== */
+    .cat-tabs { display: flex; gap: 0.65rem; justify-content: center; padding: 1.75rem 2rem; flex-wrap: wrap; background: var(--cream); border-bottom: 1px solid var(--border); }
+    .cat-tab { padding: 0.55rem 1.4rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border: 2px solid var(--border); background: #fff; color: var(--text-mid); transition: all 0.25s; }
+    .cat-tab:hover, .cat-tab.active { background: var(--maroon); color: var(--cream); border-color: var(--maroon); }
+
+    /* ===== PRODUCT GRID ===== */
+    .products-section { padding: 3rem 2rem; max-width: 1240px; margin: 0 auto; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap: 1.75rem; }
+    .product-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 18px rgba(107,15,26,0.07); border: 1px solid var(--border); transition: all 0.3s; cursor: pointer; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 14px 38px rgba(107,15,26,0.14); }
+    .product-image { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: var(--cream-dark); display: block; }
+    .product-img-placeholder { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg,var(--cream-dark),var(--pink-pale)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+    .product-info { padding: 1.25rem 1.25rem 1.4rem; }
+    .tag { display: inline-block; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 50px; margin-bottom: 0.6rem; }
+    .tag-cat     { background: var(--maroon); color: var(--cream); }
+    .tag-instock { background: var(--green);  color: #fff; }
+    .product-brand { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--green); margin-bottom: 0.28rem; }
+    .product-name { font-family: 'PT Serif', serif; font-size: 1.05rem; color: var(--text-dark); margin-bottom: 0.35rem; line-height: 1.3; }
+    .product-desc { font-size: 0.79rem; color: var(--text-light); line-height: 1.65; margin-bottom: 0.8rem; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid var(--border); margin-top: 0.4rem; }
+    .product-price { font-family: 'PT Serif', serif; font-size: 1.1rem; color: var(--maroon); font-weight: 700; }
+    .qty-badge { font-size: 0.7rem; padding: 0.22rem 0.65rem; border-radius: 50px; }
+    .qty-ok   { background: var(--green-pale); color: #2E7D32; }
+    .qty-low  { background: #FFF3E0; color: #E65100; }
+    .qty-none { background: #FFEBEE; color: #B71C1C; }
+    .product-cta { margin-top: 1rem; display: flex; gap: 0.5rem; }
+    .product-cta .btn { flex: 1; padding: 0.62rem 0.8rem; font-size: 0.7rem; }
+    /* "View Details" button on card */
+    .btn-details { background: var(--pink-pale); color: var(--maroon); border: 1.5px solid var(--pink); font-size: 0.7rem; padding: 0.55rem 0.9rem; border-radius: 50px; font-family: 'Montserrat', sans-serif; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 0.35rem; }
+    .btn-details:hover { background: var(--pink); color: var(--maroon-deep); }
+
+    .loading-state, .empty-state { text-align: center; padding: 5rem 2rem; color: var(--text-light); }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 1.5rem; border: 3px solid var(--border); border-top-color: var(--maroon); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-family: 'PT Serif', serif; color: var(--maroon); margin-bottom: 0.5rem; }
+    .notice { margin: 1.25rem auto; padding: 0.9rem 1.35rem; border-radius: 10px; font-size: 0.8rem; max-width: 820px; }
+    .notice-demo  { background: linear-gradient(90deg,var(--green-pale),#E8F5E9); border: 1px solid var(--green-light); border-left: 4px solid var(--green); color: #2E7D32; }
+    .notice-setup { background: var(--cream); border: 1px solid var(--gold); border-left: 4px solid var(--gold); color: var(--text-mid); }
+    .notice-setup strong { color: var(--maroon); }
+    .notice-setup code { background: rgba(107,15,26,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+    /* =====================================================
+       PRODUCT DETAIL PAGE
+       ===================================================== */
+    .detail-back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--cream); font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; padding: 0.5rem 0; opacity: 0.85; transition: opacity 0.2s;
+    }
+    .detail-back:hover { opacity: 1; }
+    .detail-page-hero {
+      background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 100%);
+      padding: 1.5rem 2rem 2rem;
+    }
+    .detail-body { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+    .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: start; }
+    @media (max-width: 780px) { .detail-layout { grid-template-columns: 1fr; gap: 2rem; } }
+
+    /* Image panel */
+    .detail-image { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; background: var(--cream-dark); }
+    .detail-img-placeholder { width: 100%; aspect-ratio: 3/4; background: linear-gradient(135deg,var(--cream-dark),var(--pink-pale)); display: flex; align-items: center; justify-content: center; font-size: 6rem; }
+
+    /* Info panel */
+    .detail-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .detail-brand { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 0.4rem; }
+    .detail-name { font-family: 'PT Serif', serif; font-size: clamp(1.6rem,3vw,2.2rem); color: var(--text-dark); line-height: 1.15; margin-bottom: 0.5rem; }
+    .detail-price { font-family: 'PT Serif', serif; font-size: 1.75rem; color: var(--maroon); font-weight: 700; margin-bottom: 0.75rem; }
+    .detail-qty { font-size: 0.8rem; margin-bottom: 1.5rem; }
+    .detail-desc { font-size: 0.9rem; color: var(--text-mid); line-height: 1.85; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+
+    /* Colours */
+    .detail-section-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-mid); margin-bottom: 0.85rem; }
+    .colour-swatches { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .colour-pill {
+      padding: 0.42rem 1.1rem; border-radius: 50px;
+      border: 2px solid var(--border); background: #fff;
+      font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 600;
+      color: var(--text-mid); cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .colour-pill:hover { border-color: var(--maroon); color: var(--maroon); }
+    .colour-pill.selected { background: var(--maroon); border-color: var(--maroon); color: var(--cream); }
+
+    /* Sizes */
+    .size-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .size-btn {
+      min-width: 44px; height: 44px; border-radius: 10px;
+      border: 2px solid var(--border); background: #fff;
+      font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-mid); cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; padding: 0 0.5rem;
+    }
+    .size-btn:hover { border-color: var(--maroon); color: var(--maroon); }
+    .size-btn.selected { background: var(--maroon); border-color: var(--maroon); color: var(--cream); }
+
+    /* Size chart accordion */
+    .size-chart-toggle {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--maroon); cursor: pointer;
+      border: none; background: none; padding: 0; margin-bottom: 1.5rem;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .size-chart-table { display: none; margin-bottom: 1.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .size-chart-table.open { display: block; }
+    .size-chart-table table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .size-chart-table th { background: var(--maroon); color: var(--cream); padding: 0.6rem 1rem; font-weight: 600; letter-spacing: 0.08em; text-align: center; }
+    .size-chart-table td { padding: 0.55rem 1rem; text-align: center; color: var(--text-mid); border-top: 1px solid var(--border); }
+    .size-chart-table tr:nth-child(even) td { background: var(--cream); }
+    .size-chart-img { width: 100%; border-radius: 8px; margin-top: 0.5rem; display: block; }
+    .size-chart-note { font-size: 0.78rem; color: var(--text-light); font-style: italic; margin-bottom: 1.5rem; }
+
+    /* Thumbnail photo strip */
+    .detail-image-wrap { border-radius: 20px; overflow: hidden; box-shadow: 0 8px 32px rgba(107,15,26,0.12); position: sticky; top: 84px; }
+    .detail-thumbs { display: flex; gap: 0.5rem; padding: 0.75rem; flex-wrap: wrap; background: var(--cream-dark); border-top: 1px solid var(--border); }
+    .detail-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2.5px solid transparent; transition: border-color 0.2s; flex-shrink: 0; }
+    .detail-thumb:hover { border-color: var(--pink); }
+    .detail-thumb.active { border-color: var(--maroon); }
+
+    /* Brand filter row */
+    .brand-tabs { display: flex; gap: 0.65rem; justify-content: center; padding: 0.75rem 2rem 1.25rem; flex-wrap: wrap; background: var(--cream); border-bottom: 1px solid var(--border); }
+    .brand-tab { padding: 0.45rem 1.2rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; cursor: pointer; border: 2px solid var(--border); background: #fff; color: var(--text-mid); transition: all 0.25s; }
+    .brand-tab:hover, .brand-tab.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+    /* About info cards */
+    .info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1.5rem; text-align: left; }
+    .info-card { border-radius: 16px; padding: 1.75rem; }
+    .info-card-payment { background: var(--pink-pale); border: 1px solid var(--pink-soft); }
+    .info-card-collection { background: var(--green-pale); border: 1px solid var(--green-light); }
+    .info-card .ic-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+    .info-card .ic-icon { font-size: 1.6rem; }
+    .info-card .ic-head h3 { font-family: 'PT Serif', serif; font-size: 1.1rem; color: var(--maroon); }
+    .info-card-collection .ic-head h3 { color: var(--green); }
+    .info-card p { font-size: 0.84rem; color: var(--text-mid); line-height: 1.75; margin-bottom: 0.5rem; }
+    .info-card strong { font-weight: 600; }
+    @media (max-width: 580px) { .info-cards { grid-template-columns: 1fr; } }
+
+    /* Detail CTA */
+    .detail-cta { margin-top: 2rem; }
+    .detail-cta .cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .detail-cta .btn { flex: 1; min-width: 140px; }
+    .detail-cta-note { margin-top: 0.85rem; font-size: 0.75rem; color: var(--text-light); font-style: italic; }
+
+    /* ===== BRIDAL ===== */
+    .bridal-hero { background: linear-gradient(150deg,var(--pink-pale) 0%,var(--cream) 100%); padding: 4.5rem 2rem; text-align: center; border-bottom: 1px solid var(--pink-soft); }
+    .bridal-hero h1 { font-family: 'PT Serif', serif; font-size: clamp(2rem,5vw,3.6rem); color: var(--maroon); margin-bottom: 0.6rem; }
+    .bridal-hero .sub { font-style: italic; color: var(--text-light); font-size: 0.95rem; margin-bottom: 1.25rem; font-family: 'PT Serif', serif; }
+    .price-pill { display: inline-block; background: var(--maroon); color: var(--cream); font-family: 'PT Serif', serif; font-size: 1.2rem; padding: 0.7rem 2rem; border-radius: 50px; margin-top: 0.5rem; }
+    .bridal-body { max-width: 920px; margin: 0 auto; padding: 4.5rem 2rem; }
+    .bridal-quote { font-family: 'PT Serif', serif; font-style: italic; font-size: 1.05rem; color: var(--text-mid); max-width: 620px; margin: 0 auto 4rem; line-height: 1.85; border-left: 3px solid var(--pink); padding-left: 1.5rem; text-align: left; }
+    .bridal-section-title { font-family: 'PT Serif', serif; font-size: 1.7rem; color: var(--maroon); text-align: center; margin-bottom: 2rem; }
+    .includes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 1.4rem; margin-bottom: 4rem; }
+    .include-card { background: #fff; border-radius: 14px; padding: 1.7rem 1.4rem; text-align: center; box-shadow: 0 4px 16px rgba(107,15,26,0.06); border: 1px solid var(--pink-soft); transition: transform 0.25s; }
+    .include-card:hover { transform: translateY(-3px); }
+    .include-card .ic-icon { font-size: 1.9rem; margin-bottom: 0.7rem; }
+    .include-card h4 { font-family: 'PT Serif', serif; font-size: 0.98rem; color: var(--maroon); margin-bottom: 0.45rem; }
+    .include-card p { font-size: 0.8rem; color: var(--text-light); line-height: 1.65; }
+    .how-box { background: var(--cream); border-radius: 18px; padding: 3rem 2rem; margin-bottom: 3.5rem; }
+    .steps { display: flex; flex-direction: column; gap: 1.5rem; max-width: 540px; margin: 0 auto; }
+    .step { display: flex; align-items: flex-start; gap: 1.1rem; }
+    .step-num { width: 40px; height: 40px; min-width: 40px; background: var(--maroon); color: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'PT Serif', serif; font-weight: 700; }
+    .step-text h4 { font-weight: 600; color: var(--text-dark); margin-bottom: 0.3rem; font-size: 0.93rem; }
+    .step-text p { font-size: 0.83rem; color: var(--text-light); line-height: 1.65; }
+    .bridal-cta-block { text-align: center; padding: 2rem 0 1rem; }
+
+    /* ===== BRIDAL CATALOGUE SAMPLE ===== */
+    .catalogue-section { background: var(--cream); border-radius: 22px; padding: 3rem 2rem; margin-bottom: 3.5rem; text-align: center; }
+    .catalogue-section h2 { font-family: 'PT Serif', serif; font-size: 1.7rem; color: var(--maroon); margin-bottom: 0.5rem; }
+    .catalogue-section .cat-sub { font-size: 0.85rem; color: var(--text-light); font-style: italic; margin-bottom: 2rem; }
+    .catalogue-frame {
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 12px 48px rgba(107,15,26,0.18);
+      border: 3px solid var(--pink-soft);
+      position: relative; cursor: zoom-in;
+      max-width: 820px; margin: 0 auto;
+    }
+    .catalogue-frame img { width: 100%; display: block; }
+    .catalogue-placeholder {
+      background: linear-gradient(135deg, var(--pink-pale) 0%, var(--cream-dark) 100%);
+      padding: 5rem 2rem; display: flex; flex-direction: column;
+      align-items: center; gap: 1rem;
+    }
+    .catalogue-placeholder .ph-icon { font-size: 4rem; }
+    .catalogue-placeholder p { font-size: 0.85rem; color: var(--text-light); max-width: 340px; line-height: 1.7; }
+    .catalogue-badge-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.75rem; }
+    .cat-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: #fff; border: 1px solid var(--pink-soft); border-radius: 50px; padding: 0.45rem 1.1rem; font-size: 0.75rem; font-weight: 600; color: var(--maroon); letter-spacing: 0.06em; box-shadow: 0 2px 8px rgba(107,15,26,0.06); }
+    .bridal-cta-block h2 { font-family: 'PT Serif', serif; font-size: 1.7rem; color: var(--maroon); margin-bottom: 0.6rem; }
+    .cta-row { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+    /* ===== SHOP ===== */
+    .shop-full { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4rem 2rem; background: linear-gradient(150deg,var(--cream) 0%,var(--pink-pale) 100%); }
+    .shop-inner { max-width: 580px; }
+    .shop-inner .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--green); margin-bottom: 1rem; }
+    .shop-inner h1 { font-family: 'PT Serif', serif; font-size: clamp(2.5rem,6vw,4.2rem); color: var(--maroon); line-height: 1.1; margin-bottom: 1rem; }
+    .launch-pill { display: inline-block; background: var(--maroon); color: var(--cream); font-family: 'PT Serif', serif; font-size: 1rem; padding: 0.55rem 1.75rem; border-radius: 50px; margin: 0.75rem 0 1.5rem; }
+    .shop-inner p { color: var(--text-mid); font-size: 0.9rem; line-height: 1.85; margin-bottom: 1rem; }
+    .shop-inner .shop-quote { font-family: 'PT Serif', serif; font-style: italic; color: var(--maroon); font-size: 1rem; margin-bottom: 2.5rem; }
+    .shop-email .email-row input { border-color: rgba(107,15,26,0.28); color: var(--text-dark); }
+
+    /* ===== ABOUT ===== */
+    .about-body { max-width: 760px; margin: 0 auto; padding: 5rem 2rem; text-align: center; }
+    .about-body h2 { font-family: 'PT Serif', serif; font-size: 2rem; color: var(--maroon); margin-bottom: 1.5rem; }
+    .about-body p { color: var(--text-mid); font-size: 0.9rem; line-height: 1.9; margin-bottom: 1.25rem; }
+    .values-row { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin: 2.5rem 0 3rem; }
+    .val { text-align: center; }
+    .val .v-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+    .val span { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-mid); }
+    .contact-card { background: var(--pink-pale); border: 1px solid var(--pink-soft); border-radius: 18px; padding: 2.25rem; }
+    .contact-card h3 { font-family: 'PT Serif', serif; color: var(--maroon); font-size: 1.25rem; margin-bottom: 0.75rem; }
+    .contact-card p { font-size: 0.86rem; color: var(--text-mid); margin-bottom: 1.5rem; line-height: 1.75; }
+
+    /* ===== REVIEWS ===== */
+    .reviews-section { padding: 4rem 2rem; max-width: 1240px; margin: 0 auto; }
+    .sourced-section { padding: 4rem 2rem; background: var(--cream); border-top: 1px solid var(--border); }
+    .sourced-inner { max-width: 1240px; margin: 0 auto; }
+    .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .review-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 18px rgba(107,15,26,0.07); border: 1px solid var(--border); transition: transform 0.3s; cursor: zoom-in; }
+    .review-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(107,15,26,0.13); }
+    .review-card img { width: 100%; display: block; }
+    .review-caption { padding: 0.85rem 1rem; font-size: 0.8rem; color: var(--text-light); font-style: italic; border-top: 1px solid var(--border); }
+    .sourced-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+    .sourced-item { border-radius: 16px; overflow: hidden; box-shadow: 0 4px 14px rgba(107,15,26,0.07); border: 1px solid var(--border); background: #fff; transition: transform 0.3s; cursor: zoom-in; }
+    .sourced-item:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(107,15,26,0.13); }
+    .sourced-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+    .sourced-caption { padding: 0.75rem 1rem; font-size: 0.78rem; color: var(--text-mid); font-style: italic; border-top: 1px solid var(--border); }
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(20,5,8,0.92); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; }
+    .lightbox.open { display: flex; }
+    .lightbox-img { max-width: 90vw; max-height: 90vh; border-radius: 12px; object-fit: contain; }
+    .lightbox-close { position: absolute; top: 1.25rem; right: 1.5rem; background: none; border: none; color: var(--cream); font-size: 2rem; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+    .lightbox-close:hover { opacity: 1; }
+
+    /* ===== FOOTER ===== */
+    footer { background: var(--maroon-deep); color: var(--pink-soft); padding: 3.5rem 2rem 2rem; text-align: center; }
+    .footer-logo { display: flex; justify-content: center; margin-bottom: 1rem; }
+    .footer-brand { font-family: 'PT Serif', serif; font-size: 1.5rem; color: var(--cream); margin-bottom: 0.4rem; }
+    .footer-slogan { font-style: italic; font-size: 0.82rem; color: var(--pink); margin-bottom: 2rem; font-family: 'PT Serif', serif; }
+    .footer-socials { display: flex; gap: 0.85rem; justify-content: center; margin-bottom: 2rem; }
+    .footer-nav { display: flex; gap: 1.25rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+    .footer-nav a { color: var(--pink-soft); text-decoration: none; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.25s; }
+    .footer-nav a:hover { color: var(--cream); }
+    .footer-hr { border: none; border-top: 1px solid rgba(242,164,187,0.18); margin: 1.5rem 0; }
+    .footer-copy { font-size: 0.72rem; color: rgba(250,212,222,0.45); }
+
+    #scrollTop { position: fixed; bottom: 2rem; right: 2rem; background: var(--maroon); color: var(--cream); border: none; border-radius: 50%; width: 44px; height: 44px; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 14px rgba(107,15,26,0.35); opacity: 0; transition: opacity 0.3s; z-index: 500; }
+    #scrollTop.vis { opacity: 1; }
+    #scrollTop:hover { background: var(--maroon-light); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 820px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .nav-links.open { display: flex; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; background: var(--maroon-deep); padding: 1.5rem; gap: 0.25rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 998; }
+      .nav-links.open a { font-size: 0.88rem; padding: 0.65rem 0.85rem; }
+      .hamburger { display: flex; }
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .products-grid { grid-template-columns: repeat(auto-fill,minmax(155px,1fr)); gap: 1rem; }
+      .section { padding: 3.5rem 1.25rem; }
+      .bridal-body, .about-body { padding: 3rem 1.25rem; }
+      .detail-body { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =====================================================
+     NAVIGATION
+     ===================================================== -->
+<nav>
+  <span class="nav-brand" onclick="showPage('home')">
+    <!-- AP Logo SVG -->
+    <svg width="32" height="40" viewBox="0 0 100 122" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="61" rx="47" ry="57" fill="#F5BDB5" stroke="#7A3040" stroke-width="6"/>
+      <path d="M7 64 C 22 56, 38 72, 50 64 C 62 56, 78 72, 93 64" fill="none" stroke="#7A3040" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="50" y="54" text-anchor="middle" font-family="Georgia,serif" font-size="38" font-style="italic" fill="#7A3040">A</text>
+      <path d="M50 10 C 48 14, 53 18, 50 22" fill="none" stroke="#7A3040" stroke-width="2" stroke-linecap="round"/>
+      <text x="50" y="100" text-anchor="middle" font-family="Georgia,serif" font-size="36" fill="#7A3040">P</text>
+    </svg>
+    <span class="nav-brand-text">Anggun Pesona</span>
+  </span>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="nav('home')">Home</a></li>
+    <li><a href="#" onclick="nav('preorders')">Pre-Orders</a></li>
+    <li><a href="#" onclick="nav('instocks')">In-Stocks</a></li>
+    <li><a href="#" onclick="nav('bridal')">Bridal Concierge</a></li>
+    <li><a href="#" onclick="nav('reviews')">Reviews</a></li>
+    <li><a href="#" onclick="nav('shop')" class="soon-link">Shop ✦ Soon</a></li>
+    <li><a href="#" onclick="nav('about')">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+
+<!-- =====================================================
+     HOME PAGE
+     ===================================================== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">✦ Pre-Order OPEN ✦</div>
+      <h1>Anggun <em>Pesona</em></h1>
+      <p class="hero-slogan">"Elevating your basics, for your inner chics"</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn btn-primary" onclick="nav('preorders')">🛍️ Shop Pre-Orders</a>
+        <a href="#" class="btn btn-outline" onclick="nav('instocks')">⚡ In-Stock Now</a>
+        <a href="#" class="btn btn-outline" onclick="nav('bridal')">💍 Bridal Concierge</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--off-white);">
+    <div style="text-align:center;"><span class="section-label">What We Offer</span></div>
+    <h2 class="section-title">Curated for Your Every Step</h2>
+    <p class="section-sub">Chic footwear thoughtfully sourced — because shoes are never just an afterthought</p>
+    <div class="offerings-grid">
+      <div class="offering-card c-pre" onclick="nav('preorders')">
+        <div class="offering-icon">🛍️</div>
+        <h3>Pre-Order</h3>
+        <p>Browse our curated finds. Let us know which pair and size, we will check it's availability for you with the ETA!</p>
+        <a href="#" class="btn btn-maroon" onclick="nav('preorders')">View Curation</a>
+      </div>
+      <div class="offering-card c-in" onclick="nav('instocks')">
+        <div class="offering-icon">⚡</div>
+        <h3>Limited In-Stocks</h3>
+        <p>Ready for you! Limited pieces, no restock. If you see it — get it. Once it's gone, it's gone.</p>
+        <a href="#" class="btn btn-green" onclick="nav('instocks')">Shop Now</a>
+      </div>
+      <div class="offering-card c-br" onclick="nav('bridal')">
+        <div class="offering-icon">💍</div>
+        <h3>Bridal Concierge</h3>
+        <p>Your perfect bridal shoe, personally sourced just for you. A dedicated consultation experience from just B$15.</p>
+        <a href="#" class="btn btn-primary" onclick="nav('bridal')">Book Consultation</a>
+      </div>
+      <div class="offering-card c-sh" onclick="nav('shop')">
+        <div class="offering-icon">✨</div>
+        <h3>Our Own Collection</h3>
+        <p>Something beautiful is being crafted — our very own Anggun Pesona label, made with intention. Arriving August 2026.</p>
+        <span style="display:inline-block;background:var(--cream-dark);color:var(--gold);font-size:0.7rem;font-weight:700;letter-spacing:0.12em;padding:0.4rem 1.1rem;border-radius:50px;border:1.5px solid var(--gold);">COMING August 2026</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-strip">
+    <div class="cs-inner">
+      <h2>Our Own Label is Coming ✨</h2>
+      <p class="cs-date">August 2026</p>
+      <p>Be the first to know when the Anggun Pesona original collection drops. Designed for the chic, the bold, and the beautifully elevated.</p>
+      <div class="email-row">
+        <input type="email" id="notifyEmail" placeholder="Your email address" />
+        <button class="btn btn-primary" onclick="handleNotify()">Notify Me</button>
+      </div>
+      <p class="signup-msg" id="notifyMsg"></p>
+    </div>
+  </section>
+
+  <section class="section" style="background: var(--cream); border-top: 1px solid var(--border);">
+    <div class="about-snippet">
+      <h2 class="section-title">About Anggun Pesona</h2>
+      <p>Anggun Pesona — <em>graceful allure</em> — is a Brunei-based curated footwear brand built for women who believe shoes are never just an afterthought. We hand-select chic, versatile pieces that seamlessly elevate and honour your everyday.</p>
+      <a href="#" class="btn btn-maroon" onclick="nav('about')">Our Story</a>
+    </div>
+  </section>
+</div>
+
+
+<!-- =====================================================
+     PRE-ORDERS PAGE
+     ===================================================== -->
+<div class="page" id="page-preorders">
+  <div class="page-hero">
+    <h1>Pre-Order</h1>
+    <p>Shop by category — Send us a text, we will assist you</p>
+  </div>
+  <div id="po-setup-notice" class="notice notice-setup" style="display:none;">
+    <strong>⚙️ Setup:</strong> Update <code>PREORDER_SHEET_ID</code> in CONFIG. Add <strong>Category</strong>, <strong>Colors</strong>, and <strong>Sizes</strong> columns to your sheet, then set <code>DEMO_MODE: false</code>.
+  </div>
+  <div id="po-demo-notice" class="notice notice-demo">
+    ✅ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
+  </div>
+  <div class="cat-tabs" id="catTabs"></div>
+  <div class="brand-tabs" id="brandTabsPO" style="display:none;"></div>
+  <div class="products-section">
+    <div id="po-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>
+    <div id="po-grid" class="products-grid"></div>
+    <div id="po-empty" class="empty-state" style="display:none;"><div class="empty-icon">🛍️</div><h3>Nothing in this category yet</h3><p>Check back soon!</p></div>
+  </div>
+</div>
+
+
+<!-- =====================================================
+     PRODUCT DETAIL PAGE
+     Populated dynamically when a product card is clicked
+     ===================================================== -->
+<div class="page" id="page-detail">
+  <div class="detail-page-hero">
+    <span class="detail-back" onclick="nav(prevPage)">← Back</span>
+  </div>
+  <div class="detail-body">
+    <div class="detail-layout">
+      <!-- Image -->
+      <div class="detail-image-wrap" id="detail-image-panel"></div>
+      <!-- Info -->
+      <div id="detail-info-panel"></div>
+    </div>
+  </div>
+  <div style="background:var(--cream);border-top:1px solid var(--border);padding:2.5rem 2rem 3rem;">
+    <div class="info-cards" style="max-width:1100px;margin:0 auto;">
+      <div class="info-card info-card-payment">
+        <div class="ic-head"><div class="ic-icon">💳</div><h3>Payment</h3></div>
+        <p><strong>Method:</strong> BIBD Transfer</p>
+        <p><strong>Fullpayment / Minimum. 50% deposit</p>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:0.5rem;">Payment is required to confirm your order. Please send proof of payment via WhatsApp after transferring.</p>
+      </div>
+      <div class="info-card info-card-collection">
+        <div class="ic-head"><div class="ic-icon">📦</div><h3>Collection</h3></div>
+        <p><strong>Pick-Up:</strong> Lambak Kanan / Sg Liang area <span style="color:var(--green);font-weight:600;">(Free)</span></p>
+        <p><strong>Delivery:</strong> Available with charges — contact us for rates.</p>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:0.5rem;">Collection arrangements will be confirmed via WhatsApp.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =====================================================
+     IN-STOCKS PAGE
+     ===================================================== -->
+<div class="page" id="page-instocks">
+  <div class="page-hero" style="background: linear-gradient(135deg,#2A5244,var(--green));">
+    <h1>Limited In-Stocks</h1>
+    <p>Ready for you! — limited pieces, no restock.</p>
+  </div>
+  <div id="is-demo-notice" class="notice notice-demo">
+    ✅ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
+  </div>
+  <div class="products-section">
+    <div id="is-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>
+    <div id="is-cat-tabs" class="cat-tabs" style="display:none;"></div>
+    <div id="is-brand-tabs" class="brand-tabs" style="display:none;"></div>
+    <div id="is-grid" class="products-grid"></div>
+    <div id="is-empty" class="empty-state" style="display:none;"><div class="empty-icon">⚡</div><h3>All sold out!</h3><p>New pieces dropping soon — follow us on Instagram.</p></div>
+  </div>
+</div>
+
+
+<!-- =====================================================
+     BRIDAL CONCIERGE PAGE
+     ===================================================== -->
+<div class="page" id="page-bridal">
+  <div class="bridal-hero">
+    <div class="hero-badge" style="background:rgba(107,15,26,0.08);color:var(--maroon);border-color:rgba(107,15,26,0.2);margin-bottom:1.25rem;">✦ For Your Most Important Walk ✦</div>
+    <h1>Bridal Concierge</h1>
+    <p class="sub">Your dream bridal shoe, personally sourced just for you</p>
+    <div class="price-pill">Consultation starts from B$15</div>
+  </div>
+  <div class="bridal-body">
+    <blockquote class="bridal-quote">"Every bride deserves a magical wedding from the dress, veil, make-up, hijab styling and down to the perfect pair of heels that feels just right. Let us handle every detail — so you can walk in with complete confidence, and absolutely perfect shoes."</blockquote>
+    <h2 class="bridal-section-title">What's Included in the Concierge Package</h2>
+    <div class="includes-grid">
+      <div class="include-card"><div class="ic-icon">👠</div><h4>Personal Sourcing</h4><p>We search and shortlist bridal shoes tailored exactly to your style, dress, and budget.</p></div>
+      <div class="include-card"><div class="ic-icon">💬</div><h4>1-on-1 Consultation</h4><p>A dedicated session to understand your vision — theme, dress silhouette, comfort needs.</p></div>
+      <div class="include-card"><div class="ic-icon">📸</div><h4>Curated lookbook</h4><p>Receive up to 8-10 hand-picked selections with photos, prices, and full sourcing details. Up to 3 revised curated lookbook.</p></div>
+      <div class="include-card"><div class="ic-icon">✅</div><h4>Order Assistance</h4><p>We guide you through the entire ordering process — sizing, payment, and delivery.</p></div>
+      <div class="include-card"><div class="ic-icon">⏰</div><h4>Timeline Planning</h4><p>We factor in your wedding date to ensure your shoes arrive comfortably on time.</p></div>
+      <div class="include-card"><div class="ic-icon">💖</div><h4>Post-Order Support</h4><p>We follow up until your shoes are safely in your hands, ready for the big day.</p></div>
+    </div>
+    <div class="how-box">
+      <h2 class="bridal-section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Book Your Consultation</h4><p>Reach out via WhatsApp or Instagram and pay the B$10 fee to secure your slot.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Share Your Vision</h4><p>Tell us your wedding theme, dress style, preferred colours, heel height, and budget.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Receive Your lookbook</h4><p>Within 3–5 business days, receive a personalised curated lookbook of options.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Choose &amp; Order</h4><p>Pick your favourite — we handle ordering, sizing confirmation, and delivery tracking.</p></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text"><h4>Walk the Aisle with Confidence ✨</h4><p>Your perfect bridal shoes arrive, ready for the most important walk of your life.</p></div></div>
+      </div>
+    </div>
+    <!-- SAMPLE CATALOGUE SECTION -->
+    <div class="catalogue-section">
+      <h2>A Peek Inside Your Catalogue ✨</h2>
+      <p class="cat-sub">Each bride receives a beautifully curated lookbook — organised by price tier, with full sourcing details for every pair</p>
+
+      <div class="catalogue-frame" onclick="toggleCatalogueZoom(this)">
+        <!-- ✏️ TO UPDATE: Upload your catalogue image to Google Drive, right-click → Share → Copy link,
+             then replace the src below with your Google Drive image URL.
+             Example: src="https://lh3.googleusercontent.com/d/YOUR_FILE_ID" -->
+        <div class="catalogue-placeholder" id="catalogue-img-wrap">
+          <div class="ph-icon">📖</div>
+          <img src="https://lh3.googleusercontent.com/d/1x5PPIXw3hz4kxnbErRnrlNthQ1V0QIH4" alt="Bridal Catalogue Sample" style="width:100%;display:block;">
+          <a id="bridal-wa-catalogue" href="#" target="_blank" class="btn btn-maroon" style="font-size:0.75rem;padding:0.6rem 1.5rem;">💬 Request a Sample Catalogue</a>
+        </div>
+      </div>
+
+      <div class="catalogue-badge-row">
+        <span class="cat-badge">🌙 Moonstone Tier · Under B$40</span>
+        <span class="cat-badge">🤍 Pearl Tier · B$41–B$80</span>
+        <span class="cat-badge">💎 Sapphire Tier · B$81–B$120</span>
+        <span class="cat-badge">✨ Diamond Tier · B$120+</span>
+      </div>
+    </div><!-- close catalogue-section -->
+
+    <div class="bridal-cta-block">
+      <h2>Ready to Find Your Perfect Bridal Shoes?</h2>
+      <p style="color:var(--text-light);font-size:0.88rem;margin-top:0.5rem;">Book your consultation today — slots are limited each month.</p>
+      <div class="cta-row">
+        <a id="bridal-wa" href="#" target="_blank" class="btn btn-whatsapp">💬 Book via WhatsApp</a>
+        <a id="bridal-ig" href="#" target="_blank" class="btn btn-instagram">📷 Book via Instagram</a>
+      </div>
+      <p style="margin-top:1.25rem;font-size:0.8rem;color:var(--text-light);font-style:italic;">Consultation fee: B$15 &nbsp;·&nbsp; Limited slots per month</p>
+    </div>
+  </div><!-- close bridal-body -->
+</div><!-- close page-bridal -->
+
+
+<!-- =====================================================
+     SHOP / COMING SOON PAGE
+     ===================================================== -->
+<div class="page" id="page-shop">
+  <div class="shop-full">
+    <div class="shop-inner">
+      <p class="eyebrow">Anggun Pesona Original Label</p>
+      <h1>Our Own<br>Collection</h1>
+      <div class="launch-pill">Launching August 2026</div>
+      <p>Something beautiful is being crafted in-house. Our very own Anggun Pesona label — designed with intention, made for women who carry themselves with quiet elegance.</p>
+      <p class="shop-quote">"Shoes made for her. Designed to elevate."</p>
+      <div class="shop-email">
+        <div class="email-row" style="justify-content:center;">
+          <input type="email" id="shopEmail" placeholder="Get notified at launch" />
+          <button class="btn btn-maroon" onclick="handleShopNotify()">Notify Me</button>
+        </div>
+        <p class="signup-msg" id="shopMsg" style="margin-top:0.9rem;color:var(--maroon);"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =====================================================
+     ABOUT PAGE
+     ===================================================== -->
+<div class="page" id="page-about">
+  <div class="page-hero">
+    <h1>About Anggun Pesona</h1>
+    <p>Our story, our values, our obsession with beautiful shoes</p>
+  </div>
+  <div class="about-body">
+    <h2>Born from a Love for Shoes</h2>
+    <p>Anggun Pesona — <em>graceful allure</em> in Malay — was born from a simple belief: the right pair of shoes can transform how you carry yourself. We're a Brunei-based curated footwear brand passionate about sourcing chic, versatile pieces that elevate your everyday and honour your most special moments.</p>
+    <p>Whether you're building a capsule shoe wardrobe, hunting for the perfect bridal pair, or simply treating yourself to something gorgeous — we curate with intention. Every piece is hand-selected for its quality, wearability, and that unmistakable something-special.</p>
+    <p>We operate on a monthly batch pre-order model, giving you access to carefully sourced styles before they sell out. Our limited in-stocks offer immediate pieces for those spontaneous moments when you simply need those shoes right now.</p>
+    <div class="values-row">
+      <div class="val"><div class="v-icon">👠</div><span>Chic</span></div>
+      <div class="val"><div class="v-icon">🔄</div><span>Versatile</span></div>
+      <div class="val"><div class="v-icon">⬆️</div><span>Elevated</span></div>
+      <div class="val"><div class="v-icon">💎</div><span>Quality</span></div>
+      <div class="val"><div class="v-icon">❤️</div><span>Personal</span></div>
+    </div>
+    <div class="contact-card">
+      <h3>Get In Touch</h3>
+      <p>Have a question, a specific style you're after, or just want to chat shoes? We'd love to hear from you.</p>
+      <div class="cta-row">
+        <a id="about-wa" href="#" target="_blank" class="btn btn-whatsapp">💬 WhatsApp Us</a>
+        <a id="about-ig" href="#" target="_blank" class="btn btn-instagram">📷 Instagram</a>
+      </div>
+    </div>
+
+    <div class="info-cards">
+      <div class="info-card info-card-payment">
+        <div class="ic-head"><div class="ic-icon">💳</div><h3>Payment</h3></div>
+        <p><strong>Method:</strong> BIBD Transfer</p>
+        <p><strong>Account Name:</strong> [Your Name]</p>
+        <p><strong>Account Number:</strong> [Your BIBD Account No.]</p>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:0.5rem;">Payment is required to confirm your order. Please send proof of payment via WhatsApp after transferring.</p>
+      </div>
+      <div class="info-card info-card-collection">
+        <div class="ic-head"><div class="ic-icon">📦</div><h3>Collection</h3></div>
+        <p><strong>Pick-Up:</strong> Lambak Kanan / Sg Liang area <span style="color:var(--green);font-weight:600;">(Free)</span></p>
+        <p><strong>Delivery:</strong> Available with charges — contact us for rates.</p>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:0.5rem;">Collection arrangements will be confirmed via WhatsApp once payment is received.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =====================================================
+     REVIEWS PAGE
+     ===================================================== -->
+<div class="page" id="page-reviews">
+  <div class="page-hero">
+    <h1>Reviews &amp; Finds</h1>
+    <p>Hear from our Angguns — and a peek at what we've sourced</p>
+  </div>
+
+  <!-- Customer Reviews -->
+  <div class="reviews-section">
+    <div style="text-align:center"><span class="section-label">Happy Customers</span></div>
+    <h2 class="section-title">What Our Angguns Say</h2>
+    <p class="section-sub">Real reviews, real love — shared by our customers</p>
+    <div class="reviews-grid" id="reviews-grid"></div>
+    <div id="reviews-empty" class="empty-state" style="display:none">
+      <div class="empty-icon">💬</div>
+      <h3>Reviews coming soon</h3>
+      <p>Add screenshot URLs to <code style="font-size:0.78rem;background:var(--cream-dark);padding:0.1rem 0.4rem;border-radius:4px;">REVIEW_SCREENSHOTS</code> in the config.</p>
+    </div>
+  </div>
+
+  <!-- Sourced Finds -->
+  <div class="sourced-section">
+    <div class="sourced-inner">
+      <div style="text-align:center"><span class="section-label">Past Sourced Finds</span></div>
+      <h2 class="section-title">Successfully Sourced</h2>
+      <p class="section-sub">A glimpse of what we've found for our customers</p>
+      <div class="sourced-grid" id="sourced-grid"></div>
+      <div id="sourced-empty" class="empty-state" style="display:none">
+        <div class="empty-icon">👠</div>
+        <h3>Photos coming soon</h3>
+        <p>Add photo URLs to <code style="font-size:0.78rem;background:var(--cream-dark);padding:0.1rem 0.4rem;border-radius:4px;">SOURCED_PHOTOS</code> in the config.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox overlay -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt="">
+</div>
+
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-logo">
+    <svg width="48" height="58" viewBox="0 0 100 122" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="61" rx="47" ry="57" fill="#F5BDB5" stroke="#7A3040" stroke-width="6"/>
+      <path d="M7 64 C 22 56, 38 72, 50 64 C 62 56, 78 72, 93 64" fill="none" stroke="#7A3040" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="50" y="54" text-anchor="middle" font-family="Georgia,serif" font-size="38" font-style="italic" fill="#7A3040">A</text>
+      <path d="M50 10 C 48 14, 53 18, 50 22" fill="none" stroke="#7A3040" stroke-width="2" stroke-linecap="round"/>
+      <text x="50" y="100" text-anchor="middle" font-family="Georgia,serif" font-size="36" fill="#7A3040">P</text>
+    </svg>
+  </div>
+  <div class="footer-brand">Anggun Pesona</div>
+  <div class="footer-slogan">"Elevating your basics, for your inner chics"</div>
+  <div class="footer-socials">
+    <a id="footer-wa" href="#" target="_blank" class="btn btn-whatsapp" style="padding:0.6rem 1.2rem;font-size:0.75rem;">💬 WhatsApp</a>
+    <a id="footer-ig" href="#" target="_blank" class="btn btn-instagram" style="padding:0.6rem 1.2rem;font-size:0.75rem;">📷 Instagram</a>
+  </div>
+  <nav class="footer-nav">
+    <a href="#" onclick="nav('home')">Home</a>
+    <a href="#" onclick="nav('preorders')">Pre-Orders</a>
+    <a href="#" onclick="nav('instocks')">In-Stocks</a>
+    <a href="#" onclick="nav('bridal')">Bridal Concierge</a>
+    <a href="#" onclick="nav('reviews')">Reviews</a>
+    <a href="#" onclick="nav('shop')">Shop (Soon)</a>
+    <a href="#" onclick="nav('about')">About</a>
+  </nav>
+  <hr class="footer-hr">
+  <p class="footer-copy">© 2024 Anggun Pesona · All rights reserved · Full of love, for our dearest Angguns 💕</p>
+</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+/* ============================================================
+   ⚙️  CONFIG
+   ============================================================ */
+const CONFIG = {
+  PREORDER_SHEET_ID:  '1cVy0tjGz6uoh5lis0Bqe7-GZ2Zv7UU1Kygtk0mJo53I',
+  PREORDER_SHEET_GID: '0',
+  INSTOCK_SHEET_ID:   '1DCvNBnImX3Aktwdc32f9LzHhWuffcYTSLhj9d05XFT0',
+  INSTOCK_SHEET_GID:  '0',
+
+  WHATSAPP: '6737471323',
+  WA_MSG_PREORDER: 'Hi Anggun Pesona! I\'d like to pre-order 🛍️',
+  WA_MSG_INSTOCK:  'Hi Anggun Pesona! I\'d like to order an in-stock item ⚡',
+  WA_MSG_BRIDAL:   'Hi Anggun Pesona! I\'d like to book a Bridal Concierge consultation 💍',
+  WA_MSG_GENERAL:  'Hi Anggun Pesona! I have an enquiry 👋',
+  WA_MSG_NOTIFY:   'Hi! I\'d like to be notified when your own collection launches 🎉',
+
+  INSTAGRAM: 'anggunpesona.co',
+  CURRENCY:  'B$',
+  DEMO_MODE: false,
+};
+
+/* ============================================================
+   COLOUR SWATCH MAP
+   Add more colour names and their hex codes here.
+   Names must match exactly what you type in the sheet.
+   ============================================================ */
+const COLOUR_MAP = {
+  'Black':     '#1C1C1C',
+  'White':     '#FFFFFF',
+  'Ivory':     '#FFFFF0',
+  'Cream':     '#FDF6E3',
+  'Nude':      '#D2A679',
+  'Beige':     '#C8A882',
+  'Tan':       '#B8894A',
+  'Brown':     '#7B4B2A',
+  'Chocolate': '#5C3317',
+  'Pink':      '#F2A4BB',
+  'Blush':     '#F9C5C5',
+  'Rose':      '#D4758A',
+  'Dusty Rose':'#C08070',
+  'Red':       '#CC2222',
+  'Burgundy':  '#800020',
+  'Maroon':    '#6B0F1A',
+  'Navy':      '#1B2A4A',
+  'Blue':      '#3355AA',
+  'Green':     '#3D7A5A',
+  'Sage':      '#8FAF8A',
+  'Gold':      '#C9A96E',
+  'Silver':    '#B0B0B0',
+  'Grey':      '#888888',
+  'Camel':     '#C19A6B',
+  'Multicolor':'linear-gradient(135deg,#F2A4BB,#C9A96E,#5A8A75)',
+};
+
+/* ============================================================
+   DEMO DATA
+   Columns: category, name, brand, price, qty, photo,
+            desc, colors (comma-sep), sizes (comma-sep)
+   ============================================================ */
+const DEFAULT_CATEGORIES = ['Chic Finds', 'Flats', 'Heels', 'Sandals', 'Sneakers', 'Boots', 'Bags & Wallets', 'Leopard Series', 'Tabi', 'Bag Finds'];
+
+const DEMO_PREORDERS = [
+  { category:'Flats',      name:'Ribbed Ballet Flats',   brand:'Studio Chic', price:'89',  qty:'8',  photo:'', photos:'', sizeChart:'', desc:'Minimalist ribbed ballet flats in ivory. The perfect elevated basic.', colors:'Ivory, Black, Nude', sizes:'Ivory:35,36,37,38,39|Black:36,37,38,39,40|Nude:35,36,37,38' },
+  { category:'Heels',      name:'Block Heel Mule',       brand:'Elara Co.',   price:'149', qty:'5',  photo:'', photos:'', sizeChart:'', desc:'Structured block heel mule in nude beige. Office to dinner, effortlessly.', colors:'Nude, Black, Cream', sizes:'Nude:35,36,37,38,39|Black:36,37,38,39|Cream:35,36,37' },
+  { category:'Sandals',    name:'Woven Kitten Heel',     brand:'Maeve Label', price:'119', qty:'10', photo:'', photos:'', sizeChart:'', desc:'Delicate woven kitten heel sandal in tan. Summer-ready chic.', colors:'Tan, Black, Brown', sizes:'36, 37, 38, 39, 40' },
+  { category:'Heels',      name:'Pointed Toe Pump',      brand:'Studio Chic', price:'139', qty:'3',  photo:'', photos:'', sizeChart:'', desc:'Classic pointed-toe pump in dusty rose. A timeless wardrobe staple.', colors:'Dusty Rose, Black, Nude', sizes:'35, 36, 37, 38, 39, 40' },
+  { category:'Chic Finds', name:'Platform Loafer',       brand:'Elara Co.',   price:'159', qty:'12', photo:'', photos:'', sizeChart:'', desc:'Chunky platform loafer in chocolate brown. Bold, grounded, chic.', colors:'Chocolate, Black, Camel', sizes:'36, 37, 38, 39, 40, 41' },
+  { category:'Sandals',    name:'Strappy Sandal',        brand:'Lumière',     price:'129', qty:'7',  photo:'', photos:'', sizeChart:'', desc:'Delicate strappy sandal with gold hardware. Made for golden hour.', colors:'Nude, Gold, Black', sizes:'35, 36, 37, 38, 39, 40' },
+  { category:'Heels',      name:'Slingback Kitten Heel', brand:'Maeve Label', price:'135', qty:'0',  photo:'', photos:'', sizeChart:'', desc:'Elegant slingback in cream patent. Barely-there, completely chic.', colors:'Cream, Black', sizes:'Cream:36,37,38,39,40|Black:36,37,38,39,40' },
+];
+
+const DEMO_INSTOCKS = [
+  { category:'Heels',    name:'Asymmetric Sling Heel',     brand:'Lumière',     price:'179', photo:'', photos:'', sizeChart:'', desc:'Architectural asymmetric heel in cream suede. For the bold and beautiful.',    colors:'Cream, Black',    sizes:'Cream:36,37,38,39|Black:36,37,38,39,40' },
+  { category:'Flats',   name:'Velvet Mary Jane',          brand:'Maeve Label', price:'99',  photo:'', photos:'', sizeChart:'', desc:'Retro-inspired velvet Mary Jane in deep burgundy. Nostalgic and chic.',       colors:'Burgundy, Black', sizes:'35, 36, 37, 38, 39' },
+  { category:'Sandals', name:'Clear Strap Heeled Sandal', brand:'Studio Chic', price:'159', photo:'', photos:'', sizeChart:'', desc:'Barely-there clear strap sandal on a slim heel. Invisible, irresistible.',   colors:'Nude, Silver',    sizes:'35, 36, 37, 38, 39, 40' },
+  { category:'Sneakers',name:'Slip-On Sneaker',           brand:'AVRE',        price:'89',  photo:'', photos:'', sizeChart:'', desc:'Clean minimalist slip-on in white canvas. Casual, elevated.',                 colors:'White, Black',    sizes:'36, 37, 38, 39, 40, 41' },
+];
+
+/* ============================================================
+   REVIEWS — add your image URLs here
+   Format: { photo: 'Google Drive share URL or direct URL', caption: 'optional label' }
+   ============================================================ */
+const REVIEW_SCREENSHOTS = [
+  // { photo: 'https://drive.google.com/file/d/YOUR_FILE_ID/view', caption: '' },
+];
+
+const SOURCED_PHOTOS = [
+  // { photo: 'https://drive.google.com/file/d/YOUR_FILE_ID/view', caption: 'Bridal heels — March 2025' },
+];
+
+/* ============================================================
+   STATE & NAV
+   ============================================================ */
+let poLoaded = false, isLoaded = false;
+let poProducts = [], isProducts = [];
+let prevPage = 'preorders';
+let currentPoFilter = 'all', currentPoBrand = 'all';
+let currentIsFilter = 'all', currentIsBrand = 'all';
+
+function nav(page) { showPage(page); document.getElementById('navLinks').classList.remove('open'); }
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('onclick')?.includes("'" + page + "'"));
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (page === 'preorders' && !poLoaded) loadPreorders();
+  if (page === 'instocks'  && !isLoaded) loadInstocks();
+  if (page === 'reviews') renderReviews();
+}
+
+function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+/* ============================================================
+   SHEETS + DRIVE
+   ============================================================ */
+async function fetchSheet(id, gid) {
+  // Use gviz URL — works with "anyone with link can view" (no Publish needed)
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} — check Sheet ID and sharing settings`);
+  const csv = await res.text();
+  // Detect redirect to login page (sheet is private)
+  if (csv.toLowerCase().includes('<!doctype html>')) throw new Error('Sheet is private — share as "Anyone with the link can view"');
+  return new Promise((resolve, reject) => {
+    Papa.parse(csv, { header: true, skipEmptyLines: true, complete: r => resolve(r.data), error: e => reject(e) });
+  });
+}
+
+function driveUrl(raw) {
+  if (!raw || !raw.trim()) return '';
+  const m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? `https://lh3.googleusercontent.com/d/${m[1]}` : raw.trim();
+}
+
+function imgOrPlaceholder(url, emoji = '👠') {
+  const src = driveUrl(url);
+  if (src) return `<img class="product-image" src="${src}" alt="Product" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="product-img-placeholder" style="display:none">${emoji}</div>`;
+  return `<div class="product-img-placeholder">${emoji}</div>`;
+}
+
+function fmtPrice(p) {
+  if (!p) return '—';
+  return (String(p).startsWith('B$') || String(p).startsWith('RM')) ? p : CONFIG.CURRENCY + p;
+}
+
+/* ============================================================
+   PRE-ORDERS
+   ============================================================ */
+async function loadPreorders() {
+  poLoaded = true;
+  const $load  = document.getElementById('po-loading');
+  const $grid  = document.getElementById('po-grid');
+  const $empty = document.getElementById('po-empty');
+  const $demo  = document.getElementById('po-demo-notice');
+  const $setup = document.getElementById('po-setup-notice');
+
+  $load.style.display = 'block'; $grid.innerHTML = ''; $empty.style.display = 'none';
+
+  if (!CONFIG.PREORDER_SHEET_ID || CONFIG.DEMO_MODE) {
+    $demo.style.display = 'block';
+    $setup.style.display = CONFIG.PREORDER_SHEET_ID ? 'none' : 'block';
+    poProducts = DEMO_PREORDERS;
+  } else {
+    $demo.style.display = 'none'; $setup.style.display = 'none';
+    try {
+      const rows = await fetchSheet(CONFIG.PREORDER_SHEET_ID, CONFIG.PREORDER_SHEET_GID);
+      poProducts = rows.map(r => ({
+        category:  r['Category']    || r['category']    || 'Other',
+        name:      r['Product Name']|| r['name']        || '',
+        brand:     r['Brand']       || r['brand']       || '',
+        price:     r['Price (BND)'] || r['Price']       || r['price']       || '',
+        qty:       r['Quantity']    || r['qty']         || '',
+        photo:     r['Photo URL']   || r['photo']       || '',
+        photos:    r['Photos']      || r['photos']      || '',
+        desc:      r['Description'] || r['desc']        || '',
+        colors:    r['Colors']      || r['colors']      || '',
+        sizes:     r['Sizes']       || r['sizes']       || '',
+        sizeChart: r['Size Chart']  || r['sizeChart']   || '',
+      }));
+    } catch(e) { poProducts = DEMO_PREORDERS; $demo.style.display = 'block'; $demo.innerHTML = `⚠️ <strong>Could not load sheet:</strong> ${e.message}. Showing demo data.`; console.error('Pre-order fetch error:', e); }
+  }
+  $load.style.display = 'none';
+  currentPoFilter = 'all'; currentPoBrand = 'all';
+  renderPreorders();
+}
+
+function setPoFilter(f)  { currentPoFilter = f; renderPreorders(); }
+function setPoBrand(b)   { currentPoBrand  = b; renderPreorders(); }
+
+function renderPreorders() {
+  const filter      = currentPoFilter;
+  const brandFilter = currentPoBrand;
+  const $grid       = document.getElementById('po-grid');
+  const $empty      = document.getElementById('po-empty');
+  const $tabs       = document.getElementById('catTabs');
+  const $brandTabs  = document.getElementById('brandTabsPO');
+
+  // Category tabs
+  const sheetCats   = [...new Set(poProducts.map(p => p.category).filter(Boolean))];
+  const orderedCats = [...DEFAULT_CATEGORIES.filter(c => sheetCats.includes(c)),
+                       ...sheetCats.filter(c => !DEFAULT_CATEGORIES.includes(c))];
+  $tabs.innerHTML = ['All', ...orderedCats].map(c => {
+    const k = c === 'All' ? 'all' : c;
+    return `<button class="cat-tab ${filter===k?'active':''}" onclick="setPoFilter('${k}')">${c}</button>`;
+  }).join('');
+
+  // Brand tabs
+  const brands = [...new Set(poProducts.map(p => p.brand).filter(Boolean))].sort();
+  if (brands.length > 1) {
+    $brandTabs.style.display = 'flex';
+    $brandTabs.innerHTML = ['All', ...brands].map(b => {
+      const k = b === 'All' ? 'all' : b;
+      return `<button class="brand-tab ${brandFilter===k?'active':''}" onclick="setPoBrand('${k}')">${b}</button>`;
+    }).join('');
+  } else {
+    $brandTabs.style.display = 'none';
+  }
+
+  const list = poProducts.filter(p =>
+    (filter === 'all' || p.category === filter) &&
+    (brandFilter === 'all' || p.brand === brandFilter)
+  );
+  if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; return; }
+  $empty.style.display = 'none';
+
+  $grid.innerHTML = list.map(p => {
+    const origIndex = poProducts.indexOf(p);
+    const qty   = parseInt(p.qty) || 0;
+    const qc    = qty <= 0 ? 'qty-none' : qty <= 3 ? 'qty-low' : 'qty-ok';
+    const qt    = qty <= 0 ? 'Sold Out' : qty <= 3 ? `Only ${qty} left!` : `${qty} available`;
+    const price = fmtPrice(p.price);
+    const firstPhoto = (p.photos || p.photo || '').split(',')[0];
+    return `
+    <div class="product-card" onclick="openProduct(${origIndex}, 'preorders')">
+      ${imgOrPlaceholder(firstPhoto)}
+      <div class="product-info">
+        <div><span class="tag tag-cat">${p.category}</span></div>
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ''}
+        <div class="product-footer">
+          <span class="product-price">${price}</span>
+          <span class="qty-badge ${qc}">${qt}</span>
+        </div>
+        <div class="product-cta">
+          <button class="btn-details" onclick="event.stopPropagation();openProduct(${origIndex},'preorders')">👁 View Details</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   IN-STOCKS
+   ============================================================ */
+async function loadInstocks() {
+  isLoaded = true;
+  const $load  = document.getElementById('is-loading');
+  const $grid  = document.getElementById('is-grid');
+  const $empty = document.getElementById('is-empty');
+  const $demo  = document.getElementById('is-demo-notice');
+
+  $load.style.display = 'block'; $grid.innerHTML = ''; $empty.style.display = 'none';
+
+  if (!CONFIG.INSTOCK_SHEET_ID || CONFIG.DEMO_MODE) {
+    $demo.style.display = 'block'; isProducts = DEMO_INSTOCKS;
+  } else {
+    $demo.style.display = 'none';
+    try {
+      const rows = await fetchSheet(CONFIG.INSTOCK_SHEET_ID, CONFIG.INSTOCK_SHEET_GID);
+      isProducts = rows.map(r => ({
+        category:  r['Category']    || r['category']    || 'Other',
+        name:      r['Product Name']|| '',
+        brand:     r['Brand']       || '',
+        price:     r['Price (BND)'] || r['Price']       || '',
+        photo:     r['Photo URL']   || '',
+        photos:    r['Photos']      || '',
+        desc:      r['Description'] || '',
+        colors:    r['Colors']      || '',
+        sizes:     r['Sizes']       || '',
+        sizeChart: r['Size Chart']  || '',
+      }));
+    } catch(e) { isProducts = DEMO_INSTOCKS; $demo.style.display = 'block'; $demo.innerHTML = `⚠️ <strong>Could not load sheet:</strong> ${e.message}. Showing demo data.`; console.error('In-stock fetch error:', e); }
+  }
+  $load.style.display = 'none';
+  currentIsFilter = 'all'; currentIsBrand = 'all';
+  renderInstocks();
+}
+
+function setIsFilter(f)  { currentIsFilter = f; renderInstocks(); }
+function setIsBrand(b)   { currentIsBrand  = b; renderInstocks(); }
+
+function renderInstocks() {
+  const filter      = currentIsFilter;
+  const brandFilter = currentIsBrand;
+  const $tabs       = document.getElementById('is-cat-tabs');
+  const $brandTabs  = document.getElementById('is-brand-tabs');
+  const $grid       = document.getElementById('is-grid');
+  const $empty      = document.getElementById('is-empty');
+
+  if (!isProducts.length) {
+    $grid.innerHTML = ''; $empty.style.display = 'block';
+    $tabs.style.display = 'none'; $brandTabs.style.display = 'none';
+    return;
+  }
+  $empty.style.display = 'none';
+
+  // Category tabs
+  const cats        = [...new Set(isProducts.map(p => p.category).filter(Boolean))];
+  const orderedCats = [...DEFAULT_CATEGORIES.filter(c => cats.includes(c)),
+                       ...cats.filter(c => !DEFAULT_CATEGORIES.includes(c))];
+  if (orderedCats.length > 1) {
+    $tabs.style.display = 'flex';
+    $tabs.innerHTML = ['All', ...orderedCats].map(c => {
+      const k = c === 'All' ? 'all' : c;
+      return `<button class="cat-tab ${filter===k?'active':''}" onclick="setIsFilter('${k}')">${c}</button>`;
+    }).join('');
+  } else {
+    $tabs.style.display = 'none';
+  }
+
+  // Brand tabs
+  const brands = [...new Set(isProducts.map(p => p.brand).filter(Boolean))].sort();
+  if (brands.length > 1) {
+    $brandTabs.style.display = 'flex';
+    $brandTabs.innerHTML = ['All', ...brands].map(b => {
+      const k = b === 'All' ? 'all' : b;
+      return `<button class="brand-tab ${brandFilter===k?'active':''}" onclick="setIsBrand('${k}')">${b}</button>`;
+    }).join('');
+  } else {
+    $brandTabs.style.display = 'none';
+  }
+
+  const list = isProducts.filter(p =>
+    (filter === 'all' || p.category === filter) &&
+    (brandFilter === 'all' || p.brand === brandFilter)
+  );
+  if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; return; }
+
+  $grid.innerHTML = list.map(p => {
+    const origIndex  = isProducts.indexOf(p);
+    const firstPhoto = (p.photos || p.photo || '').split(',')[0];
+    return `
+    <div class="product-card" onclick="openProduct(${origIndex}, 'instocks')">
+      ${imgOrPlaceholder(firstPhoto, '⚡')}
+      <div class="product-info">
+        <span class="tag tag-instock">In Stock</span>
+        ${p.category ? `<span class="tag tag-cat">${p.category}</span>` : ''}
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ''}
+        <div class="product-footer">
+          <span class="product-price">${fmtPrice(p.price)}</span>
+          <span style="font-size:0.7rem;color:var(--text-light);font-style:italic;">Limited stock</span>
+        </div>
+        <div class="product-cta">
+          <button class="btn-details" onclick="event.stopPropagation();openProduct(${origIndex},'instocks')">👁 View Details</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   PRODUCT DETAIL PAGE
+   ============================================================ */
+function openProduct(index, source) {
+  const p = source === 'preorders' ? poProducts[index] : isProducts[index];
+  if (!p) return;
+  prevPage = source;
+
+  document.querySelector('.detail-back').textContent =
+    `← Back to ${source === 'preorders' ? 'Pre-Orders' : 'In-Stocks'}`;
+
+  // --- Photo gallery ---
+  const photoRaw   = (p.photos && p.photos.trim()) ? p.photos : (p.photo || '');
+  const photoList  = photoRaw.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
+  const mainSrc    = photoList[0] || '';
+  const thumbsHtml = photoList.length > 1
+    ? `<div class="detail-thumbs">${photoList.map((src, i) =>
+        `<img class="detail-thumb${i===0?' active':''}" src="${src}" alt="Photo ${i+1}" onclick="switchPhoto('${src}',this)" onerror="this.style.display='none'">`
+      ).join('')}</div>`
+    : '';
+  document.getElementById('detail-image-panel').innerHTML = mainSrc
+    ? `<img id="detail-main-img" class="detail-image" src="${mainSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="detail-img-placeholder" style="display:none">👠</div>${thumbsHtml}`
+    : `<div class="detail-img-placeholder">👠</div>`;
+
+  // --- Info panel ---
+  const isPreorder = source === 'preorders';
+  const qty     = parseInt(p.qty) || (isPreorder ? 0 : 1);
+  const qc      = qty <= 0 ? 'qty-none' : qty <= 3 ? 'qty-low' : 'qty-ok';
+  const qt      = qty <= 0 ? 'Sold Out' : qty <= 3 ? `Only ${qty} left!` : `${qty} available`;
+  const price   = fmtPrice(p.price);
+  const wa      = `https://wa.me/${CONFIG.WHATSAPP}`;
+  const ig      = `https://instagram.com/${CONFIG.INSTAGRAM}`;
+  const ctaMsg  = isPreorder
+    ? encodeURIComponent(`Hi! I'd like to pre-order: ${p.name} 🛍️`)
+    : encodeURIComponent(`Hi! I'd like to order: ${p.name} ⚡`);
+  const ctaLabel = isPreorder ? '💬 Pre-order via WhatsApp' : '💬 Order via WhatsApp';
+
+  // Colours — shown for in-stocks only; pre-orders hide this to keep cards clean
+  const colourList = (p.colors || '').split(',').map(c => c.trim()).filter(Boolean);
+  const coloursHtml = (!isPreorder && colourList.length) ? `
+    <div class="detail-section-label">Available Colours</div>
+    <div class="colour-swatches" id="colour-swatches">
+      ${colourList.map(c => `<button class="colour-pill" onclick="selectColour(this,'${c}')">${c}</button>`).join('')}
+    </div>` : '';
+
+  // Sizes — support per-colour variants
+  const sizeVariants = parseSizeVariants(p.sizes);
+  window._currentSizeVariants = sizeVariants;
+  let initialSizes;
+  if (sizeVariants.isVariant) {
+    const all = new Set();
+    Object.values(sizeVariants.map).forEach(arr => arr.forEach(s => all.add(s)));
+    initialSizes = [...all];
+  } else {
+    initialSizes = sizeVariants.map['*'];
+  }
+  const hasSizeChart = p.sizeChart && p.sizeChart.trim();
+  const sizeChartBlock = hasSizeChart
+    ? `<button class="size-chart-toggle" onclick="toggleSizeChart()">📏 View size chart</button>
+       <div class="size-chart-table" id="sizeChartTable"><img src="${driveUrl(p.sizeChart)}" class="size-chart-img" alt="Size chart"></div>`
+    : `<p class="size-chart-note">Not sure about your size? Contact us and we'll help you find the right fit.</p>`;
+  const sizesHtml = initialSizes.length ? `
+    <div class="detail-section-label">Available Sizes (EU)${sizeVariants.isVariant ? ' — select a colour to filter' : ''}</div>
+    <div class="size-row" id="size-row">
+      ${initialSizes.map(s => `<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`).join('')}
+    </div>
+    ${sizeChartBlock}` : '';
+
+  // Tags
+  const tagsHtml = [
+    p.category ? `<span class="tag tag-cat">${p.category}</span>` : '',
+    !isPreorder ? `<span class="tag tag-instock">In Stock</span>` : '',
+  ].filter(Boolean).join('');
+
+  // Description label differs by page type
+  const descLabel = isPreorder ? 'Size Availability' : 'Description';
+
+  document.getElementById('detail-info-panel').innerHTML = `
+    <div class="detail-tags">${tagsHtml}</div>
+    <div class="detail-brand">${p.brand}</div>
+    <h1 class="detail-name">${p.name}</h1>
+    <div class="detail-price">${price}</div>
+    ${isPreorder ? `<div class="detail-qty"><span class="qty-badge ${qc}">${qt}</span></div>` : ''}
+    <div class="detail-section-label" style="margin-bottom:0.5rem;">${descLabel}</div>
+    <p class="detail-desc">${p.desc || 'No description available.'}</p>
+    ${coloursHtml}
+    ${sizesHtml}
+    <div class="detail-cta">
+      <div class="cta-row">
+        <a href="${wa}?text=${ctaMsg}" target="_blank" class="btn btn-whatsapp">${ctaLabel}</a>
+        <a href="${ig}" target="_blank" class="btn btn-instagram">📷 DM on Instagram</a>
+      </div>
+      <p class="detail-cta-note">${isPreorder ? 'Select your preferred size above, then tap to order — we\'ll confirm availability!' : 'Select your preferred colour and size above, then tap to order — we\'ll confirm availability!'}</p>
+    </div>`;
+
+  showPage('detail');
+}
+
+/* ============================================================
+   SIZE VARIANT HELPERS
+   ============================================================ */
+function parseSizeVariants(sizesStr) {
+  if (!sizesStr) return { isVariant: false, map: { '*': [] } };
+  if (sizesStr.includes(':')) {
+    const map = {};
+    sizesStr.split('|').forEach(part => {
+      const idx = part.indexOf(':');
+      if (idx === -1) return;
+      const colour = part.slice(0, idx).trim();
+      const sizes  = part.slice(idx + 1).split(',').map(s => s.trim()).filter(Boolean);
+      if (colour) map[colour] = sizes;
+    });
+    return { isVariant: true, map };
+  }
+  return { isVariant: false, map: { '*': sizesStr.split(',').map(s => s.trim()).filter(Boolean) } };
+}
+
+function switchPhoto(url, el) {
+  const main = document.getElementById('detail-main-img');
+  if (main) main.src = url;
+  document.querySelectorAll('.detail-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* Selection helpers */
+function selectColour(el, colour) {
+  document.querySelectorAll('.colour-pill').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  const variantData = window._currentSizeVariants;
+  if (!variantData || !variantData.isVariant) return;
+  const sizes   = variantData.map[colour] || [];
+  const sizeRow = document.getElementById('size-row');
+  if (sizeRow) sizeRow.innerHTML = sizes.map(s => `<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`).join('');
+}
+
+function selectSize(el, size) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleSizeChart() {
+  document.getElementById('sizeChartTable').classList.toggle('open');
+}
+
+/* ============================================================
+   REVIEWS PAGE
+   ============================================================ */
+function renderReviews() {
+  const $rGrid  = document.getElementById('reviews-grid');
+  const $rEmpty = document.getElementById('reviews-empty');
+  const $sGrid  = document.getElementById('sourced-grid');
+  const $sEmpty = document.getElementById('sourced-empty');
+
+  if (REVIEW_SCREENSHOTS.length) {
+    $rEmpty.style.display = 'none';
+    $rGrid.innerHTML = REVIEW_SCREENSHOTS.map(item => {
+      const src = driveUrl(item.photo);
+      return `<div class="review-card" onclick="openLightbox('${src}')">
+        <img src="${src}" alt="Customer review" onerror="this.parentElement.style.display='none'">
+        ${item.caption ? `<div class="review-caption">${item.caption}</div>` : ''}
+      </div>`;
+    }).join('');
+  } else {
+    $rGrid.innerHTML = '';
+    $rEmpty.style.display = 'block';
+  }
+
+  if (SOURCED_PHOTOS.length) {
+    $sEmpty.style.display = 'none';
+    $sGrid.innerHTML = SOURCED_PHOTOS.map(item => {
+      const src = driveUrl(item.photo);
+      return `<div class="sourced-item" onclick="openLightbox('${src}')">
+        <img src="${src}" alt="Sourced find" onerror="this.parentElement.style.display='none'">
+        ${item.caption ? `<div class="sourced-caption">${item.caption}</div>` : ''}
+      </div>`;
+    }).join('');
+  } else {
+    $sGrid.innerHTML = '';
+    $sEmpty.style.display = 'block';
+  }
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+/* ============================================================
+   CONTACT LINKS
+   ============================================================ */
+function applyContactLinks() {
+  const wa = `https://wa.me/${CONFIG.WHATSAPP}`;
+  const ig = `https://instagram.com/${CONFIG.INSTAGRAM}`;
+  const map = {
+    'bridal-wa':           `${wa}?text=${encodeURIComponent(CONFIG.WA_MSG_BRIDAL)}`,
+    'bridal-ig':           ig,
+    'bridal-wa-catalogue': `${wa}?text=${encodeURIComponent('Hi Anggun Pesona! I\'d love to see a sample bridal catalogue 📖')}`,
+    'about-wa':            `${wa}?text=${encodeURIComponent(CONFIG.WA_MSG_GENERAL)}`,
+    'about-ig':            ig,
+    'footer-wa':           `${wa}?text=${encodeURIComponent(CONFIG.WA_MSG_GENERAL)}`,
+    'footer-ig':           ig,
+  };
+  for (const [id, href] of Object.entries(map)) { const el = document.getElementById(id); if (el) el.href = href; }
+}
+
+/* ============================================================
+   NOTIFY SIGNUPS
+   ============================================================ */
+function handleNotify() {
+  const email = document.getElementById('notifyEmail').value.trim();
+  const $msg  = document.getElementById('notifyMsg');
+  if (!email.includes('@')) { $msg.textContent = 'Please enter a valid email address.'; $msg.style.display='block'; return; }
+  window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(CONFIG.WA_MSG_NOTIFY + ' My email: ' + email)}`, '_blank');
+  $msg.textContent = '✨ Redirecting to WhatsApp — see you soon!'; $msg.style.display='block';
+  document.getElementById('notifyEmail').value = '';
+}
+
+function handleShopNotify() {
+  const email = document.getElementById('shopEmail').value.trim();
+  const $msg  = document.getElementById('shopMsg');
+  if (!email.includes('@')) { $msg.textContent = 'Please enter a valid email address.'; $msg.style.display='block'; return; }
+  window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(CONFIG.WA_MSG_NOTIFY + ' My email: ' + email)}`, '_blank');
+  $msg.textContent = '✨ Redirecting to WhatsApp — talk soon!'; $msg.style.display='block';
+  document.getElementById('shopEmail').value = '';
+}
+
+/* ============================================================
+   CATALOGUE ZOOM TOGGLE
+   ============================================================ */
+function toggleCatalogueZoom(el) {
+  el.style.maxWidth = el.style.maxWidth === '100%' ? '820px' : '100%';
+}
+
+/* ============================================================
+   SCROLL + INIT
+   ============================================================ */
+window.addEventListener('scroll', () => { document.getElementById('scrollTop').classList.toggle('vis', window.scrollY > 400); });
+document.addEventListener('DOMContentLoaded', applyContactLinks);
+</script>
+
+</body>
+</html>
