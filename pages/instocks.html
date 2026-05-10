@@ -1,0 +1,30 @@
+  <div class="page-hero green-hero">
+    <h1>Limited <em>In-Stocks</em></h1>
+    <p>Ready for you — limited pieces, no restock</p>
+  </div>
+  <div id="is-demo-notice" class="notice notice-demo">
+    ✓ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
+  </div>
+  <div class="filter-bar" id="isFilterBar" style="display:none;">
+    <div class="filter-group" id="isFilterCatGroup">
+      <label for="isCatSelect">Category</label>
+      <select class="filter-select" id="isCatSelect" onchange="setIsFilter(this.value)">
+        <option value="all">All Categories</option>
+      </select>
+    </div>
+    <div class="filter-group" id="isFilterBrandGroup" style="display:none;">
+      <label for="isBrandSelect">Brand</label>
+      <select class="filter-select" id="isBrandSelect" onchange="setIsBrand(this.value)">
+        <option value="all">All Brands</option>
+      </select>
+    </div>
+  </div>
+  <div class="products-section">
+    <div id="is-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>
+    <div id="is-grid" class="products-grid"></div>
+    <div id="is-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">⚡</div>
+      <h3>All sold out!</h3>
+      <p style="font-family:'Homemade Apple',cursive;font-size:0.78rem;">new pieces dropping soon — follow us on Instagram</p>
+    </div>
+  </div>
