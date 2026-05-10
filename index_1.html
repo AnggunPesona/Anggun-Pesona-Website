@@ -1977,7 +1977,7 @@
     /* =====================================================
        REVIEWS PAGE
        ===================================================== */
-    .reviews-section { padding: 5rem 2rem; max-width: 1280px; margin: 0 auto; }
+    .reviews-section { padding: 3.5rem 2rem; max-width: 1280px; margin: 0 auto; }
     .sourced-section {
       padding: 5rem 2rem;
       background: var(--green-pale);
@@ -1985,16 +1985,15 @@
     }
     .sourced-inner { max-width: 1280px; margin: 0 auto; }
     .reviews-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      auto-rows: auto;
+      display: flex;
+      flex-wrap: wrap;
       gap: 1.5rem 1rem;
       margin-top: 2.5rem;
-      min-height: auto;
+      justify-content: center;
     }
-    /* Ensure minimum 2 rows by setting min-height and grid behavior */
-    .reviews-grid {
-      grid-auto-rows: 1fr;
+    .reviews-grid .review-card {
+      width: calc(20% - 1rem);
+      min-width: 180px;
     }
     .review-card {
       background: var(--cream);
@@ -2612,7 +2611,7 @@
       .hero-ctas { flex-direction: column; align-items: stretch; }
       .hero-ctas .btn { width: 100%; }
 
-      .products-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
       .products-grid .product-card { padding: 0.35rem 0.35rem 0.5rem; }
       .products-grid .product-card::before { width: 40px; height: 12px; top: -6px; }
       .products-grid .product-info { padding: 0.5rem 0.15rem 0.15rem; }
@@ -2628,18 +2627,52 @@
         border-width: 1px;
       }
       .products-grid .product-info .product-cta { margin-top: 0.5rem; }
-      .reviews-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; }
+      .reviews-grid {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        max-height: 520px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 0.6rem;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        padding-bottom: 0.5rem;
+      }
+      .reviews-grid .review-card {
+        width: 140px;
+        min-width: 140px;
+        flex: 0 0 auto;
+        scroll-snap-align: start;
+      }
+      .reviews-section { position: relative; }
+      .reviews-section::after {
+        content: '← Swipe →';
+        display: block;
+        text-align: center;
+        font-family: 'Homemade Apple', cursive;
+        font-size: 0.65rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+      }
       .sourced-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; }
       .review-photos-grid, .sourced-photos-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
       .section { padding: 4rem 1.25rem; }
       .bridal-body, .about-body { padding: 2.5rem 1.25rem; }
       .bridal-notes-grid { grid-template-columns: 1fr; }
+      .includes-grid { grid-template-columns: 1fr; }
       .detail-body { padding: 2.5rem 1.25rem; }
       .info-cards { padding: 0 1.25rem; }
     }
 
     @media (max-width: 600px) {
-      .reviews-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 0.5rem; }
+      .reviews-grid {
+        max-height: 440px;
+      }
+      .reviews-grid .review-card {
+        width: 120px;
+        min-width: 120px;
+      }
       .sourced-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 0.5rem; }
       .review-card, .sourced-item { padding: 0.35rem 0.35rem 0.25rem; }
       .review-caption, .sourced-caption { font-size: 0.6rem; padding: 0.25rem 0.25rem 0.1rem; }
@@ -2963,10 +2996,10 @@
 
         <h3 class="bridal-sub-heading">What's included</h3>
         <div class="includes-grid">
-          <div class="include-card"><div class="ic-icon">📸</div><h4>Curated Lookbook</h4><p>1st lookbook with 8–10 options, 2nd revision with 5, 3rd with 3 options.</p></div>
-          <div class="include-card"><div class="ic-icon">💬</div><h4>1-on-1 Discussion</h4><p>We understand your vision — theme, dress, colour palette, and budget.</p></div>
-          <div class="include-card"><div class="ic-icon">+5</div><h4>Extra Revisions</h4><p>B$5 per additional revised lookbook with 3 curated heels options.</p></div>
-          <div class="include-card"><div class="ic-icon">✓</div><h4>Order Assistance</h4><p>We handle sizing, payment, and delivery for you.</p></div>
+          <div class="include-card"><div class="ic-icon">📸</div><h4>Your Personal Lookbook</h4><p>Receive a beautifully curated lookbook with 8–10 hand-picked options — refined through up to 3 rounds until we find "the one."</p></div>
+          <div class="include-card"><div class="ic-icon">💬</div><h4>A Conversation, Not a Catalogue</h4><p>We sit down with you to understand your wedding vision — the dress, the venue, the palette — so every recommendation feels intentional.</p></div>
+          <div class="include-card"><div class="ic-icon">+5</div><h4>Unlimited Revisions Available</h4><p>Still exploring? Additional revised lookbooks are just B$5 each — with 3 fresh curated heels options every round.</p></div>
+          <div class="include-card"><div class="ic-icon">✓</div><h4>Stress-Free From Order to Doorstep</h4><p>Once you've chosen, we handle everything — sizing, payment coordination, and delivery — so you can focus on being a bride.</p></div>
         </div>
 
         <h3 class="bridal-sub-heading">Price tiers</h3>
@@ -2992,14 +3025,19 @@
       <!-- SERVICE 2: CUSTOMIZED -->
       <div class="bridal-service-block svc-custom">
         <h2 class="bridal-section-title" style="font-size:clamp(1.3rem,3vw,1.8rem);">Customized <em>Heels</em></h2>
-        <div class="price-pill" style="font-size:1.4rem;margin-bottom:1.25rem;">From B$30 · Heels B$100+</div>
+        <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem;">
+          <div class="price-pill" style="font-size:1.4rem;">Consultation B$30</div>
+          <div class="price-pill" style="font-size:1.4rem;">Heels from B$100+</div>
+        </div>
 
         <h3 class="bridal-sub-heading">What's included</h3>
         <div class="includes-grid">
-          <div class="include-card"><div class="ic-icon">🤝</div><h4>Physical Meet-Up</h4><p>In-person session to discuss your style, materials, and design vision.</p></div>
-          <div class="include-card"><div class="ic-icon">🎨</div><h4>Custom Moodboard</h4><p>We finalize a moodboard capturing your exact vision.</p></div>
-          <div class="include-card"><div class="ic-icon">🏭</div><h4>Vendor Liaison</h4><p>We liaise with trusted vendors for estimated pricing.</p></div>
-          <div class="include-card"><div class="ic-icon">👠</div><h4>Bespoke Creation</h4><p>One-of-a-kind heels custom-made to your specs.</p></div>
+          <div class="include-card"><div class="ic-icon">🤝</div><h4>Face-to-Face Design Session</h4><p>We meet you in person to truly understand your style, try materials, and co-create a design that's unmistakably you.</p></div>
+          <div class="include-card"><div class="ic-icon">🎨</div><h4>Your Vision, Visualised</h4><p>We craft a detailed moodboard that captures every detail — so you see your dream heels before they're made.</p></div>
+          <div class="include-card"><div class="ic-icon">🏭</div><h4>Trusted Artisan Network</h4><p>We connect you with our vetted craftsmen and handle all vendor coordination, pricing, and quality checks.</p></div>
+          <div class="include-card"><div class="ic-icon">👠</div><h4>Truly One-of-a-Kind</h4><p>Walk the aisle in heels that exist nowhere else — custom-crafted to your exact measurements, materials, and vision.</p></div>
+          <div class="include-card"><div class="ic-icon">🎁</div><h4>Full Concierge Experience</h4><p>From first sketch to final fitting, we manage every step — you simply show up and fall in love with your heels.</p></div>
+          <div class="include-card"><div class="ic-icon">💎</div><h4>Premium Materials & Finishing</h4><p>Choose from luxurious leathers, satins, embellishments, and custom heel heights — every detail is yours to decide.</p></div>
         </div>
 
         <div class="how-box" style="background:var(--green-pale);">
@@ -3242,7 +3280,7 @@ const COLOUR_MAP = {
   'Gold':'#C9A96E','Silver':'#B0B0B0','Grey':'#888888','Camel':'#C19A6B',
 };
 
-const DEFAULT_CATEGORIES = ['Chic Finds', 'Flats', 'Heels', 'Sandals', 'Sneakers', 'Boots', 'Bags & Wallets', 'Leopard Series', 'Tabi', 'Bag Finds'];
+const DEFAULT_CATEGORIES = ['Chic Finds', 'Flats', 'Heels', 'Sandals', 'Sneakers', 'Boots', 'Bags', 'Leopard Series', 'Tabi', 'Bag Finds'];
 
 const DEMO_PREORDERS = [
   { category:'Flats', name:'Ribbed Ballet Flats', brand:'Studio Chic', price:'89', qty:'8', photo:'', photos:'', sizeChart:'', desc:'Minimalist ribbed ballet flats in ivory. The perfect elevated basic.', colors:'Ivory, Black, Nude', sizes:'Ivory:35,36,37,38,39|Black:36,37,38,39,40|Nude:35,36,37,38' },
@@ -3572,13 +3610,11 @@ function renderInstocks() {
     <div class="product-card" onclick="openProduct(${origIndex}, 'instocks')">
       ${imgOrPlaceholder(firstPhoto, '⚡')}
       <div class="product-info">
-        <span class="tag tag-instock">In Stock</span>
         ${parseCats(p.category).map(c => `<span class="tag tag-cat">${c}</span>`).join('')}
         <div class="product-brand">${p.brand}</div>
         <div class="product-name">${p.name}</div>
         <div class="product-footer">
           <span class="product-price">${fmtPrice(p.price)}</span>
-          <span style="font-family:'Homemade Apple',cursive;font-size:0.58rem;color:var(--text-light);white-space:nowrap;">limited stock</span>
         </div>
         <div class="product-cta">
           <button class="btn-details" onclick="event.stopPropagation();openProduct(${origIndex},'instocks')">View Details →</button>
@@ -3653,7 +3689,6 @@ function openProduct(index, source) {
 
   const tagsHtml = [
     p.category ? `<span class="tag tag-cat">${p.category}</span>` : '',
-    !isPreorder ? `<span class="tag tag-instock">In Stock</span>` : '',
   ].filter(Boolean).join('');
 
   const descLabel = isPreorder ? 'Size Availability' : 'Description';
