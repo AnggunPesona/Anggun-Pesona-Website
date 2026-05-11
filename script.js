@@ -397,7 +397,6 @@ function renderPreorders() {
         <div class="product-name">${p.name}</div>
         <div class="product-footer">
           <span class="product-price">${price}</span>
-          ${qty <= 0 ? `<span class="qty-badge qty-none">Sold Out</span>` : ''}
         </div>
         <div class="product-cta">
           <button class="btn-details" onclick="event.stopPropagation();openProduct(${origIndex},'preorders')">View Details →</button>
