@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "/Users/linamunirah/Documents/Claude/Projects/Anggun Pesona Website"
-rm -f .git/index.lock .git/HEAD.lock .git/ORIG_HEAD.lock
+rm -f .git/index.lock
 git add -A
-git commit -m "Fix: remove double padding-top on product detail pages"
+git commit -m "Convert SPA to multi-page site with clean URLs — /preorders, /instocks, /bridal, /reviews, /shop, /about"
 git push origin main
 echo "Done! Check https://anggunpesona.github.io/"
