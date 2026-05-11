@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggun Pesona — Elevating Your Basics, For Your Inner Chics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <span class="nav-brand-text">Anggun<span> Pesona</span></span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/preorders">Pre-Orders</a></li>
+    <li><a href="/instocks">In-Stocks</a></li>
+    <li><a href="/bridal">Bridal</a></li>
+    <li><a href="/reviews">Reviews</a></li>
+    <li><a href="/shop" class="soon-link">Shop Soon</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page" id="page-instocks">
+<div class="page-catalog">
+  <div class="page-hero green-hero">
+    <h1>Limited <em>In-Stocks</em></h1>
+    <p>Ready for you — limited pieces, no restock</p>
+  </div>
+  <div id="is-demo-notice" class="notice notice-demo">
+    ✓ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
+  </div>
+  <div class="filter-bar" id="isFilterBar" style="display:none;">
+    <div class="filter-group" id="isFilterCatGroup">
+      <label for="isCatSelect">Category</label>
+      <select class="filter-select" id="isCatSelect" onchange="setIsFilter(this.value)">
+        <option value="all">All Categories</option>
+      </select>
+    </div>
+    <div class="filter-group" id="isFilterBrandGroup" style="display:none;">
+      <label for="isBrandSelect">Brand</label>
+      <select class="filter-select" id="isBrandSelect" onchange="setIsBrand(this.value)">
+        <option value="all">All Brands</option>
+      </select>
+    </div>
+  </div>
+  <div class="products-section">
+    <div id="is-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>
+    <div id="is-grid" class="products-grid"></div>
+    <div id="is-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">⚡</div>
+      <h3>All sold out!</h3>
+      <p style="font-family:'Homemade Apple',cursive;font-size:0.78rem;">new pieces dropping soon — follow us on Instagram</p>
+    </div>
+  </div>
+</div>
+</div><!-- end page-catalog -->
+
+<div id="page-detail" style="display:none;padding-top:68px;">
+  <div class="detail-page-hero">
+    <span class="detail-back" onclick="hideDetail()">← Back</span>
+  </div>
+  <div class="detail-body">
+    <div class="detail-layout">
+      <div class="detail-image-wrap" id="detail-image-panel"></div>
+      <div id="detail-info-panel"></div>
+    </div>
+  </div>
+  <div style="background:var(--cream);border-top:2px dashed var(--pink-soft);padding:2rem 2rem 2.5rem;">
+    <div class="info-cards">
+      <div class="info-card info-card-payment">
+        <div class="ic-head"><div class="ic-icon">💳</div><h3>Payment</h3></div>
+        <p><strong>Method:</strong> BIBD Transfer</p>
+        <p><strong>Fullpayment</strong> / Min. 50% deposit</p>
+        <p style="font-size:0.85rem;color:var(--text-light);font-style:italic;margin-top:0.5rem;">Send proof of payment via WhatsApp/Instagram after transferring to confirm your order.</p>
+      </div>
+      <div class="info-card info-card-collection">
+        <div class="ic-head"><div class="ic-icon">📦</div><h3>Collection</h3></div>
+        <p><strong>Pick-Up:</strong> Lambak Kanan / Sg Liang area <span style="color:var(--green);font-weight:600;">(Free)</span></p>
+        <p><strong>Delivery:</strong> Available with charges — contact us for rates.</p>
+        <p style="font-size:0.85rem;color:var(--text-light);font-style:italic;margin-top:0.5rem;">Collection arrangements confirmed via WhatsApp/Instagram.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page-instocks -->
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-deco">
+    <div class="footer-deco-line"></div>
+    <span>✦ ✿ ✦</span>
+    <div class="footer-deco-line"></div>
+  </div>
+  <div class="footer-brand">Anggun<span> Pesona</span></div>
+  <div class="footer-slogan">"Elevating your basics, for your inner chics"</div>
+  <div class="footer-socials">
+    <a id="footer-wa" href="#" target="_blank" class="btn btn-whatsapp" style="padding:0.6rem 1.3rem;font-size:0.8rem;">WhatsApp</a>
+    <a id="footer-ig" href="#" target="_blank" class="btn btn-instagram" style="padding:0.6rem 1.3rem;font-size:0.8rem;">Instagram</a>
+  </div>
+  <div class="footer-confetti">
+    <span>· · · · · · · · · · · · · · · · · · · · ·</span>
+  </div>
+  <hr class="footer-hr">
+  <p class="footer-copy">© 2024 Anggun Pesona · made with love for our dearest angguns 💕</p>
+</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>

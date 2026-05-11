@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggun Pesona — Elevating Your Basics, For Your Inner Chics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <span class="nav-brand-text">Anggun<span> Pesona</span></span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/preorders">Pre-Orders</a></li>
+    <li><a href="/instocks">In-Stocks</a></li>
+    <li><a href="/bridal">Bridal</a></li>
+    <li><a href="/reviews">Reviews</a></li>
+    <li><a href="/shop" class="soon-link">Shop Soon</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page" id="page-shop">
+  <div class="shop-full">
+    <div class="shop-inner">
+      <span class="eyebrow">Anggun Pesona Original Label</span>
+      <h1>Our own<br><em>collection</em></h1>
+      <div class="launch-pill">✦ Launching August 2026 ✦</div>
+      <p>Something beautiful is being crafted in-house. Our very own Anggun Pesona label — designed with intention, made for women who carry themselves with quiet elegance.</p>
+      <p class="shop-quote">"Shoes made for you. Designed to elevate."</p>
+      <div class="shop-email">
+        <div class="email-row" style="justify-content:center;">
+          <input type="email" id="shopEmail" placeholder="Get notified at launch">
+          <button class="btn btn-maroon" onclick="handleShopNotify()">Notify Me</button>
+        </div>
+        <p class="signup-msg" id="shopMsg" style="margin-top:1rem;color:var(--maroon);"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-deco">
+    <div class="footer-deco-line"></div>
+    <span>✦ ✿ ✦</span>
+    <div class="footer-deco-line"></div>
+  </div>
+  <div class="footer-brand">Anggun<span> Pesona</span></div>
+  <div class="footer-slogan">"Elevating your basics, for your inner chics"</div>
+  <div class="footer-socials">
+    <a id="footer-wa" href="#" target="_blank" class="btn btn-whatsapp" style="padding:0.6rem 1.3rem;font-size:0.8rem;">WhatsApp</a>
+    <a id="footer-ig" href="#" target="_blank" class="btn btn-instagram" style="padding:0.6rem 1.3rem;font-size:0.8rem;">Instagram</a>
+  </div>
+  <div class="footer-confetti">
+    <span>· · · · · · · · · · · · · · · · · · · · ·</span>
+  </div>
+  <hr class="footer-hr">
+  <p class="footer-copy">© 2024 Anggun Pesona · made with love for our dearest angguns 💕</p>
+</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>

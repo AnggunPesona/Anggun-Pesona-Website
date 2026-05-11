@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggun Pesona — Elevating Your Basics, For Your Inner Chics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <span class="nav-brand-text">Anggun<span> Pesona</span></span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/preorders">Pre-Orders</a></li>
+    <li><a href="/instocks">In-Stocks</a></li>
+    <li><a href="/bridal">Bridal</a></li>
+    <li><a href="/reviews">Reviews</a></li>
+    <li><a href="/shop" class="soon-link">Shop Soon</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page" id="page-about">
+  <div class="page-hero">
+    <h1>About <em>us</em></h1>
+    <p>Our story, our values, our mission to make you feel more anggun</p>
+  </div>
+  <div class="about-body">
+    <h2>Born from a love for beauty that carries<em>grace</em></h2>
+    <p>Anggun Pesona — <em>graceful allure</em> in Malay — was born from a simple belief: the right pair of shoes can transform how you carry yourself. We're a Brunei-based curated footwear brand passionate about sourcing chic, versatile pieces that elevate your everyday and honour your most special moments.</p>
+    <p>Whether you're building a capsule shoe wardrobe, hunting for the perfect bridal pair, or simply treating yourself to something gorgeous — we curate with intention. Every piece is hand-selected for its quality, wearability, and that unmistakable something-special.</p>
+    <p>We operate on a monthly batch pre-order model, giving you access to carefully sourced styles before they sell out. Our limited in-stocks offer immediate pieces for those spontaneous moments when you simply need those shoes right now.</p>
+    <p>Our curation spans <em>multiple trusted brands</em> — each chosen for their craftsmanship, aesthetic, and consistency. We do the searching so you don't have to, bringing together the best of what's out there into one carefully edited collection.</p>
+
+    <div class="values-row">
+      <div class="val"><div class="v-icon">👠</div><span>Chic</span></div>
+      <div class="val"><div class="v-icon">🔄</div><span>Versatile</span></div>
+      <div class="val"><div class="v-icon">⬆</div><span>Elevated</span></div>
+      <div class="val"><div class="v-icon">💎</div><span>Quality</span></div>
+      <div class="val"><div class="v-icon">♥</div><span>Personal</span></div>
+    </div>
+
+    <div class="brands-section">
+      <h3>Our sourced brands</h3>
+      <p class="brands-sub">A curated selection of trusted brands to bring you quality, style, and variety. Our collection spans multiple labels — each hand-picked for its craftsmanship and aesthetic. List of brands are not exhaustive to below, you may request for any brands and we will check them out for you</p>
+      <div class="brand-pill-list" id="brandPillList"></div>
+      <p class="brands-disclaimer">*Anggun Pesona is not affiliated with, endorsed by, or officially partnered with any of the brands listed above.</p>
+    </div>
+
+    <div class="contact-card">
+      <h3>Get in touch</h3>
+      <p>Have a question, a specific style you're after, or a brand you'd like us to source? We'd love to hear from you.</p>
+      <div class="cta-row">
+        <a id="about-wa" href="#" target="_blank" class="btn btn-whatsapp">WhatsApp Us</a>
+        <a id="about-ig" href="#" target="_blank" class="btn btn-instagram">Instagram</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-deco">
+    <div class="footer-deco-line"></div>
+    <span>✦ ✿ ✦</span>
+    <div class="footer-deco-line"></div>
+  </div>
+  <div class="footer-brand">Anggun<span> Pesona</span></div>
+  <div class="footer-slogan">"Elevating your basics, for your inner chics"</div>
+  <div class="footer-socials">
+    <a id="footer-wa" href="#" target="_blank" class="btn btn-whatsapp" style="padding:0.6rem 1.3rem;font-size:0.8rem;">WhatsApp</a>
+    <a id="footer-ig" href="#" target="_blank" class="btn btn-instagram" style="padding:0.6rem 1.3rem;font-size:0.8rem;">Instagram</a>
+  </div>
+  <div class="footer-confetti">
+    <span>· · · · · · · · · · · · · · · · · · · · ·</span>
+  </div>
+  <hr class="footer-hr">
+  <p class="footer-copy">© 2024 Anggun Pesona · made with love for our dearest angguns 💕</p>
+</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>
