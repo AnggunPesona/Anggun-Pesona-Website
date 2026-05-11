@@ -182,6 +182,8 @@ function showPage(page) {
     const catalogEl = document.querySelector('.page-catalog');
     if (detailEl) detailEl.style.display = 'block';
     if (catalogEl) catalogEl.style.display = 'none';
+    const pageWrapper = detailEl?.closest('.page');
+    if (pageWrapper) pageWrapper.classList.add('detail-active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
@@ -195,6 +197,8 @@ function hideDetail(skipUrlUpdate) {
   const catalogEl = document.querySelector('.page-catalog');
   if (detailEl) detailEl.style.display = 'none';
   if (catalogEl) catalogEl.style.display = 'block';
+  const pageWrapper = detailEl?.closest('.page');
+  if (pageWrapper) pageWrapper.classList.remove('detail-active');
   if (!skipUrlUpdate) clearProductUrl();
   /* Restore page title */
   const page = getCurrentPage();
@@ -564,7 +568,7 @@ function renderDetail(index, source) {
   const ctaLabel = isPreorder ? 'Pre-order via WhatsApp' : 'Order via WhatsApp';
 
   const colourList = (p.colors || '').split(',').map(c => c.trim()).filter(Boolean);
-  const coloursHtml = (!isPreorder && colourList.length) ? `
+  const coloursHtml = colourList.length ? `
     <div class="detail-section-label">Available Colours</div>
     <div class="colour-swatches" id="colour-swatches">
       ${colourList.map(c => `<button class="colour-pill" onclick="selectColour(this,'${c}')">${c}</button>`).join('')}
@@ -596,14 +600,14 @@ function renderDetail(index, source) {
     p.category ? `<span class="tag tag-cat">${p.category}</span>` : '',
   ].filter(Boolean).join('');
 
-  const descLabel = isPreorder ? 'Size Availability' : 'Description';
+  const descLabel = 'Description';
 
   $infoPanel.innerHTML = `
     <div class="detail-tags">${tagsHtml}</div>
     <div class="detail-brand">${p.brand}</div>
     <h1 class="detail-name">${p.name}</h1>
     <div class="detail-price">${price}</div>
-    ${isPreorder ? `<div class="detail-qty"><span class="qty-badge ${qc}">${qt}</span></div>` : ''}
+    ${!isPreorder && qty <= 3 ? `<div class="detail-qty"><span class="qty-badge ${qc}">${qt}</span></div>` : ''}
     <div class="detail-section-label" style="margin-bottom:0.5rem;">${descLabel}</div>
     <p class="detail-desc">${p.desc || 'No description available.'}</p>
     ${coloursHtml}
@@ -613,7 +617,7 @@ function renderDetail(index, source) {
         <a id="wa-cta-btn" href="${wa}" target="_blank" class="btn btn-whatsapp">${ctaLabel}</a>
         <a href="${ig}" target="_blank" class="btn btn-instagram">DM on Instagram</a>
       </div>
-      <p class="detail-cta-note">${isPreorder ? 'select your preferred size above, then tap to order — we\'ll confirm availability!' : 'select your preferred colour and size above, then tap to order — we\'ll assist you from there!'}</p>
+      <p class="detail-cta-note">${isPreorder ? 'select your preferred colour and size above, then tap to order — we\'ll confirm availability!' : 'select your preferred colour and size above, then tap to order — we\'ll assist you from there!'}</p>
     </div>`;
 
   showPage('detail');
