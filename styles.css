@@ -142,6 +142,7 @@
        PAGES
        ===================================================== */
     .page { padding-top: 68px; min-height: 100vh; }
+    .page.detail-active { min-height: auto; }
 
     /* =====================================================
        BUTTONS — sticker-like, with playful shadow
