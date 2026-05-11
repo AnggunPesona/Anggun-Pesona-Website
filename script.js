@@ -95,6 +95,57 @@ let currentPoFilter = 'all', currentPoBrand = 'all';
 let currentIsFilter = 'all', currentIsBrand = 'all';
 
 /* ============================================================
+   PRODUCT URL ROUTING
+   ============================================================ */
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function getProductParam() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('product');
+}
+
+function setProductUrl(product, source) {
+  const slug = slugify(product.name);
+  const basePath = source === 'preorders' ? '/preorders' : '/instocks';
+  const newUrl = `${basePath}?product=${encodeURIComponent(slug)}`;
+  history.pushState({ productSlug: slug, source: source }, '', newUrl);
+}
+
+function clearProductUrl() {
+  const page = getCurrentPage();
+  const basePath = page === 'home' ? '/' : '/' + page;
+  history.pushState({ catalog: true }, '', basePath);
+}
+
+function findProductBySlug(slug, source) {
+  const products = source === 'preorders' ? poProducts : isProducts;
+  const decodedSlug = decodeURIComponent(slug);
+  for (let i = 0; i < products.length; i++) {
+    if (slugify(products[i].name) === decodedSlug) return i;
+  }
+  return -1;
+}
+
+/* Listen for browser back/forward */
+window.addEventListener('popstate', function(e) {
+  const page = getCurrentPage();
+  if (page !== 'preorders' && page !== 'instocks') return;
+
+  const slug = getProductParam();
+  if (slug) {
+    const idx = findProductBySlug(slug, page);
+    if (idx >= 0) {
+      renderDetail(idx, page);
+      return;
+    }
+  }
+  /* No product param — show catalog */
+  hideDetail(true);
+});
+
+/* ============================================================
    ROUTER (hash-based SPA — pages live in /pages/<name>.html)
    ============================================================ */
 const PAGE_TITLES = {
@@ -139,11 +190,15 @@ function showPage(page) {
   window.location.href = url;
 }
 
-function hideDetail() {
+function hideDetail(skipUrlUpdate) {
   const detailEl = document.getElementById('page-detail');
   const catalogEl = document.querySelector('.page-catalog');
   if (detailEl) detailEl.style.display = 'none';
   if (catalogEl) catalogEl.style.display = 'block';
+  if (!skipUrlUpdate) clearProductUrl();
+  /* Restore page title */
+  const page = getCurrentPage();
+  document.title = PAGE_TITLES[page] || PAGE_TITLES.home;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -164,12 +219,35 @@ function initCurrentPage() {
   });
 
   /* Page-specific init */
-  if (page === 'preorders') { if (!poLoaded) loadPreorders(); else renderPreorders(); }
-  if (page === 'instocks')  { if (!isLoaded) loadInstocks(); else renderInstocks(); }
+  const productSlug = getProductParam();
+
+  if (page === 'preorders') {
+    if (!poLoaded) loadPreorders().then(() => {
+      if (productSlug) openProductBySlug(productSlug, 'preorders');
+    });
+    else {
+      renderPreorders();
+      if (productSlug) openProductBySlug(productSlug, 'preorders');
+    }
+  }
+  if (page === 'instocks') {
+    if (!isLoaded) loadInstocks().then(() => {
+      if (productSlug) openProductBySlug(productSlug, 'instocks');
+    });
+    else {
+      renderInstocks();
+      if (productSlug) openProductBySlug(productSlug, 'instocks');
+    }
+  }
   if (page === 'reviews')   { renderReviews(); }
   if (page === 'bridal')    { applyContactLinks(); }
   if (page === 'about')     { applyContactLinks(); initBrandsList(); }
   if (page === 'home')      { applyContactLinks(); }
+}
+
+function openProductBySlug(slug, source) {
+  const idx = findProductBySlug(slug, source);
+  if (idx >= 0) renderDetail(idx, source);
 }
 
 function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
@@ -442,6 +520,9 @@ function renderInstocks() {
    PRODUCT DETAIL
    ============================================================ */
 function openProduct(index, source) {
+  const products = source === 'preorders' ? poProducts : isProducts;
+  const p = products[index];
+  if (p) setProductUrl(p, source);
   renderDetail(index, source);
 }
 
@@ -450,8 +531,14 @@ function renderDetail(index, source) {
   if (!p) { return; }
   prevPage = source;
 
+  /* Update page title for shareability */
+  document.title = `${p.name} · Anggun Pesona`;
+
   document.querySelector('.detail-back').textContent =
     `← Back to ${source === 'preorders' ? 'Pre-Orders' : 'In-Stocks'}`;
+
+  const $imgPanel  = document.getElementById('detail-image-panel');
+  const $infoPanel = document.getElementById('detail-info-panel');
 
   const photoRaw   = (p.photos && p.photos.trim()) ? p.photos : (p.photo || '');
   const photoList  = photoRaw.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
