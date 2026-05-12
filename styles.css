@@ -1187,6 +1187,7 @@
     .detail-page-hero {
       background: var(--maroon);
       padding: 1.5rem 2rem 2rem;
+      padding-top: calc(68px + 1.5rem);
       position: relative;
     }
     .detail-page-hero::before {
@@ -1350,6 +1351,56 @@
     .size-chart-table.open { display: block; }
     .size-chart-img { width: 100%; display: block; }
     .size-chart-note { font-size: 0.85rem; color: var(--text-light); font-style: italic; margin-bottom: 1.5rem; }
+    /* Detail image viewer (clickable, with arrows) */
+    .detail-image-viewer {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .detail-image-viewer:hover .detail-arrow { opacity: 1; }
+    .detail-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.85);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      color: var(--maroon);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.25s;
+      z-index: 5;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      line-height: 1;
+    }
+    .detail-arrow-left { left: 10px; }
+    .detail-arrow-right { right: 10px; }
+    .detail-arrow:hover { background: #fff; }
+    .detail-counter {
+      position: absolute;
+      bottom: 10px; right: 10px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .detail-dots {
+      display: flex; justify-content: center; gap: 6px;
+      padding: 0.6rem 0 0;
+    }
+    .detail-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .detail-dot.active { background: var(--maroon); }
     .detail-thumbs {
       display: flex; gap: 0.5rem; padding: 0.75rem 0 0;
       flex-wrap: wrap;
@@ -1364,6 +1415,9 @@
     }
     .detail-thumb:hover { border-color: var(--pink); }
     .detail-thumb.active { border-color: var(--maroon); }
+    @media (max-width: 820px) {
+      .detail-arrow { opacity: 0.7; width: 32px; height: 32px; font-size: 1.2rem; }
+    }
 
     /* Detail CTA */
     .detail-cta { margin-top: 2.25rem; }

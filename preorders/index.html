@@ -68,7 +68,7 @@
 </div>
 <!-- end page-catalog -->
 
-<div id="page-detail" style="display:none;padding-top:68px;">
+<div id="page-detail" style="display:none;">
   <div class="detail-page-hero">
     <span class="detail-back" onclick="hideDetail()">← Back</span>
   </div>
@@ -98,6 +98,18 @@
 
 </div><!-- end page-preorders -->
 
+<!-- Photo Carousel Modal -->
+<div class="carousel-modal" id="carousel-modal">
+  <button class="carousel-close" onclick="closeCarousel()">✕</button>
+  <div class="carousel-container">
+    <button class="carousel-nav carousel-prev" onclick="carouselPrev()">←</button>
+    <div class="carousel-viewer">
+      <img class="carousel-img" id="carousel-img" src="" alt="">
+    </div>
+    <button class="carousel-nav carousel-next" onclick="carouselNext()">→</button>
+  </div>
+  <div class="carousel-counter"><span id="carousel-counter-text"></span></div>
+</div>
 
 <!-- FOOTER -->
 <footer>

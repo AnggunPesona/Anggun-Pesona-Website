@@ -546,15 +546,31 @@ function renderDetail(index, source) {
   const photoRaw   = (p.photos && p.photos.trim()) ? p.photos : (p.photo || '');
   const photoList  = photoRaw.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
   const mainSrc    = photoList[0] || '';
-  const thumbsHtml = photoList.length > 1
+  const hasMultiple = photoList.length > 1;
+  const arrowsHtml = hasMultiple
+    ? `<button class="detail-arrow detail-arrow-left" onclick="event.stopPropagation();detailImgPrev()">‹</button>
+       <button class="detail-arrow detail-arrow-right" onclick="event.stopPropagation();detailImgNext()">›</button>
+       <div class="detail-counter">${1} / ${photoList.length}</div>`
+    : '';
+  const dotsHtml = hasMultiple
+    ? `<div class="detail-dots">${photoList.map((_, i) => `<span class="detail-dot${i===0?' active':''}" onclick="event.stopPropagation();detailImgGoTo(${i})"></span>`).join('')}</div>`
+    : '';
+  const thumbsHtml = hasMultiple
     ? `<div class="detail-thumbs">${photoList.map((src, i) =>
-        `<img class="detail-thumb${i===0?' active':''}" src="${src}" alt="Photo ${i+1}" onclick="switchPhoto('${src}',this)" onerror="this.style.display='none'">`
+        `<img class="detail-thumb${i===0?' active':''}" src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();detailImgGoTo(${i})" onerror="this.style.display='none'">`
       ).join('')}</div>`
     : '';
+  window._detailPhotos = photoList;
+  window._detailPhotoIdx = 0;
   $imgPanel.innerHTML = mainSrc
-    ? `<img id="detail-main-img" class="detail-image" src="${mainSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-       <div class="detail-img-placeholder" style="display:none">👠</div>${thumbsHtml}`
+    ? `<div class="detail-image-viewer" onclick="openCarousel(window._detailPhotos, window._detailPhotoIdx)">
+         <img id="detail-main-img" class="detail-image" src="${mainSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+         <div class="detail-img-placeholder" style="display:none">👠</div>
+         ${arrowsHtml}
+       </div>${dotsHtml}${thumbsHtml}`
     : `<div class="detail-img-placeholder">👠</div>`;
+  // Add touch swipe to detail image viewer
+  setupDetailSwipe();
 
   const isPreorder = source === 'preorders';
   const qty = parseInt(p.qty) || (isPreorder ? 0 : 1);
@@ -606,7 +622,6 @@ function renderDetail(index, source) {
     <div class="detail-brand">${p.brand}</div>
     <h1 class="detail-name">${p.name}</h1>
     <div class="detail-price">${price}</div>
-    ${!isPreorder && qty <= 3 ? `<div class="detail-qty"><span class="qty-badge ${qc}">${qt}</span></div>` : ''}
     <div class="detail-section-label" style="margin-bottom:0.5rem;">${descLabel}</div>
     <p class="detail-desc">${p.desc || 'No description available.'}</p>
     ${coloursHtml}
@@ -621,6 +636,44 @@ function renderDetail(index, source) {
 
   showPage('detail');
   buildWaLink();
+}
+
+/* Detail image navigation */
+function detailImgGoTo(idx) {
+  const photos = window._detailPhotos;
+  if (!photos || idx < 0 || idx >= photos.length) return;
+  window._detailPhotoIdx = idx;
+  const main = document.getElementById('detail-main-img');
+  if (main) main.src = photos[idx];
+  const counter = document.querySelector('.detail-counter');
+  if (counter) counter.textContent = `${idx + 1} / ${photos.length}`;
+  document.querySelectorAll('.detail-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  document.querySelectorAll('.detail-thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
+}
+function detailImgNext() {
+  const photos = window._detailPhotos;
+  if (!photos) return;
+  const next = (window._detailPhotoIdx + 1) % photos.length;
+  detailImgGoTo(next);
+}
+function detailImgPrev() {
+  const photos = window._detailPhotos;
+  if (!photos) return;
+  const prev = (window._detailPhotoIdx - 1 + photos.length) % photos.length;
+  detailImgGoTo(prev);
+}
+function setupDetailSwipe() {
+  const viewer = document.querySelector('.detail-image-viewer');
+  if (!viewer) return;
+  let startX = 0;
+  viewer.addEventListener('touchstart', e => { startX = e.changedTouches[0].screenX; }, { passive: true });
+  viewer.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) detailImgNext(); else detailImgPrev();
+      e.preventDefault();
+    }
+  });
 }
 
 function buildWaLink() {
