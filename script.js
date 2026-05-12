@@ -108,6 +108,19 @@ function getProductParam() {
   return params.get('product');
 }
 
+function getPageParam() {
+  const params = new URLSearchParams(window.location.search);
+  const p = parseInt(params.get('page'));
+  return (p && p > 0) ? p : 1;
+}
+
+function setPageUrl(n) {
+  const page = getCurrentPage();
+  const basePath = '/' + page;
+  const url = n > 1 ? `${basePath}?page=${n}` : basePath;
+  history.pushState({ page: n }, '', url);
+}
+
 function setProductUrl(product, source) {
   const slug = slugify(product.name);
   const basePath = source === 'preorders' ? '/preorders' : '/instocks';
@@ -118,7 +131,9 @@ function setProductUrl(product, source) {
 function clearProductUrl() {
   const page = getCurrentPage();
   const basePath = page === 'home' ? '/' : '/' + page;
-  history.pushState({ catalog: true }, '', basePath);
+  const pageNum = page === 'preorders' ? poCurrentPage : 1;
+  const url = (page === 'preorders' && pageNum > 1) ? `${basePath}?page=${pageNum}` : basePath;
+  history.pushState({ catalog: true }, '', url);
 }
 
 function findProductBySlug(slug, source) {
@@ -145,6 +160,11 @@ window.addEventListener('popstate', function(e) {
   }
   /* No product param — show catalog */
   hideDetail(true);
+  /* Apply page number from URL (handles back/forward through paginated pages) */
+  if (page === 'preorders') {
+    poCurrentPage = getPageParam();
+    renderPreorders();
+  }
 });
 
 /* ============================================================
@@ -228,6 +248,8 @@ function initCurrentPage() {
   const productSlug = getProductParam();
 
   if (page === 'preorders') {
+    /* Restore pagination page from URL on load/refresh */
+    if (!productSlug) poCurrentPage = getPageParam();
     if (!poLoaded) loadPreorders().then(() => {
       if (productSlug) openProductBySlug(productSlug, 'preorders');
     });
@@ -359,9 +381,9 @@ function buildPageNumbers(current, total) {
   return pages;
 }
 
-function setPoFilter(f) { currentPoFilter = f; poCurrentPage = 1; renderPreorders(); }
-function setPoBrand(b)  { currentPoBrand  = b; poCurrentPage = 1; renderPreorders(); }
-function goPoPage(n) { poCurrentPage = n; renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
+function setPoFilter(f) { currentPoFilter = f; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+function setPoBrand(b)  { currentPoBrand  = b; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
 
 function renderPreorders() {
   const filter      = currentPoFilter;

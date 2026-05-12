@@ -43,7 +43,7 @@
     ✓ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
   </div>
   <div class="search-bar-wrap" id="poSearchWrap">
-    <input type="text" id="poSearchInput" class="search-input" placeholder="Search products…" oninput="poCurrentPage=1;renderPreorders()">
+    <input type="text" id="poSearchInput" class="search-input" placeholder="Search products…" oninput="poCurrentPage=1;history.replaceState({},'','/preorders');renderPreorders()">
     <span class="search-icon">🔍</span>
   </div>
   <div class="filter-bar" id="poFilterBar">
