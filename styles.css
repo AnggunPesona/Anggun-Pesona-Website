@@ -1173,7 +1173,7 @@
     .search-bar-wrap {
       max-width: 480px;
       margin: 0 auto 0.5rem;
-      padding: 0 1.5rem;
+      padding: 1.5rem 1.5rem 0;
       position: relative;
     }
     .search-input {
