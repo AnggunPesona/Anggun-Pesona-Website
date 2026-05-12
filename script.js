@@ -93,6 +93,8 @@ let poProducts = [], isProducts = [];
 let prevPage = 'preorders';
 let currentPoFilter = 'all', currentPoBrand = 'all';
 let currentIsFilter = 'all', currentIsBrand = 'all';
+let poCurrentPage = 1;
+const PO_PER_PAGE = 12;
 
 /* ============================================================
    PRODUCT URL ROUTING
@@ -345,8 +347,21 @@ async function loadPreorders() {
   renderPreorders();
 }
 
-function setPoFilter(f) { currentPoFilter = f; renderPreorders(); }
-function setPoBrand(b)  { currentPoBrand  = b; renderPreorders(); }
+/* Build compact page number list with ellipsis, e.g. 1 2 ... 5 6 */
+function buildPageNumbers(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  const pages = [];
+  pages.push(1);
+  if (current > 3) pages.push('...');
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+  if (current < total - 2) pages.push('...');
+  pages.push(total);
+  return pages;
+}
+
+function setPoFilter(f) { currentPoFilter = f; poCurrentPage = 1; renderPreorders(); }
+function setPoBrand(b)  { currentPoBrand  = b; poCurrentPage = 1; renderPreorders(); }
+function goPoPage(n) { poCurrentPage = n; renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
 
 function renderPreorders() {
   const filter      = currentPoFilter;
@@ -374,14 +389,25 @@ function renderPreorders() {
     $brandGrp.style.display = 'none';
   }
 
+  /* Search filter */
+  const searchEl = document.getElementById('poSearchInput');
+  const searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
+
   const list = poProducts.filter(p =>
     matchesCat(p, filter) &&
-    (brandFilter === 'all' || p.brand === brandFilter)
+    (brandFilter === 'all' || p.brand === brandFilter) &&
+    (!searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.brand || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm))
   );
-  if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; return; }
+  if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }
   $empty.style.display = 'none';
 
-  $grid.innerHTML = list.map((p, i) => {
+  /* Pagination */
+  const totalPages = Math.ceil(list.length / PO_PER_PAGE);
+  if (poCurrentPage > totalPages) poCurrentPage = totalPages;
+  const startIdx = (poCurrentPage - 1) * PO_PER_PAGE;
+  const pageItems = list.slice(startIdx, startIdx + PO_PER_PAGE);
+
+  $grid.innerHTML = pageItems.map((p, i) => {
     const origIndex = poProducts.indexOf(p);
     const qty = parseInt(p.qty) || 0;
     const qc = qty <= 0 ? 'qty-none' : qty <= 3 ? 'qty-low' : 'qty-ok';
@@ -404,6 +430,22 @@ function renderPreorders() {
       </div>
     </div>`;
   }).join('');
+
+  /* Render pagination controls */
+  const $pag = document.getElementById('po-pagination');
+  if ($pag) {
+    if (totalPages <= 1) { $pag.innerHTML = ''; }
+    else {
+      let html = `<button class="page-btn" onclick="goPoPage(${poCurrentPage - 1})" ${poCurrentPage === 1 ? 'disabled' : ''}>‹</button>`;
+      const pages = buildPageNumbers(poCurrentPage, totalPages);
+      pages.forEach(pg => {
+        if (pg === '...') html += `<span class="page-ellipsis">…</span>`;
+        else html += `<button class="page-btn${pg === poCurrentPage ? ' active' : ''}" onclick="goPoPage(${pg})">${pg}</button>`;
+      });
+      html += `<button class="page-btn" onclick="goPoPage(${poCurrentPage + 1})" ${poCurrentPage === totalPages ? 'disabled' : ''}>›</button>`;
+      $pag.innerHTML = html;
+    }
+  }
 }
 
 /* ============================================================

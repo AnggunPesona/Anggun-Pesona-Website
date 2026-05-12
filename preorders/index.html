@@ -42,6 +42,10 @@
   <div id="po-demo-notice" class="notice notice-demo">
     ✓ <strong>Demo Mode:</strong> Showing sample products. Connect your Google Sheet to display real inventory.
   </div>
+  <div class="search-bar-wrap" id="poSearchWrap">
+    <input type="text" id="poSearchInput" class="search-input" placeholder="Search products…" oninput="poCurrentPage=1;renderPreorders()">
+    <span class="search-icon">🔍</span>
+  </div>
   <div class="filter-bar" id="poFilterBar">
     <div class="filter-group">
       <label for="catSelect">Category</label>
@@ -64,6 +68,7 @@
       <h3>Nothing in this category yet</h3>
       <p style="font-family:'Homemade Apple',cursive;font-size:0.78rem;">check back soon!</p>
     </div>
+    <div id="po-pagination" class="pagination-bar"></div>
   </div>
 </div>
 <!-- end page-catalog -->
