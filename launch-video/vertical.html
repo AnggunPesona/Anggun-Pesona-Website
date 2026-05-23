@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anggun Pesona — Launch (Vertical 9:16)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Italianno&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --maroon:#6B0F1A; --maroon-deep:#420810; --maroon-soft:#8B1F2E;
+    --pink:#F2A4BB; --pink-soft:#FAD4DE; --pink-pale:#FEF0F4; --pink-hot:#E87A9A;
+    --green:#5A8A75; --green-light:#8FBD9D; --green-pale:#EBF4EF;
+    --cream:#FDF6E3; --cream-dark:#F5EDD4; --butter:#FFF8E1; --off-white:#FEFAF5;
+    --gold:#C9A96E; --ink:#2B0A12; --text-mid:#4A2030;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;background:#1a1a1a;font-family:'DM Sans',sans-serif;overflow:hidden;}
+
+  /* ============ STAGE — 9:16 canvas ============ */
+  .stage{
+    position:relative;
+    width:1080px; height:1920px;
+    background:var(--off-white);
+    overflow:hidden;
+    transform-origin: top center;
+    margin:0 auto;
+    box-shadow:0 30px 80px rgba(0,0,0,.4);
+  }
+  /* Paper grain */
+  .stage::before{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:200;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity:.07; mix-blend-mode:multiply;
+  }
+
+  /* Scale to viewport */
+  .scaler{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:#1a1a1a;
+  }
+
+  /* ============ START SCREEN ============ */
+  .start{
+    position:absolute; inset:0; z-index:9999;
+    background:var(--maroon);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:30px; cursor:pointer;
+    transition: opacity .6s ease;
+  }
+  .start.hidden{ opacity:0; pointer-events:none; }
+  .start h1{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:700;
+    color:var(--cream); font-size:80px; line-height:1;
+  }
+  .start h1 span{ font-family:'Italianno',cursive; font-style:normal; color:var(--pink); font-size:120px; }
+  .start .play-btn{
+    background:var(--pink); color:var(--maroon-deep);
+    border:none; padding:30px 80px; border-radius:60px;
+    font-family:'DM Sans',sans-serif; font-weight:700; font-size:36px;
+    letter-spacing:.15em; text-transform:uppercase;
+    cursor:pointer; transition:transform .2s;
+    box-shadow:0 12px 32px rgba(0,0,0,.3);
+  }
+  .start .play-btn:hover{ transform:scale(1.05); }
+  .start p{
+    color:var(--pink-soft); font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:28px; letter-spacing:.1em; margin-top:20px;
+  }
+
+  /* ============ SCENES ============ */
+  .scene{
+    position:absolute; inset:0;
+    opacity:0; pointer-events:none;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .stage.playing .scene{ animation-fill-mode: both; }
+
+  /* Scene timings (total ~38s):
+     s1 0-4   intro
+     s2 4-9   logo
+     s3 9-13  tagline
+     s4 13-18 launch announce
+     s5 18-26 three offerings
+     s6 26-31 bridal spotlight
+     s7 31-35 reviews/social proof
+     s8 35-42 cta + url
+  */
+  .stage.playing .s1{ animation: showScene 0s 0s forwards, hideScene 0s 4s forwards; }
+  .stage.playing .s2{ animation: showScene 0s 4s forwards, hideScene 0s 9s forwards; }
+  .stage.playing .s3{ animation: showScene 0s 9s forwards, hideScene 0s 13s forwards; }
+  .stage.playing .s4{ animation: showScene 0s 13s forwards, hideScene 0s 18s forwards; }
+  .stage.playing .s5{ animation: showScene 0s 18s forwards, hideScene 0s 26s forwards; }
+  .stage.playing .s6{ animation: showScene 0s 26s forwards, hideScene 0s 31s forwards; }
+  .stage.playing .s7{ animation: showScene 0s 31s forwards, hideScene 0s 35s forwards; }
+  .stage.playing .s8{ animation: showScene 0s 35s forwards; }
+
+  @keyframes showScene{ to{ opacity:1; } }
+  @keyframes hideScene{ to{ opacity:0; } }
+
+  /* ============ SCENE 1 — INTRO ============ */
+  .s1{ background: var(--cream); }
+  .s1 .date-stamp{
+    position:absolute; top:80px; right:90px;
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--maroon-soft); font-size:34px; letter-spacing:.3em;
+    text-transform:uppercase;
+  }
+  .s1 .gingham-frame{
+    position:absolute; inset:60px;
+    border:6px dashed var(--maroon);
+    border-radius:20px;
+  }
+  .s1 .eyebrow{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--maroon-soft); font-size:38px; letter-spacing:.4em;
+    text-transform:uppercase; margin-bottom:40px;
+  }
+  .s1 .headline{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:160px; line-height:1.05;
+    text-align:center;
+  }
+  .s1 .headline em{ font-family:'Italianno',cursive; font-style:normal; color:var(--pink-hot); font-size:200px; display:inline-block; }
+  .s1 .sticker{
+    position:absolute; font-size:130px;
+  }
+  .s1 .sticker.shoe{ top:240px; left:130px; transform:rotate(-15deg); }
+  .s1 .sticker.bow{ top:1500px; right:140px; transform:rotate(10deg); }
+  .s1 .sticker.heart{ top:1620px; left:180px; font-size:90px; color:var(--pink-hot); }
+  .s1 .sticker.star{ top:300px; right:160px; color:var(--gold); font-size:90px; }
+
+  .stage.playing .s1 .sticker.shoe   { animation: showScene 0s 0s forwards, popIn .6s .3s both, wobble 2.5s 1s infinite ease-in-out; }
+  .stage.playing .s1 .sticker.star   { animation: showScene 0s 0s forwards, popIn .5s .6s both, spin 4s 1s infinite linear; }
+  .stage.playing .s1 .sticker.bow    { animation: showScene 0s 0s forwards, popIn .6s .9s both, wobble 2.5s 1.5s infinite ease-in-out; }
+  .stage.playing .s1 .sticker.heart  { animation: showScene 0s 0s forwards, popIn .5s 1.2s both, pulse 1.4s 1.5s infinite ease-in-out; }
+  .stage.playing .s1 .eyebrow        { animation: showScene 0s 0s forwards, slideUp .8s .2s both; }
+  .stage.playing .s1 .headline       { animation: showScene 0s 0s forwards, slideUp .9s .5s both; }
+  .stage.playing .s1 .date-stamp     { animation: showScene 0s 0s forwards, slideRight .8s 1.4s both; }
+
+  @keyframes popIn{
+    0%{transform:scale(0) rotate(-15deg);}
+    60%{transform:scale(1.2) rotate(-15deg);}
+    100%{transform:scale(1) rotate(-15deg);}
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(-15deg);}
+    50%{transform:rotate(-25deg);}
+  }
+  @keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.2);}
+  }
+  @keyframes slideUp{
+    from{transform:translateY(40px); opacity:0;}
+    to{transform:translateY(0); opacity:1;}
+  }
+  @keyframes slideRight{
+    from{transform:translateX(80px); opacity:0;}
+    to{transform:translateX(0); opacity:1;}
+  }
+  @keyframes slideLeft{
+    from{transform:translateX(-80px); opacity:0;}
+    to{transform:translateX(0); opacity:1;}
+  }
+  @keyframes zoomIn{
+    from{transform:scale(.6); opacity:0;}
+    to{transform:scale(1); opacity:1;}
+  }
+  @keyframes fadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+  }
+
+  /* ============ SCENE 2 — LOGO ============ */
+  .s2{ background: var(--maroon); }
+  .s2::before{
+    content:'';position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(45deg, transparent 0 40px, rgba(255,255,255,.04) 40px 80px);
+  }
+  .s2 .scallop-top{
+    position:absolute; top:0; left:0; right:0; height:80px;
+    background:var(--pink);
+    -webkit-mask: radial-gradient(circle at 40px 80px, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+            mask: radial-gradient(circle at 40px 80px, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+  }
+  .s2 .scallop-bot{
+    position:absolute; bottom:0; left:0; right:0; height:80px;
+    background:var(--pink);
+    -webkit-mask: radial-gradient(circle at 40px 0, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+            mask: radial-gradient(circle at 40px 0, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+  }
+  .s2 .logo-block{
+    text-align:center; position:relative; z-index:5;
+  }
+  .s2 .established{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--pink); font-size:32px; letter-spacing:.5em;
+    text-transform:uppercase; margin-bottom:30px;
+  }
+  .s2 .anggun{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--cream); font-size:200px; line-height:.9;
+    letter-spacing:.02em;
+  }
+  .s2 .pesona{
+    font-family:'Italianno',cursive;
+    color:var(--pink); font-size:320px; line-height:.85;
+    text-shadow: 0 6px 0 var(--maroon-deep);
+  }
+  .s2 .tag-bottom{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--pink-soft); font-size:36px; letter-spacing:.3em;
+    text-transform:uppercase; margin-top:50px;
+  }
+  .s2 .gold-line{
+    width:200px; height:2px; background:var(--gold);
+    margin:30px auto;
+  }
+  .stage.playing .s2 .established { animation: showScene 0s 4s forwards, slideUp .7s 4.3s both; }
+  .stage.playing .s2 .anggun      { animation: showScene 0s 4s forwards, slideLeft .9s 4.6s both; }
+  .stage.playing .s2 .pesona      { animation: showScene 0s 4s forwards, zoomIn 1.2s 5.2s both; }
+  .stage.playing .s2 .gold-line   { animation: showScene 0s 4s forwards, widen .7s 6.4s both; }
+  .stage.playing .s2 .tag-bottom  { animation: showScene 0s 4s forwards, slideUp .7s 6.6s both; }
+  @keyframes widen{
+    from{width:0;}
+    to{width:200px;}
+  }
+
+  /* ============ SCENE 3 — TAGLINE ============ */
+  .s3{ background: var(--pink-pale); }
+  .s3 .quote-mark{
+    position:absolute; top:200px; left:130px;
+    font-family:'Playfair Display',serif; color:var(--maroon-soft);
+    font-size:300px; line-height:1; opacity:.18;
+  }
+  .s3 .quote-mark2{
+    position:absolute; bottom:200px; right:130px;
+    font-family:'Playfair Display',serif; color:var(--maroon-soft);
+    font-size:300px; line-height:1; opacity:.18;
+    transform:rotate(180deg);
+  }
+  .s3 .tagline{
+    text-align:center; padding:0 100px;
+  }
+  .s3 .line1{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:400;
+    color:var(--maroon-deep); font-size:110px; line-height:1.1;
+    display:block; margin-bottom:30px;
+  }
+  .s3 .line2{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:400;
+    color:var(--maroon-deep); font-size:110px; line-height:1.1;
+    display:block;
+  }
+  .s3 .line2 em{
+    font-family:'Italianno',cursive; font-style:normal;
+    color:var(--pink-hot); font-size:160px;
+    display:inline-block; transform:translateY(20px);
+  }
+  .s3 .chic-circle{
+    display:inline-block; position:relative;
+  }
+  .s3 .chic-circle::after{
+    content:''; position:absolute; inset:-20px -30px;
+    border:5px solid var(--pink-hot); border-radius:50%;
+    transform:rotate(-8deg);
+  }
+  .stage.playing .s3 .line1     { animation: showScene 0s 9s forwards, slideUp .8s 9.2s both; }
+  .stage.playing .s3 .line2     { animation: showScene 0s 9s forwards, slideUp .8s 9.7s both; }
+  .stage.playing .s3 .quote-mark{ animation: showScene 0s 9s forwards, fadeIn 1s 9.5s both; }
+  .stage.playing .s3 .quote-mark2{ animation: showScene 0s 9s forwards, fadeIn 1s 10s both; }
+
+  /* ============ SCENE 4 — LAUNCH ANNOUNCE ============ */
+  .s4{ background: var(--cream); }
+  .s4 .stamp{
+    position:absolute; top:200px; left:50%; transform:translateX(-50%) rotate(-5deg);
+    border:6px solid var(--green-light); padding:20px 50px; border-radius:20px;
+    background:var(--green-pale);
+  }
+  .s4 .stamp-text{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--green); font-size:48px; letter-spacing:.3em;
+    text-transform:uppercase; font-weight:600;
+  }
+  .s4 .big{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:170px; line-height:1; text-align:center;
+    margin-top:120px;
+  }
+  .s4 .big em{
+    font-family:'Italianno',cursive; font-style:normal;
+    color:var(--pink-hot); font-size:240px;
+  }
+  .s4 .browser{
+    margin-top:80px; width:840px; background:var(--off-white);
+    border:4px solid var(--maroon-deep); border-radius:20px;
+    box-shadow: 12px 12px 0 var(--pink-hot);
+    overflow:hidden;
+  }
+  .s4 .browser-bar{
+    background:var(--maroon); padding:18px 24px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .s4 .dot{ width:18px; height:18px; border-radius:50%; }
+  .s4 .url-box{
+    flex:1; background:var(--cream); border-radius:30px;
+    padding:10px 24px; font-family:'DM Sans',monospace; font-size:30px;
+    color:var(--maroon-deep); text-align:center; font-weight:500;
+    margin-left:20px;
+  }
+  .s4 .browser-body{
+    height:340px; padding:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg, var(--pink-pale), var(--cream));
+  }
+  .s4 .browser-body-text{
+    text-align:center;
+  }
+  .s4 .browser-body-text .preview-name{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:96px; line-height:1;
+  }
+  .s4 .browser-body-text .preview-name em{
+    font-family:'Italianno',cursive; font-style:normal; color:var(--pink-hot); font-size:140px;
+  }
+
+  .stage.playing .s4 .stamp   { animation: showScene 0s 13s forwards, popInStraight .6s 13.3s both, wiggle 2s 14s infinite ease-in-out; }
+  .stage.playing .s4 .big     { animation: showScene 0s 13s forwards, slideUp .8s 13.7s both; }
+  .stage.playing .s4 .browser { animation: showScene 0s 13s forwards, slideUp .9s 14.4s both; }
+
+  @keyframes popInStraight{
+    0%{transform:translateX(-50%) scale(0) rotate(-5deg);}
+    60%{transform:translateX(-50%) scale(1.15) rotate(-5deg);}
+    100%{transform:translateX(-50%) scale(1) rotate(-5deg);}
+  }
+  @keyframes wiggle{
+    0%,100%{transform:translateX(-50%) rotate(-5deg);}
+    50%{transform:translateX(-50%) rotate(-8deg);}
+  }
+
+  /* ============ SCENE 5 — THREE OFFERINGS ============ */
+  .s5{ background: var(--off-white); padding-top:100px; }
+  .s5 .label-top{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--maroon-soft); font-size:38px; letter-spacing:.35em;
+    text-transform:uppercase; text-align:center;
+  }
+  .s5 .h2{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:700;
+    color:var(--maroon-deep); font-size:110px; line-height:1; text-align:center;
+    margin:30px 0 60px;
+  }
+  .s5 .h2 em{ font-family:'Italianno',cursive; font-style:normal; color:var(--pink-hot); font-size:150px;}
+  .s5 .cards{
+    display:flex; flex-direction:column; gap:30px; padding:0 80px;
+  }
+  .s5 .card{
+    border-radius:30px; padding:50px 60px; position:relative;
+    border:5px solid var(--maroon-deep);
+    box-shadow: 10px 10px 0 var(--maroon-deep);
+  }
+  .s5 .card .num{
+    position:absolute; top:-25px; left:40px;
+    background:var(--cream); border:4px solid var(--maroon-deep);
+    width:80px; height:80px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:48px;
+  }
+  .s5 .card.pre   { background:var(--pink-soft); }
+  .s5 .card.stock { background:var(--green-pale); }
+  .s5 .card.bridal{ background:var(--butter); }
+  .s5 .card h3{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:80px; line-height:1; margin-bottom:14px;
+  }
+  .s5 .card p{
+    font-family:'DM Sans',sans-serif; color:var(--text-mid);
+    font-size:34px; line-height:1.4;
+  }
+  .s5 .card .badge{
+    position:absolute; top:30px; right:40px;
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--maroon-soft); font-size:26px; letter-spacing:.2em;
+    text-transform:uppercase;
+  }
+  .stage.playing .s5 .label-top{ animation: showScene 0s 18s forwards, slideUp .6s 18.2s both; }
+  .stage.playing .s5 .h2{ animation: showScene 0s 18s forwards, slideUp .7s 18.5s both; }
+  .stage.playing .s5 .card.pre   { animation: showScene 0s 18s forwards, slideRightCard .7s 19.2s both; }
+  .stage.playing .s5 .card.stock { animation: showScene 0s 18s forwards, slideLeftCard .7s 20.3s both; }
+  .stage.playing .s5 .card.bridal{ animation: showScene 0s 18s forwards, slideRightCard .7s 21.4s both; }
+
+  @keyframes slideRightCard{
+    from{transform:translateX(150px); opacity:0;}
+    to{transform:translateX(0); opacity:1;}
+  }
+  @keyframes slideLeftCard{
+    from{transform:translateX(-150px); opacity:0;}
+    to{transform:translateX(0); opacity:1;}
+  }
+
+  /* ============ SCENE 6 — BRIDAL SPOTLIGHT ============ */
+  .s6{
+    background: linear-gradient(135deg, var(--butter), var(--cream-dark));
+  }
+  .s6 .ribbon-stripe{
+    position:absolute; top:0; left:0; right:0; height:120px;
+    background:var(--maroon);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .s6 .ribbon-stripe span{
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    color:var(--cream); font-size:38px; letter-spacing:.4em;
+    text-transform:uppercase;
+  }
+  .s6 .frame{
+    margin-top:200px; padding:80px 100px; text-align:center;
+    border:4px solid var(--gold); border-radius:20px;
+    background:rgba(253,246,227,.6);
+    width:880px;
+  }
+  .s6 .h{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:140px; line-height:.95;
+  }
+  .s6 .h em{ font-family:'Italianno',cursive; font-style:normal; color:var(--pink-hot); font-size:180px; }
+  .s6 .sub{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--text-mid); font-size:42px; line-height:1.4;
+    margin-top:30px;
+  }
+  .s6 .price-row{
+    display:flex; justify-content:center; gap:50px; margin-top:60px;
+  }
+  .s6 .price{
+    background:var(--maroon); color:var(--cream); padding:25px 45px;
+    border-radius:50px; font-family:'DM Sans',sans-serif; font-weight:600;
+    font-size:36px;
+  }
+  .s6 .price em{
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400;
+    color:var(--pink-soft); font-size:30px;
+  }
+  .s6 .sticker-corner{
+    position:absolute; bottom:120px; right:100px;
+    font-size:140px; transform:rotate(15deg);
+  }
+  .stage.playing .s6 .ribbon-stripe{ animation: showScene 0s 26s forwards, slideDown .6s 26.2s both; }
+  .stage.playing .s6 .frame{ animation: showScene 0s 26s forwards, zoomIn .8s 26.7s both; }
+  .stage.playing .s6 .sticker-corner{ animation: showScene 0s 26s forwards, popIn15 .6s 27.3s both, wobble15 2s 28s infinite ease-in-out; }
+
+  @keyframes slideDown{
+    from{transform:translateY(-100%);}
+    to{transform:translateY(0);}
+  }
+  @keyframes popIn15{
+    0%{transform:scale(0) rotate(15deg);}
+    60%{transform:scale(1.2) rotate(15deg);}
+    100%{transform:scale(1) rotate(15deg);}
+  }
+  @keyframes wobble15{
+    0%,100%{transform:rotate(15deg);}
+    50%{transform:rotate(25deg);}
+  }
+
+  /* ============ SCENE 7 — REVIEWS / SOCIAL PROOF ============ */
+  .s7{ background: var(--maroon-deep); }
+  .s7::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(242,164,187,.15), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(201,169,110,.15), transparent 40%);
+  }
+  .s7 .label{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--pink); font-size:42px; letter-spacing:.4em;
+    text-transform:uppercase; text-align:center; margin-bottom:40px;
+  }
+  .s7 .stars{ font-size:120px; color:var(--gold); letter-spacing:.1em; }
+  .s7 .quote{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:400;
+    color:var(--cream); font-size:90px; line-height:1.2; text-align:center;
+    margin:40px 80px; max-width:900px;
+  }
+  .s7 .quote em{ color:var(--pink-hot); font-style:italic; }
+  .s7 .author{
+    font-family:'Italianno',cursive; color:var(--pink-soft);
+    font-size:90px; margin-top:30px;
+  }
+  .stage.playing .s7 .label{ animation: showScene 0s 31s forwards, slideUp .6s 31.1s both; }
+  .stage.playing .s7 .stars{ animation: showScene 0s 31s forwards, zoomIn .6s 31.4s both; }
+  .stage.playing .s7 .quote{ animation: showScene 0s 31s forwards, slideUp .7s 31.7s both; }
+  .stage.playing .s7 .author{ animation: showScene 0s 31s forwards, slideUp .7s 32.5s both; }
+
+  /* ============ SCENE 8 — CTA / URL ============ */
+  .s8{
+    background: var(--maroon);
+    overflow:hidden;
+  }
+  .s8::before{
+    content:'';position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(45deg, transparent 0 50px, rgba(242,164,187,.06) 50px 100px);
+  }
+  .s8 .corner-shoe{
+    position:absolute; top:120px; left:80px; font-size:140px;
+    transform:rotate(-20deg);
+  }
+  .s8 .corner-bow{
+    position:absolute; top:140px; right:100px; font-size:140px;
+    transform:rotate(20deg);
+  }
+  .s8 .visit{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--pink); font-size:50px; letter-spacing:.5em;
+    text-transform:uppercase; text-align:center; margin-bottom:30px;
+  }
+  .s8 .main-url-card{
+    background:var(--cream); padding:60px 70px;
+    border-radius:30px; transform:rotate(-2deg);
+    box-shadow: 15px 15px 0 var(--pink-hot), 30px 30px 0 var(--gold);
+    text-align:center;
+    margin:0 60px;
+  }
+  .s8 .main-url-card .name{
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:var(--maroon-deep); font-size:130px; line-height:.9;
+  }
+  .s8 .main-url-card .name em{
+    font-family:'Italianno',cursive; font-style:normal; color:var(--pink-hot); font-size:170px;
+  }
+  .s8 .url{
+    margin-top:25px; font-family:'DM Sans',monospace; font-weight:500;
+    color:var(--maroon); font-size:46px; letter-spacing:.05em;
+    border-top:3px dashed var(--maroon-soft); padding-top:25px;
+  }
+  .s8 .ig-handle{
+    margin-top:60px; text-align:center;
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--pink-soft); font-size:42px; letter-spacing:.2em;
+  }
+  .s8 .ig-handle strong{
+    color:var(--pink); font-weight:600;
+  }
+  .s8 .scallop-bot-2{
+    position:absolute; bottom:0; left:0; right:0; height:80px;
+    background:var(--pink);
+    -webkit-mask: radial-gradient(circle at 40px 0, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+            mask: radial-gradient(circle at 40px 0, transparent 40px, #000 41px) 0 0/80px 80px repeat-x;
+  }
+  .stage.playing .s8 .corner-shoe{ animation: showScene 0s 35s forwards, popIn .6s 35.2s both, wobbleN20 2s 36s infinite ease-in-out; }
+  .stage.playing .s8 .corner-bow { animation: showScene 0s 35s forwards, popIn20 .6s 35.4s both, wobble20 2s 36s infinite ease-in-out; }
+  .stage.playing .s8 .visit{ animation: showScene 0s 35s forwards, slideUp .6s 35.5s both; }
+  .stage.playing .s8 .main-url-card{ animation: showScene 0s 35s forwards, zoomInRot .8s 35.8s both, pulseSlow 2s 37s infinite ease-in-out; }
+  .stage.playing .s8 .ig-handle{ animation: showScene 0s 35s forwards, slideUp .7s 36.8s both; }
+  @keyframes popIn20{
+    0%{transform:scale(0) rotate(20deg);}
+    60%{transform:scale(1.2) rotate(20deg);}
+    100%{transform:scale(1) rotate(20deg);}
+  }
+  @keyframes wobble20{
+    0%,100%{transform:rotate(20deg);}
+    50%{transform:rotate(30deg);}
+  }
+  @keyframes wobbleN20{
+    0%,100%{transform:rotate(-20deg);}
+    50%{transform:rotate(-30deg);}
+  }
+  @keyframes zoomInRot{
+    from{transform:scale(.6) rotate(-2deg); opacity:0;}
+    to{transform:scale(1) rotate(-2deg); opacity:1;}
+  }
+  @keyframes pulseSlow{
+    0%,100%{transform:scale(1) rotate(-2deg);}
+    50%{transform:scale(1.03) rotate(-2deg);}
+  }
+
+  /* progress bar (silent / dev visibility) */
+  .progress{
+    position:absolute; bottom:0; left:0; height:6px; background:var(--pink-hot);
+    width:0; z-index:100; opacity:.0;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="scaler">
+  <div class="stage" id="stage">
+
+    <!-- START OVERLAY -->
+    <div class="start" id="start">
+      <h1>Anggun<br><span>Pesona</span></h1>
+      <button class="play-btn" id="playBtn">▶  Play</button>
+      <p>~ 40 seconds &nbsp;•&nbsp; press F11 for fullscreen first</p>
+    </div>
+
+    <!-- SCENE 1 — INTRO HOOK -->
+    <div class="scene s1">
+      <div class="gingham-frame"></div>
+      <div class="date-stamp">Now Open</div>
+      <span class="sticker shoe">👠</span>
+      <span class="sticker star">✦</span>
+      <span class="sticker bow">🎀</span>
+      <span class="sticker heart">♥</span>
+      <div style="text-align:center;">
+        <div class="eyebrow">Brunei × Curated</div>
+        <div class="headline">our new<br>website<br>is <em>live</em></div>
+      </div>
+    </div>
+
+    <!-- SCENE 2 — LOGO REVEAL -->
+    <div class="scene s2">
+      <div class="scallop-top"></div>
+      <div class="scallop-bot"></div>
+      <div class="logo-block">
+        <div class="established">Est. 2024 — Brunei</div>
+        <div class="anggun">Anggun</div>
+        <div class="pesona">Pesona</div>
+        <div class="gold-line"></div>
+        <div class="tag-bottom">Curated Footwear Atelier</div>
+      </div>
+    </div>
+
+    <!-- SCENE 3 — TAGLINE -->
+    <div class="scene s3">
+      <div class="quote-mark">"</div>
+      <div class="quote-mark2">"</div>
+      <div class="tagline">
+        <span class="line1">Elevating your basics,</span>
+        <span class="line2">for your inner <em><span class="chic-circle">chic</span></em></span>
+      </div>
+    </div>
+
+    <!-- SCENE 4 — LAUNCH ANNOUNCE -->
+    <div class="scene s4">
+      <div class="stamp"><span class="stamp-text">★ Just Launched ★</span></div>
+      <div class="big">Visit<br>us <em>online</em></div>
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="dot" style="background:#FF5F57;"></div>
+          <div class="dot" style="background:#FEBC2E;"></div>
+          <div class="dot" style="background:#28C840;"></div>
+          <div class="url-box">anggunpesona.github.io</div>
+        </div>
+        <div class="browser-body">
+          <div class="browser-body-text">
+            <div class="preview-name">Anggun<br><em>Pesona</em></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 5 — THREE OFFERINGS -->
+    <div class="scene s5">
+      <div class="label-top">What you'll find</div>
+      <div class="h2">Three ways<br>to find <em>your pair</em></div>
+      <div class="cards">
+        <div class="card pre">
+          <div class="num">1</div>
+          <span class="badge">Open Now</span>
+          <h3>Pre-Order ✦</h3>
+          <p>Curated finds from beyond Brunei. Tell us your pair, we'll bring it home.</p>
+        </div>
+        <div class="card stock">
+          <div class="num">2</div>
+          <span class="badge">Limited</span>
+          <h3>In-Stocks ♥</h3>
+          <p>Ready to ship. No restocks — once she's gone, she's gone.</p>
+        </div>
+        <div class="card bridal">
+          <div class="num">3</div>
+          <span class="badge">Concierge</span>
+          <h3>Bridal Heels 👠</h3>
+          <p>Your dream wedding shoe — curated or custom-made just for you.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 6 — BRIDAL SPOTLIGHT -->
+    <div class="scene s6">
+      <div class="ribbon-stripe"><span>✦ Bridal Concierge ✦</span></div>
+      <div class="frame">
+        <div class="h">Your shoe,<br>your <em>moment</em></div>
+        <div class="sub">From curated finds to fully custom heels —<br>shaped to your dress, your day, your story.</div>
+        <div class="price-row">
+          <div class="price">Curation <em>from B$20</em></div>
+          <div class="price">Custom <em>from B$30</em></div>
+        </div>
+      </div>
+      <div class="sticker-corner">💍</div>
+    </div>
+
+    <!-- SCENE 7 — REVIEWS -->
+    <div class="scene s7">
+      <div style="text-align:center; position:relative; z-index:5; padding: 0 60px;">
+        <div class="label">Loved by Brunei girls</div>
+        <div class="stars">★ ★ ★ ★ ★</div>
+        <div class="quote">"The most <em>thoughtful</em> shoe<br>shopping I've ever done."</div>
+        <div class="author">— happy bride, '26</div>
+      </div>
+    </div>
+
+    <!-- SCENE 8 — CTA & URL -->
+    <div class="scene s8">
+      <span class="corner-shoe">👠</span>
+      <span class="corner-bow">🎀</span>
+      <div style="text-align:center; position:relative; z-index:5; width:100%;">
+        <div class="visit">✦ Visit us now ✦</div>
+        <div class="main-url-card">
+          <div class="name">Anggun<br><em>Pesona</em></div>
+          <div class="url">anggunpesona.github.io</div>
+        </div>
+        <div class="ig-handle">find us on instagram &nbsp;<strong>@anggunpesona</strong></div>
+      </div>
+      <div class="scallop-bot-2"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Scale the 1080x1920 stage to fit the viewport
+  function fit(){
+    const stage = document.getElementById('stage');
+    const sw = window.innerWidth;
+    const sh = window.innerHeight;
+    const scale = Math.min(sw/1080, sh/1920);
+    stage.style.transform = `scale(${scale})`;
+    stage.style.marginTop = ((sh - 1920*scale)/2) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  // Start button → kick off animations
+  document.getElementById('playBtn').addEventListener('click', start);
+  document.getElementById('start').addEventListener('click', start);
+
+  function start(){
+    document.getElementById('start').classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById('stage').classList.add('playing');
+    }, 600);
+  }
+
+  // Tap any key to restart
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R'){
+      location.reload();
+    }
+  });
+</script>
+
+</body>
+</html>
