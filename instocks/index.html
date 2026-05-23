@@ -52,6 +52,12 @@
         <option value="all">All Brands</option>
       </select>
     </div>
+    <div class="filter-group" id="isFilterSizeGroup" style="display:none;">
+      <label for="isSizeSelect">Size (EU)</label>
+      <select class="filter-select" id="isSizeSelect" onchange="setIsSize(this.value)">
+        <option value="all">All Sizes</option>
+      </select>
+    </div>
   </div>
   <div class="products-section">
     <div id="is-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>

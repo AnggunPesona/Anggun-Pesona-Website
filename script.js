@@ -74,8 +74,10 @@ const BRIDAL_REVIEWS = [
 //   { url: 'URL2', caption: 'Another caption' }
 // ]
 const SOURCED_PHOTOS = [
-  { url: 'https://drive.google.com/file/d/1XVmZTyUQck_bW40lzVjtqtqX60r6KpEx/view?usp=sharing', caption: '7th PO Batch 2026' },
-  { url: 'https://drive.google.com/file/d/1SmU885pv1uRaxZHZpV90i33TRIgF_0VJ/view?usp=sharing', caption: '6th PO Batch 2026' },
+  {photos: 'https://drive.google.com/file/d/1s2Wa7-cep28jl0wJ-U1G2Lr6sIkH6gJr/view?usp=sharing, https://drive.google.com/file/d/1zNcQDW4Jev3FFjSWbbkWwnv51_wEdsrN/view?usp=sharing, https://drive.google.com/file/d/1O8u_kw4t--bPr1tGQNdPX1YqNGUtOcUe/view?usp=sharing, https://drive.google.com/file/d/1rVqIcvKJSbkvvqUsMRkLjgCPrm_DRxap/view?usp=sharing', caption: 'Machino sourced'},
+  {url: 'https://drive.google.com/file/d/1pptnQX6PpK-x2konvb744d-Md5mlrWrD/view?usp=sharing', caption: '8th PO Batch 2026'},
+  {url: 'https://drive.google.com/file/d/1XVmZTyUQck_bW40lzVjtqtqX60r6KpEx/view?usp=sharing', caption: '7th PO Batch 2026' },
+  {url: 'https://drive.google.com/file/d/1SmU885pv1uRaxZHZpV90i33TRIgF_0VJ/view?usp=sharing', caption: '6th PO Batch 2026' },
   {url: 'https://drive.google.com/file/d/1BZL1h1Y_aPCl-9aFCZWlwM0c_HXB73fw/view?usp=drive_link', caption: 'Delayed Batch 5th PO 2026'},
   {url: 'https://drive.google.com/file/d/1QvLQdqmnhYo_dtGVm8x-xy1C5V-xaw4R/view?usp=drive_link', caption: '5th PO Batch 2026'},
   {url: 'https://drive.google.com/file/d/1kLTo4BlS3U1AUShdrze41-PQvombnrcN/view?usp=drive_link', caption: 'Delayed Batch 4th RAYA PO 2026'},
@@ -91,8 +93,8 @@ const SOURCED_PHOTOS = [
 let poLoaded = false, isLoaded = false;
 let poProducts = [], isProducts = [];
 let prevPage = 'preorders';
-let currentPoFilter = 'all', currentPoBrand = 'all';
-let currentIsFilter = 'all', currentIsBrand = 'all';
+let currentPoFilter = 'all', currentPoBrand = 'all', currentPoSize = 'all';
+let currentIsFilter = 'all', currentIsBrand = 'all', currentIsSize = 'all';
 let poCurrentPage = 1;
 const PO_PER_PAGE = 12;
 
@@ -323,6 +325,31 @@ function matchesCat(product, filter) {
   return parseCats(product.category).includes(filter);
 }
 
+/* Get all unique sizes available for a product
+   Handles both "35,36,37" and "Color1:35,36|Color2:37,38" formats */
+function getProductSizes(product) {
+  if (!product || !product.sizes) return [];
+  const variants = parseSizeVariants(product.sizes);
+  const all = new Set();
+  Object.values(variants.map).forEach(arr => arr.forEach(s => all.add(s)));
+  return [...all];
+}
+
+/* Check if a product has a given size available */
+function matchesSize(product, size) {
+  if (size === 'all') return true;
+  return getProductSizes(product).includes(size);
+}
+
+/* Sort sizes numerically when possible (EU sizes like 35, 36, 37.5) */
+function sortSizes(sizes) {
+  return [...sizes].sort((a, b) => {
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return String(a).localeCompare(String(b));
+  });
+}
+
 /* ============================================================
    PRE-ORDERS
    ============================================================ */
@@ -365,7 +392,7 @@ async function loadPreorders() {
     }
   }
   $load.style.display = 'none';
-  currentPoFilter = 'all'; currentPoBrand = 'all';
+  currentPoFilter = 'all'; currentPoBrand = 'all'; currentPoSize = 'all';
   renderPreorders();
 }
 
@@ -383,16 +410,20 @@ function buildPageNumbers(current, total) {
 
 function setPoFilter(f) { currentPoFilter = f; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function setPoBrand(b)  { currentPoBrand  = b; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+function setPoSize(s)   { currentPoSize   = s; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
 
 function renderPreorders() {
   const filter      = currentPoFilter;
   const brandFilter = currentPoBrand;
+  const sizeFilter  = currentPoSize;
   const $grid       = document.getElementById('po-grid');
   const $empty      = document.getElementById('po-empty');
   const $catSel     = document.getElementById('catSelect');
   const $brandSel   = document.getElementById('brandSelectPO');
   const $brandGrp   = document.getElementById('poFilterBrandGroup');
+  const $sizeSel    = document.getElementById('sizeSelectPO');
+  const $sizeGrp    = document.getElementById('poFilterSizeGroup');
   // SPA partial may have been swapped out while async load was in flight.
   if (!$grid || !$catSel) return;
 
@@ -411,6 +442,18 @@ function renderPreorders() {
     $brandGrp.style.display = 'none';
   }
 
+  /* Populate size dropdown from all products' sizes */
+  const allSizes = sortSizes([...new Set(poProducts.flatMap(p => getProductSizes(p)))]);
+  if ($sizeGrp && $sizeSel) {
+    if (allSizes.length > 0) {
+      $sizeGrp.style.display = 'flex';
+      $sizeSel.innerHTML = `<option value="all">All Sizes</option>` +
+        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>EU ${s}</option>`).join('');
+    } else {
+      $sizeGrp.style.display = 'none';
+    }
+  }
+
   /* Search filter */
   const searchEl = document.getElementById('poSearchInput');
   const searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
@@ -418,6 +461,7 @@ function renderPreorders() {
   const list = poProducts.filter(p =>
     matchesCat(p, filter) &&
     (brandFilter === 'all' || p.brand === brandFilter) &&
+    matchesSize(p, sizeFilter) &&
     (!searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.brand || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm))
   );
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }
@@ -508,21 +552,25 @@ async function loadInstocks() {
     }
   }
   $load.style.display = 'none';
-  currentIsFilter = 'all'; currentIsBrand = 'all';
+  currentIsFilter = 'all'; currentIsBrand = 'all'; currentIsSize = 'all';
   renderInstocks();
 }
 
 function setIsFilter(f) { currentIsFilter = f; renderInstocks(); }
 function setIsBrand(b)  { currentIsBrand  = b; renderInstocks(); }
+function setIsSize(s)   { currentIsSize   = s; renderInstocks(); }
 
 function renderInstocks() {
   const filter      = currentIsFilter;
   const brandFilter = currentIsBrand;
+  const sizeFilter  = currentIsSize;
   const $filterBar  = document.getElementById('isFilterBar');
   const $catGrp     = document.getElementById('isFilterCatGroup');
   const $brandGrp   = document.getElementById('isFilterBrandGroup');
+  const $sizeGrp    = document.getElementById('isFilterSizeGroup');
   const $catSel     = document.getElementById('isCatSelect');
   const $brandSel   = document.getElementById('isBrandSelect');
+  const $sizeSel    = document.getElementById('isSizeSelect');
   const $grid       = document.getElementById('is-grid');
   const $empty      = document.getElementById('is-empty');
   if (!$grid || !$filterBar) return; // partial was swapped out
@@ -556,9 +604,23 @@ function renderInstocks() {
     $brandGrp.style.display = 'none';
   }
 
+  /* Populate size dropdown from all products' sizes */
+  const allSizes = sortSizes([...new Set(isProducts.flatMap(p => getProductSizes(p)))]);
+  if ($sizeGrp && $sizeSel) {
+    if (allSizes.length > 0) {
+      $filterBar.style.display = 'flex';
+      $sizeGrp.style.display = 'flex';
+      $sizeSel.innerHTML = `<option value="all">All Sizes</option>` +
+        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>EU ${s}</option>`).join('');
+    } else {
+      $sizeGrp.style.display = 'none';
+    }
+  }
+
   const list = isProducts.filter(p =>
     matchesCat(p, filter) &&
-    (brandFilter === 'all' || p.brand === brandFilter)
+    (brandFilter === 'all' || p.brand === brandFilter) &&
+    matchesSize(p, sizeFilter)
   );
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; return; }
 
