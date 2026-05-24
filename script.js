@@ -74,7 +74,7 @@ const BRIDAL_REVIEWS = [
 //   { url: 'URL2', caption: 'Another caption' }
 // ]
 const SOURCED_PHOTOS = [
-  {photos: 'https://drive.google.com/file/d/1vf0ji53iZg2we4BD7B9HCjIvVeIcAJVK/view?usp=drive_link, https://drive.google.com/file/d/1s2Wa7-cep28jl0wJ-U1G2Lr6sIkH6gJr/view?usp=sharing, https://drive.google.com/file/d/1zNcQDW4Jev3FFjSWbbkWwnv51_wEdsrN/view?usp=sharing, https://drive.google.com/file/d/1O8u_kw4t--bPr1tGQNdPX1YqNGUtOcUe/view?usp=sharing, https://drive.google.com/file/d/1rVqIcvKJSbkvvqUsMRkLjgCPrm_DRxap/view?usp=sharing', caption: 'Machino sourced'},
+  {url: 'https://drive.google.com/file/d/1vf0ji53iZg2we4BD7B9HCjIvVeIcAJVK/view?usp=drive_link, https://drive.google.com/file/d/1s2Wa7-cep28jl0wJ-U1G2Lr6sIkH6gJr/view?usp=sharing, https://drive.google.com/file/d/1zNcQDW4Jev3FFjSWbbkWwnv51_wEdsrN/view?usp=sharing, https://drive.google.com/file/d/1O8u_kw4t--bPr1tGQNdPX1YqNGUtOcUe/view?usp=sharing, https://drive.google.com/file/d/1rVqIcvKJSbkvvqUsMRkLjgCPrm_DRxap/view?usp=sharing', caption: 'Machino sourced'},
   {url: 'https://drive.google.com/file/d/1pptnQX6PpK-x2konvb744d-Md5mlrWrD/view?usp=sharing', caption: '8th PO Batch 2026'},
   {url: 'https://drive.google.com/file/d/1XVmZTyUQck_bW40lzVjtqtqX60r6KpEx/view?usp=sharing', caption: '7th PO Batch 2026' },
   {url: 'https://drive.google.com/file/d/1SmU885pv1uRaxZHZpV90i33TRIgF_0VJ/view?usp=sharing', caption: '6th PO Batch 2026' },
