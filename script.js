@@ -428,8 +428,7 @@ function renderPreorders() {
   if (!$grid || !$catSel) return;
 
   const sheetCats   = [...new Set(poProducts.flatMap(p => parseCats(p.category)))];
-  const orderedCats = [...DEFAULT_CATEGORIES.filter(c => sheetCats.includes(c)),
-                       ...sheetCats.filter(c => !DEFAULT_CATEGORIES.includes(c))];
+  const orderedCats = [...sheetCats].sort((a, b) => a.localeCompare(b));
   $catSel.innerHTML = `<option value="all">All Categories</option>` +
     orderedCats.map(c => `<option value="${c}"${filter===c?' selected':''}>${c}</option>`).join('');
 
@@ -448,7 +447,7 @@ function renderPreorders() {
     if (allSizes.length > 0) {
       $sizeGrp.style.display = 'flex';
       $sizeSel.innerHTML = `<option value="all">All Sizes</option>` +
-        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>EU ${s}</option>`).join('');
+        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>${s}</option>`).join('');
     } else {
       $sizeGrp.style.display = 'none';
     }
@@ -583,8 +582,7 @@ function renderInstocks() {
   $empty.style.display = 'none';
 
   const cats = [...new Set(isProducts.flatMap(p => parseCats(p.category)))];
-  const orderedCats = [...DEFAULT_CATEGORIES.filter(c => cats.includes(c)),
-                       ...cats.filter(c => !DEFAULT_CATEGORIES.includes(c))];
+  const orderedCats = [...cats].sort((a, b) => a.localeCompare(b));
   if (orderedCats.length > 1) {
     $filterBar.style.display = 'flex';
     $catGrp.style.display = 'flex';
@@ -611,7 +609,7 @@ function renderInstocks() {
       $filterBar.style.display = 'flex';
       $sizeGrp.style.display = 'flex';
       $sizeSel.innerHTML = `<option value="all">All Sizes</option>` +
-        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>EU ${s}</option>`).join('');
+        allSizes.map(s => `<option value="${s}"${sizeFilter===s?' selected':''}>${s}</option>`).join('');
     } else {
       $sizeGrp.style.display = 'none';
     }
