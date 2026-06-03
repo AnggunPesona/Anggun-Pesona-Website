@@ -703,7 +703,7 @@ function renderDetail(index, source) {
   const price = fmtPrice(p.price);
   const wa = `https://wa.me/${CONFIG.WHATSAPP}`;
   const ig = `https://instagram.com/${CONFIG.INSTAGRAM}`;
-  window._waCtx = { isPreorder, name: p.name, wa };
+  window._waCtx = { isPreorder, name: p.name, price, wa };
   const ctaLabel = isPreorder ? 'Pre-order via WhatsApp' : 'Order via WhatsApp';
 
   const colourList = (p.colors || '').split(',').map(c => c.trim()).filter(Boolean);
@@ -810,6 +810,7 @@ function buildWaLink() {
     : `Hi Anggun Pesona! I'd like to order ⚡`,
     ``,
     `Product: ${ctx.name}`];
+  if (ctx.price && ctx.price !== '—') lines.push(`Price: ${ctx.price}`);
   if (colour) lines.push(`Colour: ${colour}`);
   if (size)   lines.push(`Size: EU ${size}`);
   const btn = document.getElementById('wa-cta-btn');
@@ -975,8 +976,8 @@ function renderReviews() {
       } else if (typeof item === 'object' && item !== null) {
         // If item is an object, check for url property (new format) or photo/photos (old format)
         if (item.url) {
-          const convertedUrl = driveUrl(item.url);
-          if (convertedUrl) photos = [convertedUrl];
+          // Support comma-separated URLs in url field (same as photos field)
+          photos = item.url.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
         } else {
           photos = getPhotoList(item);
         }
