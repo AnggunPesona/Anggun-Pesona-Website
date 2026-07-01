@@ -292,7 +292,7 @@ async function fetchSheet(id, gid) {
   const csv = await res.text();
   if (csv.toLowerCase().includes('<!doctype html>')) throw new Error('Sheet is private — share as "Anyone with the link can view"');
   return new Promise((resolve, reject) => {
-    Papa.parse(csv, { header: true, skipEmptyLines: true, complete: r => resolve(r.data), error: e => reject(e) });
+    Papa.parse(csv, { header: true, skipEmptyLines: true, transformHeader: h => h.trim(), complete: r => resolve(r.data), error: e => reject(e) });
   });
 }
 
