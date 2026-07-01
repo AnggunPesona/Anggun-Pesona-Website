@@ -7,7 +7,7 @@ Static website for Anggun Pesona, a curated footwear brand based in Brunei. Host
 - Plain HTML/CSS/JS (no framework)
 - Google Sheets as product data backend (fetched client-side)
 - GitHub Pages for hosting
-- Repo: https://github.com/AnggunPesona/Anggun-Pesona-Website
+- Repo: https://github.com/AnggunPesona/anggunpesona.github.io (renamed from Anggun-Pesona-Website, 2026-07-01)
 
 ## Key Files
 - `index.html` — Home page (SPA-style root)
