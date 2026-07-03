@@ -65,6 +65,15 @@
         <option value="all">All Sizes</option>
       </select>
     </div>
+    <div class="filter-group" id="poFilterSortGroup">
+      <label for="sortSelectPO">Sort by</label>
+      <select class="filter-select" id="sortSelectPO" onchange="setPoSort(this.value)">
+        <option value="default">Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="name-asc">Name: A to Z</option>
+      </select>
+    </div>
   </div>
   <div class="products-section">
     <div id="po-loading" class="loading-state"><div class="spinner"></div><p>Loading products…</p></div>
@@ -146,6 +155,6 @@
 <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="/script.js?v=5"></script>
+<script src="/script.js?v=6"></script>
 </body>
 </html>

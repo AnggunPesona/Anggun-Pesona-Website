@@ -94,7 +94,7 @@ const SOURCED_PHOTOS = [
 let poLoaded = false, isLoaded = false;
 let poProducts = [], isProducts = [];
 let prevPage = 'preorders';
-let currentPoFilter = 'all', currentPoBrand = 'all', currentPoSize = 'all';
+let currentPoFilter = 'all', currentPoBrand = 'all', currentPoSize = 'all', currentPoSort = 'default';
 let currentIsFilter = 'all', currentIsBrand = 'all', currentIsSize = 'all';
 let poCurrentPage = 1;
 const PO_PER_PAGE = 12;
@@ -412,6 +412,35 @@ function buildPageNumbers(current, total) {
 function setPoFilter(f) { currentPoFilter = f; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function setPoBrand(b)  { currentPoBrand  = b; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function setPoSize(s)   { currentPoSize   = s; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+function setPoSort(s)   { currentPoSort   = s; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+
+/* Extract a numeric price for sorting. Strips currency prefixes (B$, RM) and
+   any non-numeric characters. Returns NaN when no number is present. */
+function priceValue(p) {
+  const raw = String(p == null ? '' : p).replace(/[^0-9.]/g, '');
+  const n = parseFloat(raw);
+  return isNaN(n) ? NaN : n;
+}
+
+/* Sort a product list in place according to the current sort option.
+   Items without a valid price are pushed to the end for price sorts. */
+function sortProducts(list, sortKey) {
+  if (sortKey === 'price-asc' || sortKey === 'price-desc') {
+    const dir = sortKey === 'price-asc' ? 1 : -1;
+    return list.sort((a, b) => {
+      const pa = priceValue(a.price), pb = priceValue(b.price);
+      const aNaN = isNaN(pa), bNaN = isNaN(pb);
+      if (aNaN && bNaN) return 0;
+      if (aNaN) return 1;
+      if (bNaN) return -1;
+      return (pa - pb) * dir;
+    });
+  }
+  if (sortKey === 'name-asc') {
+    return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }
+  return list;
+}
 function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
 
 function renderPreorders() {
@@ -466,6 +495,11 @@ function renderPreorders() {
   );
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }
   $empty.style.display = 'none';
+
+  /* Sort (applied after filtering, before pagination) */
+  const $sortSel = document.getElementById('sortSelectPO');
+  if ($sortSel && $sortSel.value !== currentPoSort) $sortSel.value = currentPoSort;
+  sortProducts(list, currentPoSort);
 
   /* Pagination */
   const totalPages = Math.ceil(list.length / PO_PER_PAGE);
