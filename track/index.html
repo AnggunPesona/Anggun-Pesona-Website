@@ -118,6 +118,69 @@
     .track-spinner{display:inline-block;width:1.1rem;height:1.1rem;border:2px solid #eddbe1;border-top-color:#a86178;
       border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:.4rem;}
     @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* ---- Booking (self-collect / delivery) ---- */
+    .slot-chip{display:inline-block;margin-top:.35rem;padding:.35rem .7rem;border-radius:999px;background:#f6e7ec;
+      color:#a86178;font-size:.75rem;font-weight:600;font-family:'DM Sans',sans-serif;}
+    .bk-cta{margin-top:1.2rem;width:100%;padding:.95rem 1rem;border:none;border-radius:14px;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-weight:600;font-size:.98rem;color:#fff;
+      background:linear-gradient(135deg,#c98a9e,#a86178);transition:transform .15s ease,box-shadow .15s ease;
+      display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .bk-cta:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(168,97,120,.28);}
+    .bk-cta.open{background:#faf4f6;color:#a86178;border:1px solid #eccdd8;}
+    .bk-panel{margin-top:1.2rem;border-top:1px dashed #efdde2;padding-top:1.4rem;}
+    .bk-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:#3a2a30;margin:0 0 .2rem;}
+    .bk-sub{font-family:'DM Sans',sans-serif;font-size:.85rem;color:#8a6b74;margin:0 0 .4rem;}
+    .bk-label{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+      color:#a86178;margin:1.5rem 0 .6rem;}
+    .bk-methods{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;}
+    .bk-method{border:1.5px solid #f0e2e6;border-radius:14px;padding:.9rem .5rem;text-align:center;cursor:pointer;
+      background:#faf4f6;transition:all .15s ease;}
+    .bk-method:hover{border-color:#e3b9c6;}
+    .bk-method.active{border-color:#a86178;background:#fff;box-shadow:0 6px 16px rgba(168,97,120,.14);}
+    .bk-method-ic{font-size:1.3rem;line-height:1;}
+    .bk-method-t{display:block;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.8rem;margin-top:.4rem;color:#3a2a30;}
+    .bk-method-s{display:block;font-family:'DM Sans',sans-serif;font-size:.66rem;color:#9a8188;margin-top:.15rem;}
+    .bk-field{margin-top:1.5rem;}
+    .bk-field label{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:#6f5a60;margin-bottom:.4rem;}
+    .bk-field input,.bk-field select,.bk-field textarea{width:100%;padding:.8rem 1rem;border:1px solid #e3d4d9;border-radius:12px;
+      font-family:'DM Sans',sans-serif;font-size:.95rem;color:#3a2a30;background:#fff;box-sizing:border-box;}
+    .bk-field input:focus,.bk-field select:focus,.bk-field textarea:focus{outline:none;border-color:#c98a9e;box-shadow:0 0 0 3px rgba(201,138,158,.15);}
+    .bk-field input[readonly]{background:#faf4f6;color:#8a6b74;}
+    .bk-field textarea{resize:vertical;min-height:70px;}
+    .bk-slots{display:flex;flex-wrap:wrap;gap:.5rem;}
+    .bk-slot{padding:.55rem 1rem;border:1.5px solid #f0e2e6;border-radius:999px;background:#faf4f6;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;color:#6f5a60;transition:all .15s ease;}
+    .bk-slot:hover{border-color:#e3b9c6;}
+    .bk-slot.active{border-color:#a86178;background:#a86178;color:#fff;}
+    .bk-batch{display:flex;align-items:center;gap:.8rem;border:1.5px solid #f0e2e6;border-radius:14px;padding:.9rem 1rem;
+      background:#faf4f6;cursor:pointer;margin-bottom:.6rem;transition:all .15s ease;}
+    .bk-batch:hover{border-color:#e3b9c6;}
+    .bk-batch.active{border-color:#a86178;background:#fff;box-shadow:0 6px 16px rgba(168,97,120,.12);}
+    .bk-batch-tag{flex:0 0 auto;width:2.6rem;height:2.6rem;border-radius:50%;background:#f6e7ec;color:#a86178;
+      font-family:'Playfair Display',serif;font-weight:600;font-size:1.05rem;display:flex;align-items:center;justify-content:center;}
+    .bk-batch.active .bk-batch-tag{background:#a86178;color:#fff;}
+    .bk-batch-info b{font-family:'DM Sans',sans-serif;font-size:.92rem;color:#3a2a30;}
+    .bk-batch-info span{display:block;font-family:'DM Sans',sans-serif;font-size:.78rem;color:#8a6b74;margin-top:.1rem;}
+    .bk-hint{font-family:'DM Sans',sans-serif;font-size:.78rem;color:#9a8188;margin:.5rem .1rem 0;line-height:1.5;}
+    .bk-hint.warn{background:#fff6e9;border:1px solid #f0dcc0;color:#8a6a3a;padding:.6rem .8rem;border-radius:10px;margin-top:.7rem;}
+    .bk-hint.info{background:#f2f6fb;border:1px solid #cfdcf0;color:#3a5a8a;padding:.6rem .8rem;border-radius:10px;margin-top:.7rem;}
+    .bk-disc{margin-top:1.6rem;padding:1.1rem 1.2rem;border-radius:14px;background:#faf4f6;border:1px solid #f0e2e6;}
+    .bk-disc-t{font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;color:#8a5a68;margin-bottom:.5rem;}
+    .bk-disc p{font-family:'DM Sans',sans-serif;font-size:.82rem;color:#8a6b74;line-height:1.6;margin:0 0 .55rem;}
+    .bk-disc p:last-child{margin-bottom:0;}
+    .bk-disc strong{color:#6f5a60;}
+    .bk-submit{margin-top:1.5rem;width:100%;padding:1rem;border:none;border-radius:14px;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-weight:600;font-size:1rem;color:#fff;
+      background:linear-gradient(135deg,#25D366,#128C7E);transition:transform .15s ease,box-shadow .15s ease;
+      display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .bk-submit:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(18,140,126,.28);}
+    .bk-submit[disabled]{opacity:.55;cursor:default;transform:none;box-shadow:none;}
+    .bk-submit-hint{text-align:center;font-family:'DM Sans',sans-serif;font-size:.75rem;color:#b3a0a6;margin-top:.7rem;}
+    .bk-banner{margin-top:1.2rem;padding:1.1rem 1.1rem;border-radius:14px;background:#e6f5ea;border:1px solid #bfe3c6;}
+    .bk-banner b{font-family:'DM Sans',sans-serif;color:#1c5c33;font-size:.92rem;}
+    .bk-banner p{font-family:'DM Sans',sans-serif;margin:.35rem 0 0;font-size:.82rem;color:#2f6b40;line-height:1.55;}
+    .bk-hide{display:none;}
   </style>
 </head>
 <body>
@@ -204,6 +267,22 @@ const TRACK_CONFIG = {
   WHATSAPP:  '6737471323',
 };
 
+/* ============================================================
+   BOOKING (self-collect / delivery)
+   ------------------------------------------------------------
+   Fill these AFTER doing the one-time Google setup (see the
+   BOOKING-SETUP guide). Until SUBMIT_URL is filled, the booking
+   button stays hidden and the tracker behaves exactly as before.
+     • SUBMIT_URL — the Apps Script Web App /exec link that saves
+       each booking into your "Bookings" sheet.
+     • AVAIL_CSV  — the PUBLISHED "Booking" availability tab (CSV).
+       Columns: Method | Location | Date | Time | Available
+   ============================================================ */
+const BOOKING_CONFIG = {
+  SUBMIT_URL: 'https://script.google.com/macros/s/AKfycbwRp2pUkodXgCjzadZHSBVhoAuVNPoeYqcgZhOsNIIj_TEIwkuBCTURifps4PBZu37t/exec',
+  AVAIL_CSV:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHy7_YGVvW16CIzsOmtSSR9XxuuC1Y8Ahiz4AAmTxDTSP1nVYOa5wgW5_PY6yVfJ6b8cInDTLenEJm/pub?gid=9847508&single=true&output=csv',
+};
+
 // ---- Smart-branch stages ----
 // Shared journey up to arrival, then EITHER self-collect OR delivery (chosen per order).
 // `match` = status words (lowercase) mapping a sheet status to that stage.
@@ -215,7 +294,8 @@ const SHARED_STAGES = [
   { title:'Arrived in Brunei',   sub:'Landed and being checked / sorted',    match:['arrived in brunei','arrived','in brunei','customs','sorting'] },
 ];
 const COLLECT_STAGES = [
-  { title:'Ready for collection',sub:'Ready! We\'ll arrange your pickup',    match:['ready for collection','ready for pickup','ready','collection','collect'] },
+  { title:'Ready for collection',sub:'Ready! Book your pickup slot below 💕', match:['ready for collection','ready for pickup','ready','collection','collect'] },
+  { title:'Collection booked',   sub:'Slot booked — wait for our confirmation text', match:['collection booked','booked for collection','collect booked','pickup booked'] },
   { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
 ];
 // Sg Liang self-collect: an extra hop — items move to the Sg Liang team first,
@@ -223,11 +303,12 @@ const COLLECT_STAGES = [
 // routes here. Within this branch, "ready" = ready stage, "collected" = done.
 const SGLIANG_STAGES = [
   { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team', match:['sg liang','sgliang','with sg liang','items with sg liang','sg liang team'] },
-  { title:'Ready for collection',     sub:'Ready to collect at Sg Liang',           match:['ready'] },
+  { title:'Ready for collection',     sub:'Ready! Book your pickup slot below 💕',   match:['ready'] },
+  { title:'Collection booked',        sub:'Slot booked — wait for our confirmation text', match:['collection booked','booked for collection','pickup booked','booked'] },
   { title:'Collected',                sub:'Picked up — thank you! 💕',              match:['collected','picked up'] },
 ];
 const DELIVER_STAGES = [
-  { title:'Booked for delivery', sub:'Delivery arranged for your order',     match:['booked for delivery','booked','for delivery','scheduled for delivery'] },
+  { title:'Booked for delivery', sub:'Slot booked — wait for our confirmation text', match:['booked for delivery','delivery booked','for delivery','scheduled for delivery'] },
   { title:'Picked up by runner', sub:'With our runner, on its way to you',    match:['picked up by runner','runner','picked up by courier','courier','out for delivery','with courier','dispatched'] },
   { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
 ];
@@ -319,6 +400,7 @@ async function trackLookup(){
   const status  = firstVal(['Status','Stage','State']);
   const updated = firstVal(['Updated','Last Updated','Date','Updated On']);
   const eta     = firstVal(['ETA','Upcoming ETA','Targeted ETA','Estimated Arrival','Est Arrival','Arrival','Est. Arrival']);
+  const slot    = firstVal(['Slot','Booked Slot','Booking Slot','Collection Slot','Pickup Slot','Booking Detail','Booking Details']);
 
   // Build the item list. Supports BOTH layouts:
   //  • one row per item  → Product / Color / Size in their own columns
@@ -361,7 +443,12 @@ async function trackLookup(){
       let cls = '';
       if(done || i < idx){ cls = 'done'; }
       else if(i === idx){  cls = 'current'; }
-      return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${esc(st.sub)}</div></li>`;
+      let subHtml = esc(st.sub);
+      // On a "booked" step, show the confirmed slot (from the sheet) as a chip.
+      if(cls && /booked/i.test(st.title) && slot){
+        subHtml = `${esc(st.sub)}<br><span class="slot-chip">${esc(slot)}</span>`;
+      }
+      return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${subHtml}</div></li>`;
     }).join('') + '</ul>';
     if(done){
       stepsHtml += `<div style="text-align:center;margin-top:.4rem"><span class="track-status-pill">🎉 ${esc(stages[idx].title)} — thank you!</span></div>`;
@@ -397,10 +484,192 @@ async function trackLookup(){
       ${etaHtml}
       ${stepsHtml}
       ${noteHtml}
+      <div id="bookingArea"></div>
       <div class="track-share">
         <button type="button" onclick="copyTrackLink(this,'${esc(orderNo)}')">🔗 Copy tracking link</button>
       </div>
     </div>`;
+
+  mountBooking(orderNo, R, slot);
+}
+
+/* ============================================================
+   BOOKING UI — appears inside the tracking card at "Ready".
+   Submits straight to the Bookings sheet (via Apps Script),
+   NOT back to WhatsApp. Availability is read from AVAIL_CSV.
+   ============================================================ */
+let AUTO_OPEN_BOOKING = false;
+let _availCache = null;
+const BK_LOC = { lambak:'Lambak Kanan', sgliang:'Sg Liang' };
+let bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
+
+function bkCanonLoc(loc){
+  const l = (loc||'').toLowerCase();
+  if(l.includes('lambak')) return 'Lambak Kanan';
+  if(l.includes('liang'))  return 'Sg Liang';
+  return loc;
+}
+
+async function bkLoadAvail(){
+  if(_availCache) return _availCache;
+  if(!BOOKING_CONFIG.AVAIL_CSV){ _availCache = {collect:{}, delivery:[]}; return _availCache; }
+  try{
+    const res = await fetch(BOOKING_CONFIG.AVAIL_CSV);
+    const csv = await res.text();
+    const rows = Papa.parse(csv,{header:true,skipEmptyLines:true,transformHeader:h=>h.trim()}).data;
+    const collect = {}, delivery = [];
+    rows.forEach(r=>{
+      const method=(col(r,['Method','Type'])||'').toString().trim().toLowerCase();
+      const locRaw=(col(r,['Location','Place','Branch','Batch'])||'').toString().trim();
+      const date=(col(r,['Date','Day'])||'').toString().trim();
+      const time=(col(r,['Time','Slot','Timing'])||'').toString().trim();
+      const av=(col(r,['Available','Open','Status'])||'').toString().trim().toLowerCase();
+      const ok = !(['no','n','false','0','closed','full','unavailable'].includes(av));
+      if(!method && !locRaw) return;
+      if(method.indexOf('deliver')===0 || /batch/i.test(locRaw)){
+        delivery.push({loc:locRaw, date, time, ok});
+      } else {
+        const loc = bkCanonLoc(locRaw);
+        (collect[loc] = collect[loc]||{});
+        (collect[loc][date] = collect[loc][date]||[]).push({time, ok});
+      }
+    });
+    _availCache = {collect, delivery};
+  }catch(e){ _availCache = {collect:{}, delivery:[]}; }
+  return _availCache;
+}
+
+function mountBooking(orderNo, R, slot){
+  const area = document.getElementById('bookingArea');
+  if(!area) return;
+  const ready = !R.cancelled && !R.done && /ready/i.test(((R.stages[R.idx]||{}).title)||'');
+  if(!BOOKING_CONFIG.SUBMIT_URL || !ready){ area.innerHTML=''; return; }
+  bkState = { order:orderNo, method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
+  area.innerHTML = `<button class="bk-cta" id="bkCta" onclick="bkToggle()"><span>📅 Book your collection or delivery</span></button>
+    <div class="bk-panel bk-hide" id="bkPanel"></div>`;
+  bkRenderPanel();
+  if(AUTO_OPEN_BOOKING){ AUTO_OPEN_BOOKING=false; bkToggle(true); }
+}
+
+function bkToggle(forceOpen){
+  const panel = document.getElementById('bkPanel'), cta = document.getElementById('bkCta');
+  if(!panel) return;
+  const open = forceOpen===true ? true : panel.classList.contains('bk-hide');
+  panel.classList.toggle('bk-hide', !open);
+  cta.classList.toggle('open', open);
+  cta.querySelector('span').textContent = open ? '✕ Close booking' : '📅 Book your collection or delivery';
+  if(open) panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function bkRenderPanel(){
+  const panel = document.getElementById('bkPanel');
+  if(!panel) return;
+  const avail = await bkLoadAvail();
+  const m = bkState.method;
+  const methodCards = [
+    ['lambak','🏠','Self-collect','Lambak Kanan'],
+    ['sgliang','🏠','Self-collect','Sg Liang'],
+    ['delivery','🛵','Delivery','Batch 1 / 2 / 3'],
+  ].map(([k,ic,t,s])=>`<div class="bk-method ${m===k?'active':''}" onclick="bkPickMethod('${k}')">
+      <span class="bk-method-ic">${ic}</span><span class="bk-method-t">${t}</span><span class="bk-method-s">${s}</span></div>`).join('');
+  const body = m==='delivery' ? bkDeliveryHtml(avail) : bkCollectHtml(avail, BK_LOC[m]);
+  panel.innerHTML = `
+    <p class="bk-title">Book your collection or delivery</p>
+    <p class="bk-sub">Choose how you'd like to receive order <strong>${esc(bkState.order)}</strong>.</p>
+    <p class="bk-label">Collection method</p>
+    <div class="bk-methods">${methodCards}</div>
+    ${body}
+    <div class="bk-disc">
+      <div class="bk-disc-t">A few gentle notes 🤍</div>
+      <p>Once you've booked, kindly <strong>wait for our confirmation text</strong> before heading over — we'll have your item prepared outside for a smooth, contactless pickup.</p>
+      <p>To keep things easy for both sides, we kindly ask that you <strong>don't drop by unannounced</strong>, as unbooked orders may not be ready.</p>
+      <p>Please arrange your slot <strong>at least 12 hours in advance</strong>.</p>
+    </div>
+    <button class="bk-submit" id="bkSubmit" onclick="bkSubmit()"><span>Send my booking</span></button>
+    <p class="bk-submit-hint">Your booking goes straight to our team — we'll text you to confirm the details.</p>
+    <div id="bkDone"></div>`;
+}
+
+function bkCollectHtml(avail, locName){
+  const loc = (avail.collect && avail.collect[locName]) || {};
+  const dates = Object.keys(loc).filter(d=>d);
+  const sgNote = bkState.method==='sgliang'
+    ? `<p class="bk-hint info">📅 Sg Liang collection is available on <strong>Fridays &amp; Sundays only</strong>.</p>` : '';
+  if(dates.length){
+    if(!bkState.date || !loc[bkState.date]) bkState.date = dates[0];
+    const dateField = `<div class="bk-field"><label>Pick a date</label>
+      <select onchange="bkPickDate(this.value)">${dates.map(d=>`<option value="${esc(d)}" ${d===bkState.date?'selected':''}>${esc(d)}</option>`).join('')}</select>
+      ${sgNote}
+      <p class="bk-hint">⏱️ Slots must be booked <strong>at least 12 hours ahead</strong> so our team can prepare your item.</p></div>`;
+    const slots = loc[bkState.date]||[];
+    const slotField = `<p class="bk-label">Available time slots</p>
+      <div class="bk-slots">${slots.map(sl=>{
+        const on = sl.ok!==false, active = bkState.slot===sl.time && on;
+        return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
+      }).join('') || '<p class="bk-hint">No open slots for this date — please pick another.</p>'}</div>
+      <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>
+      <p class="bk-hint warn">⏰ Kindly collect within the hour of your chosen slot. Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
+    return dateField + slotField;
+  }
+  // Fallback if the availability tab has no rows for this location yet.
+  return `<div class="bk-field"><label>Preferred date</label>
+      <input type="date" value="${esc(bkState.date)}" oninput="bkState.date=this.value">
+      ${sgNote}
+      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
+    <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
+    <p class="bk-hint warn">⏰ Kindly collect within the hour of your slot. Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule.</p>`;
+}
+
+function bkDeliveryHtml(avail){
+  const batches = (avail.delivery||[]).filter(b=>b.ok!==false);
+  let cards;
+  if(batches.length){
+    if(!bkState.batch || !batches.some(b=>b.loc===bkState.batch)) bkState.batch = batches[0].loc;
+    cards = batches.map(b=>`<div class="bk-batch ${bkState.batch===b.loc?'active':''}" onclick="bkPickBatch('${esc(b.loc)}')">
+        <div class="bk-batch-tag">${esc((b.loc.match(/\d+/)||['•'])[0])}</div>
+        <div class="bk-batch-info"><b>${esc(b.loc)}</b><span>${esc([b.date,b.time].filter(Boolean).join(' · '))}</span></div></div>`).join('');
+  } else {
+    cards = `<div class="bk-field"><label>Preferred batch / date</label>
+      <input type="text" value="${esc(bkState.batch)}" placeholder="e.g. Batch 2, this Saturday" oninput="bkState.batch=this.value"></div>`;
+  }
+  return `<p class="bk-label">Choose a delivery batch</p>${cards}
+    <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
+    <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
+    <div class="bk-field"><label>Location link (optional)</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
+}
+
+function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkRenderPanel(); }
+function bkPickDate(v){ bkState.date=v; bkState.slot=''; bkRenderPanel(); }
+function bkPickSlot(t){ bkState.slot=t; bkRenderPanel(); }
+function bkPickBatch(b){ bkState.batch=b; bkRenderPanel(); }
+
+async function bkSubmit(){
+  if(bkState.sending) return;
+  const done = document.getElementById('bkDone'), m = bkState.method;
+  if(m==='delivery' && !(bkState.address||'').trim()){ done.innerHTML = `<p class="bk-hint warn">Please share your delivery address so we can confirm the rate.</p>`; return; }
+  if(m!=='delivery' && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a date first.</p>`; return; }
+  const payload = {
+    order: bkState.order,
+    method: m==='delivery' ? 'Delivery' : (m==='sgliang' ? 'Self-collect · Sg Liang' : 'Self-collect · Lambak Kanan'),
+    date: bkState.date||'', slot: bkState.slot||'',
+    batch: m==='delivery' ? (bkState.batch||'') : '',
+    address: m==='delivery' ? (bkState.address||'') : '',
+    location: m==='delivery' ? (bkState.location||'') : '',
+    page: location.href, submitted: new Date().toISOString(),
+  };
+  const btn = document.getElementById('bkSubmit');
+  bkState.sending = true; btn.setAttribute('disabled','disabled'); btn.querySelector('span').innerHTML = '<span class="track-spinner"></span>Sending…';
+  try{
+    await fetch(BOOKING_CONFIG.SUBMIT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(payload)});
+  }catch(e){ /* opaque no-cors response — assume delivered */ }
+  bkState.sending = false;
+  const when = m==='delivery'
+    ? `<strong>${esc(payload.batch||'your chosen batch')}</strong>`
+    : `<strong>${esc(payload.date)}${payload.slot?', '+esc(payload.slot):''}</strong> at <strong>${esc(payload.method.replace('Self-collect · ',''))}</strong>`;
+  document.getElementById('bkPanel').innerHTML =
+    `<div class="bk-banner"><b>✓ Your booking request is in!</b>
+       <p>${m==='delivery'?'Delivery':'Collection'}: ${when}. Our team will <strong>text you to confirm the details</strong> shortly — please wait for that message before heading over 💕</p></div>`;
+  const cta = document.getElementById('bkCta'); if(cta) cta.classList.add('bk-hide');
 }
 
 // Build + copy a direct link that auto-opens this order, e.g. .../track?order=May26A1234
@@ -419,7 +688,11 @@ function copyTrackLink(btn, orderNo){
 document.addEventListener('DOMContentLoaded',()=>{
   const wa = `https://wa.me/${TRACK_CONFIG.WHATSAPP}?text=${encodeURIComponent("Hi Anggun Pesona! I'd like to check on my pre-order 📦")}`;
   const el = document.getElementById('track-wa'); if(el) el.href = wa;
-  const pre = new URLSearchParams(location.search).get('order');
+  const params = new URLSearchParams(location.search);
+  const pre = params.get('order');
+  // ?book=1 (or ?book) auto-opens the booking panel after the order loads —
+  // paste this link into your "your item is ready" text to customers.
+  if(params.has('book') && params.get('book') !== '0') AUTO_OPEN_BOOKING = true;
   if(pre){ document.getElementById('trackInput').value = pre; trackLookup(); }
 });
 </script>
