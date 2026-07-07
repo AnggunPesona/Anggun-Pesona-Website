@@ -92,6 +92,7 @@
     .track-eta-label{display:block;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
       letter-spacing:.6px;text-transform:uppercase;color:#a86178;}
     .track-eta-val{display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:#3a2a30;margin-top:.05rem;}
+    .track-eta-note{display:block;font-family:'DM Sans',sans-serif;font-size:.72rem;line-height:1.45;color:#a58c93;margin-top:.3rem;}
 
     .track-note{display:flex;gap:.55rem;margin-top:1.3rem;padding:.9rem 1rem;border-radius:12px;
       background:#faf4f6;border:1px solid #f0e2e6;font-family:'DM Sans',sans-serif;font-size:.82rem;
@@ -207,8 +208,9 @@ const TRACK_CONFIG = {
 // Shared journey up to arrival, then EITHER self-collect OR delivery (chosen per order).
 // `match` = status words (lowercase) mapping a sheet status to that stage.
 const SHARED_STAGES = [
-  { title:'Order placed',        sub:'We\'ve received your pre-order',       match:['order placed','ordered','confirmed','placed','received'] },
-  { title:'Waiting for Shipment',sub:'Waiting for your order to ship out',   match:['waiting for shipment','waiting','awaiting','submitted','with supplier','ordered from supplier','supplier'] },
+  { title:'Order placed',              sub:'We\'ve received your pre-order',            match:['order placed','order received','confirmed','placed','received'] },
+  { title:'Order submitted to Supplier',sub:'Your order has been sent to our supplier', match:['order submitted to supplier','submitted to supplier','order submitted','submitted','with supplier','ordered from supplier','supplier'] },
+  { title:'Waiting for Shipment',      sub:'Waiting for your order to ship out',        match:['waiting for shipment','waiting','awaiting'] },
   { title:'In Transit',          sub:'On its way to Brunei',                 match:['in transit','transit','shipped','on the way','en route','enroute'] },
   { title:'Arrived in Brunei',   sub:'Landed and being checked / sorted',    match:['arrived in brunei','arrived','in brunei','customs','sorting'] },
 ];
@@ -229,7 +231,7 @@ const DELIVER_STAGES = [
   { title:'Picked up by runner', sub:'With our runner, on its way to you',    match:['picked up by runner','runner','picked up by courier','courier','out for delivery','with courier','dispatched'] },
   { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
 ];
-const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-collect, Sg Liang pickup, or delivery once it arrives', match:[] };
+const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-pick up at Lambak Kanan/Sg Liang, or delivery once it arrives', match:[] };
 const CANCELLED_WORDS = ['cancelled','canceled','refunded','void'];
 
 const anyHit = (s, stages) => stages.some(st => st.match.some(w => s.includes(w)));
@@ -379,7 +381,8 @@ async function trackLookup(){
   // Upcoming ETA band — shown whenever admin has filled the ETA cell (and order isn't finished/cancelled).
   const etaHtml = (eta && !R.cancelled && !R.done)
     ? `<div class="track-eta"><span class="track-eta-ic" aria-hidden="true">📅</span>
-         <span><span class="track-eta-label">Targeted date ready for collection</span><span class="track-eta-val">${esc(eta)}</span></span></div>`
+         <span><span class="track-eta-label">Targeted date ready for collection</span><span class="track-eta-val">${esc(eta)}</span>
+         <span class="track-eta-note">This date is an estimate and will be updated according to our shipment monitoring.</span></span></div>`
     : '';
 
   box.innerHTML = `
