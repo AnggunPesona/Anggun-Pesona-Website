@@ -108,6 +108,7 @@
   <ul class="nav-links" id="navLinks">
     <li><a href="/">Home</a></li>
     <li><a href="/preorders">Pre-Orders</a></li>
+    <li><a href="/track">Track</a></li>
     <li><a href="/instocks">In-Stocks</a></li>
     <li><a href="/bridal">Bridal</a></li>
     <li><a href="/reviews">Reviews</a></li>
@@ -127,16 +128,16 @@
 
   <div class="track-wrap">
     <div class="track-search">
-      <input type="text" id="trackInput" placeholder="e.g. AP-1042" autocomplete="off"
+      <input type="text" id="trackInput" placeholder="e.g. May26AXXYYYY (Y - last 4 digit of your phone no.)" autocomplete="off"
              onkeydown="if(event.key==='Enter')trackLookup()">
       <button type="button" onclick="trackLookup()">Track</button>
     </div>
-    <p class="track-hint">Your order number is on your invoice / WhatsApp confirmation.</p>
+    <p class="track-hint">Your order number is in the form we provided when you placed your order.</p>
 
     <div id="trackResult"></div>
 
     <p class="track-help">
-      Can't find your order? <a id="track-wa" href="#" target="_blank">Message us on WhatsApp</a>
+      Can't find your order? <a id="track-wa" href="#" target="_blank">Contact us</a>
     </p>
   </div>
 </div>
