@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Invoice Maker · Anggun Pesona (Admin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=Italianno&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --cream:#FDF6E3; --cream-dark:#F5EDD4; --gold:#C9A96E; --gold-dark:#B8956A;
+    --ink:#2B0A12; --muted:#8a7a70; --line:#e6dcc4; --white:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:#efe7d2;color:var(--ink);line-height:1.5;padding:24px 16px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1.title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700}
+  .sub{color:var(--muted);font-size:14px;margin-top:2px}
+  .cols{display:grid;grid-template-columns:400px 1fr;gap:28px;margin-top:24px;align-items:start}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+
+  /* ---- Control panel ---- */
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+  .panel h2{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:.3px}
+  .fieldrow{margin-bottom:12px}
+  .fieldrow.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  input,select,textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;background:#fdfcf7;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  textarea{resize:vertical;min-height:52px}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;padding:10px 16px;border:none;border-radius:10px;cursor:pointer;transition:transform .08s,box-shadow .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn-gold{background:var(--gold);color:#fff;box-shadow:0 3px 0 var(--gold-dark)}
+  .btn-gold:hover{box-shadow:0 5px 0 var(--gold-dark)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--gold)}
+  .btn-ink{background:var(--ink);color:var(--cream);box-shadow:0 3px 0 #1a060c}
+  .btn-ink:hover{box-shadow:0 5px 0 #1a060c}
+  .btn-full{width:100%}
+  .btn-sm{padding:7px 12px;font-size:13px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .status{font-size:12.5px;margin-top:8px;padding:8px 10px;border-radius:8px;display:none}
+  .status.show{display:block}
+  .status.ok{background:#eaf6ec;color:#2e6b3a}
+  .status.err{background:#fdeaea;color:#a33}
+  .status.load{background:#f3ecd8;color:#8a6d2f}
+
+  /* line item editor list */
+  .lines{margin-top:6px}
+  .lineitem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#fbf7ec;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px}
+  .lineitem .li-main{font-size:13.5px;font-weight:600}
+  .lineitem .li-sub{font-size:12px;color:var(--muted)}
+  .li-del{background:none;border:none;color:#c0392b;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px}
+
+  /* ---- Invoice preview ---- */
+  .preview-shell{display:flex;flex-direction:column;gap:14px}
+  #invoice{background:var(--cream);border:1px solid var(--line);border-radius:4px;padding:44px 44px 34px;box-shadow:0 10px 40px rgba(0,0,0,.12);position:relative;overflow:hidden}
+  #invoice::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--gold),#e4cf9a,var(--gold))}
+  .inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+  .brand-name{font-family:'Playfair Display',serif;font-size:30px;font-weight:800;letter-spacing:.5px;line-height:1}
+  .brand-script{font-family:'Italianno',cursive;font-size:26px;color:var(--gold-dark);margin-top:-2px}
+  .brand-tag{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+  .inv-label{text-align:right}
+  .inv-label .word{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;letter-spacing:4px;color:var(--gold-dark);text-transform:uppercase;line-height:1}
+  .inv-meta{font-size:12.5px;color:#5c4a44;margin-top:8px}
+  .inv-meta b{color:var(--ink)}
+  .inv-rule{height:2px;background:var(--ink);opacity:.85;margin:22px 0 18px}
+
+  .bill{display:flex;justify-content:space-between;gap:24px;margin-bottom:20px}
+  .bill h4{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:4px}
+  .bill .val{font-size:14px;font-weight:600}
+  .bill .val small{display:block;font-weight:400;color:#5c4a44;font-size:12.5px;margin-top:2px}
+  .bill .right{text-align:right}
+
+  table.items{width:100%;border-collapse:collapse;margin-bottom:16px}
+  table.items thead th{font-family:'Cormorant Garamond',serif;font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;color:#fff;background:var(--ink);padding:9px 12px;text-align:left}
+  table.items thead th.r{text-align:right}
+  table.items tbody td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+  table.items tbody td.r{text-align:right;white-space:nowrap}
+  table.items .it-name{font-weight:600}
+  table.items .it-sub{font-size:12px;color:var(--muted);margin-top:1px}
+  .empty-row td{color:var(--muted);font-style:italic;text-align:center;padding:22px}
+
+  .totals{display:flex;justify-content:flex-end}
+  .totals table{width:auto;min-width:260px}
+  .totals td{padding:5px 4px;font-size:13.5px}
+  .totals td.lbl{text-align:right;color:#5c4a44;padding-right:20px}
+  .totals td.amt{text-align:right;white-space:nowrap;font-weight:600}
+  .totals tr.grand td{border-top:2px solid var(--ink);padding-top:9px;font-family:'Playfair Display',serif;font-size:17px;font-weight:700}
+  .totals tr.grand td.amt{color:var(--gold-dark)}
+
+  .inv-foot{margin-top:26px;border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .inv-foot .blk h4{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:4px}
+  .inv-foot .blk div{font-size:12.5px;color:#5c4a44;line-height:1.6}
+  .thanks{text-align:center;margin-top:22px;font-family:'Italianno',cursive;font-size:28px;color:var(--gold-dark)}
+  .contact-line{text-align:center;font-size:12px;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">Invoice Maker <span style="font-family:'Italianno',cursive;color:var(--gold-dark);font-size:30px">· Anggun Pesona</span></h1>
+  <p class="sub">Admin only · Fill in the details, add items, then download the invoice as an image to send to your customer.</p>
+
+  <div class="cols">
+    <!-- ================= CONTROL PANEL ================= -->
+    <div class="panel">
+      <h2>1 · Invoice details</h2>
+      <div class="fieldrow two">
+        <div><label>Invoice No.</label><input id="f-invno" type="text"></div>
+        <div><label>Date</label><input id="f-date" type="date"></div>
+      </div>
+      <div class="fieldrow"><label>Customer name</label><input id="f-cust" type="text" placeholder="e.g. Nur Aisyah"></div>
+      <div class="fieldrow two">
+        <div><label>Contact (WhatsApp)</label><input id="f-phone" type="text" placeholder="+673 ..."></div>
+        <div><label>Order type</label>
+          <select id="f-otype"><option>Pre-Order</option><option>In-Stock</option><option>Bridal Concierge</option><option>Custom Order</option></select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <h2>2 · Add items</h2>
+      <div class="fieldrow">
+        <label>Pick from catalogue</label>
+        <select id="f-catalogue"><option value="">Loading products…</option></select>
+        <div class="hint" id="cat-hint">Loads live from your Google Sheets.</div>
+      </div>
+      <div class="fieldrow two">
+        <div><label>Colour (optional)</label><input id="f-color" type="text" placeholder="e.g. Nude"></div>
+        <div><label>Size (optional)</label><input id="f-size" type="text" placeholder="e.g. 38"></div>
+      </div>
+      <div class="fieldrow two">
+        <div><label>Qty</label><input id="f-qty" type="number" value="1" min="1"></div>
+        <div><label>Unit price (B$)</label><input id="f-price" type="number" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="fieldrow"><label>Item name (edit or type manually)</label><input id="f-name" type="text" placeholder="Type a custom item here"></div>
+      <button class="btn btn-gold btn-full" id="btn-add">+ Add item to invoice</button>
+      <div class="hint">Pick from the dropdown to auto-fill, or just type an item name + price for a custom line.</div>
+
+      <div class="lines" id="lines"></div>
+
+      <div class="divider"></div>
+      <h2>3 · Charges &amp; notes</h2>
+      <div class="fieldrow two">
+        <div><label>Delivery fee (B$)</label><input id="f-delivery" type="number" step="0.01" value="0"></div>
+        <div><label>Discount (B$)</label><input id="f-discount" type="number" step="0.01" value="0"></div>
+      </div>
+      <div class="fieldrow"><label>Deposit paid (B$)</label><input id="f-deposit" type="number" step="0.01" value="0"><div class="hint">If set, invoice shows a "Balance Due" line.</div></div>
+      <div class="fieldrow"><label>Payment instructions</label><textarea id="f-payment">Bank transfer to Baiduri 12-34-5678 (Anggun Pesona). Please send screenshot via WhatsApp.</textarea></div>
+      <div class="fieldrow"><label>Notes (optional)</label><textarea id="f-notes" placeholder="e.g. Pre-order ETA 3–4 weeks. Thank you!"></textarea></div>
+
+      <div class="divider"></div>
+      <div class="btnrow">
+        <button class="btn btn-ink" id="btn-download">⬇ Download invoice (PNG)</button>
+        <button class="btn btn-ghost" id="btn-reset">Reset</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <!-- ================= LIVE PREVIEW ================= -->
+    <div class="preview-shell">
+      <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600">Live preview</div>
+      <div id="invoice">
+        <div class="inv-top">
+          <div>
+            <div class="brand-name">ANGGUN PESONA</div>
+            <div class="brand-script">curated footwear</div>
+            <div class="brand-tag">Brunei Darussalam</div>
+          </div>
+          <div class="inv-label">
+            <div class="word">Invoice</div>
+            <div class="inv-meta">
+              <div><b>No:</b> <span id="p-invno">—</span></div>
+              <div><b>Date:</b> <span id="p-date">—</span></div>
+              <div><b>Type:</b> <span id="p-otype">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="inv-rule"></div>
+        <div class="bill">
+          <div>
+            <h4>Billed to</h4>
+            <div class="val"><span id="p-cust">Customer name</span><small id="p-phone"></small></div>
+          </div>
+          <div class="right">
+            <h4>From</h4>
+            <div class="val">Anggun Pesona<small>wa.me/6737471323<br>@anggunpesona.co</small></div>
+          </div>
+        </div>
+        <table class="items">
+          <thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Amount</th></tr></thead>
+          <tbody id="p-rows"><tr class="empty-row"><td colspan="4">No items added yet.</td></tr></tbody>
+        </table>
+        <div class="totals">
+          <table>
+            <tr><td class="lbl">Subtotal</td><td class="amt" id="p-subtotal">B$0.00</td></tr>
+            <tr id="p-delivery-row"><td class="lbl">Delivery</td><td class="amt" id="p-delivery">B$0.00</td></tr>
+            <tr id="p-discount-row"><td class="lbl">Discount</td><td class="amt" id="p-discount">−B$0.00</td></tr>
+            <tr class="grand"><td class="lbl">Total</td><td class="amt" id="p-total">B$0.00</td></tr>
+            <tr id="p-deposit-row"><td class="lbl">Deposit paid</td><td class="amt" id="p-deposit">−B$0.00</td></tr>
+            <tr id="p-balance-row" class="grand"><td class="lbl">Balance Due</td><td class="amt" id="p-balance">B$0.00</td></tr>
+          </table>
+        </div>
+        <div class="inv-foot">
+          <div class="blk" id="p-payment-blk"><h4>Payment</h4><div id="p-payment"></div></div>
+          <div class="blk" id="p-notes-blk" style="display:none"><h4>Notes</h4><div id="p-notes"></div></div>
+        </div>
+        <div class="thanks">Terima kasih, thank you!</div>
+        <div class="contact-line">WhatsApp wa.me/6737471323 · Instagram @anggunpesona.co</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- CONFIG (mirrors site) ---------- */
+const CONFIG = {
+  PREORDER_SHEET_ID:'1cVy0tjGz6uoh5lis0Bqe7-GZ2Zv7UU1Kygtk0mJo53I',
+  INSTOCK_SHEET_ID:'1DCvNBnImX3Aktwdc32f9LzHhWuffcYTSLhj9d05XFT0',
+  GID:'0'
+};
+const $ = id => document.getElementById(id);
+let lineItems = [];
+
+/* ---------- helpers ---------- */
+const money = n => 'B$' + (Number(n)||0).toFixed(2);
+function priceNum(p){ if(p==null) return 0; const m=String(p).replace(/[^0-9.]/g,''); return parseFloat(m)||0; }
+
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function genInvNo(){
+  const d=new Date();
+  const ymd = d.getFullYear().toString().slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  const rand = Math.floor(Math.random()*900+100);
+  return `AP-${ymd}-${rand}`;
+}
+function fmtDate(iso){ if(!iso) return '—'; const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); }
+
+/* ---------- load catalogue ---------- */
+async function fetchSheet(id){
+  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${CONFIG.GID}`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const csv=await res.text();
+  if(csv.toLowerCase().includes('<!doctype html>')) throw new Error('Sheet is private');
+  return new Promise((resolve,reject)=>{
+    Papa.parse(csv,{header:true,skipEmptyLines:true,transformHeader:h=>h.trim(),complete:r=>resolve(r.data),error:reject});
+  });
+}
+async function loadCatalogue(){
+  const sel=$('f-catalogue');
+  try{
+    const [pre,ins]=await Promise.all([
+      fetchSheet(CONFIG.PREORDER_SHEET_ID).catch(()=>[]),
+      fetchSheet(CONFIG.INSTOCK_SHEET_ID).catch(()=>[])
+    ]);
+    const opts=[];
+    const add=(rows,tag)=>rows.forEach(r=>{
+      const name=(r['Product Name']||r['name']||'').trim();
+      if(!name) return;
+      const brand=(r['Brand']||r['brand']||'').trim();
+      const price=priceNum(r['Price (BND)']||r['Price']||r['price']);
+      opts.push({name,brand,price,tag});
+    });
+    add(pre,'Pre-Order'); add(ins,'In-Stock');
+    sel.innerHTML='<option value="">— Select a product —</option>';
+    if(!opts.length){ sel.innerHTML='<option value="">No products found (type manually)</option>'; $('cat-hint').textContent='Could not load catalogue — you can still type items manually below.'; return; }
+    opts.sort((a,b)=>a.name.localeCompare(b.name));
+    opts.forEach((o,i)=>{
+      const op=document.createElement('option');
+      op.value=i; op.dataset.name=o.name; op.dataset.price=o.price;
+      op.textContent=`[${o.tag}] ${o.name}${o.brand?' · '+o.brand:''} — ${money(o.price)}`;
+      sel.appendChild(op);
+    });
+    $('cat-hint').textContent=`${opts.length} products loaded from your catalogues.`;
+  }catch(e){
+    sel.innerHTML='<option value="">Could not load — type manually</option>';
+    $('cat-hint').textContent='Could not load catalogue — type items manually below.';
+  }
+}
+
+/* dropdown auto-fills name + price */
+$('f-catalogue').addEventListener('change',e=>{
+  const op=e.target.selectedOptions[0];
+  if(op && op.dataset.name){ $('f-name').value=op.dataset.name; $('f-price').value=op.dataset.price; }
+});
+
+/* ---------- add / remove line items ---------- */
+$('btn-add').addEventListener('click',()=>{
+  const name=$('f-name').value.trim();
+  const price=parseFloat($('f-price').value)||0;
+  const qty=parseInt($('f-qty').value)||1;
+  if(!name){ flash('Enter or pick an item name first.','err'); return; }
+  lineItems.push({name,color:$('f-color').value.trim(),size:$('f-size').value.trim(),qty,price});
+  // clear item inputs
+  $('f-name').value='';$('f-color').value='';$('f-size').value='';$('f-price').value='';$('f-qty').value='1';$('f-catalogue').value='';
+  renderLines(); renderPreview();
+});
+function renderLines(){
+  const box=$('lines');
+  if(!lineItems.length){ box.innerHTML=''; return; }
+  box.innerHTML=lineItems.map((it,i)=>{
+    const sub=[it.color,it.size?'Size '+it.size:''].filter(Boolean).join(' · ');
+    return `<div class="lineitem"><div><div class="li-main">${esc(it.name)}</div><div class="li-sub">${it.qty} × ${money(it.price)}${sub?' · '+esc(sub):''}</div></div><button class="li-del" data-i="${i}" title="Remove">×</button></div>`;
+  }).join('');
+  box.querySelectorAll('.li-del').forEach(b=>b.addEventListener('click',()=>{ lineItems.splice(+b.dataset.i,1); renderLines(); renderPreview(); }));
+}
+
+/* ---------- render preview ---------- */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function renderPreview(){
+  $('p-invno').textContent=$('f-invno').value||'—';
+  $('p-date').textContent=fmtDate($('f-date').value);
+  $('p-otype').textContent=$('f-otype').value;
+  $('p-cust').textContent=$('f-cust').value||'Customer name';
+  $('p-phone').textContent=$('f-phone').value||'';
+
+  const rows=$('p-rows');
+  if(!lineItems.length){ rows.innerHTML='<tr class="empty-row"><td colspan="4">No items added yet.</td></tr>'; }
+  else{
+    rows.innerHTML=lineItems.map(it=>{
+      const sub=[it.color,it.size?'Size '+it.size:''].filter(Boolean).join(' · ');
+      return `<tr><td><div class="it-name">${esc(it.name)}</div>${sub?`<div class="it-sub">${esc(sub)}</div>`:''}</td><td class="r">${it.qty}</td><td class="r">${money(it.price)}</td><td class="r">${money(it.qty*it.price)}</td></tr>`;
+    }).join('');
+  }
+  const subtotal=lineItems.reduce((s,it)=>s+it.qty*it.price,0);
+  const delivery=parseFloat($('f-delivery').value)||0;
+  const discount=parseFloat($('f-discount').value)||0;
+  const deposit=parseFloat($('f-deposit').value)||0;
+  const total=Math.max(0,subtotal+delivery-discount);
+  const balance=Math.max(0,total-deposit);
+
+  $('p-subtotal').textContent=money(subtotal);
+  $('p-delivery').textContent=money(delivery);
+  $('p-discount').textContent='−'+money(discount);
+  $('p-total').textContent=money(total);
+  $('p-deposit').textContent='−'+money(deposit);
+  $('p-balance').textContent=money(balance);
+
+  $('p-delivery-row').style.display=delivery>0?'':'none';
+  $('p-discount-row').style.display=discount>0?'':'none';
+  $('p-deposit-row').style.display=deposit>0?'':'none';
+  $('p-balance-row').style.display=deposit>0?'':'none';
+
+  const pay=$('f-payment').value.trim();
+  $('p-payment').textContent=pay; $('p-payment-blk').style.display=pay?'':'none';
+  const notes=$('f-notes').value.trim();
+  $('p-notes').textContent=notes; $('p-notes-blk').style.display=notes?'':'none';
+}
+
+/* live update on any input */
+['f-invno','f-date','f-otype','f-cust','f-phone','f-delivery','f-discount','f-deposit','f-payment','f-notes']
+  .forEach(id=>{ $(id).addEventListener('input',renderPreview); $(id).addEventListener('change',renderPreview); });
+
+/* ---------- download PNG ---------- */
+$('btn-download').addEventListener('click',async()=>{
+  if(!lineItems.length){ flash('Add at least one item before downloading.','err'); return; }
+  flash('Generating image…','load');
+  const node=$('invoice');
+  try{
+    const canvas=await html2canvas(node,{scale:2,backgroundColor:'#FDF6E3',useCORS:true});
+    const link=document.createElement('a');
+    const cust=($('f-cust').value||'customer').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+    link.download=`Invoice-${$('f-invno').value||'AP'}-${cust}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    flash('Downloaded! Check your Downloads folder, then send it via WhatsApp.','ok');
+  }catch(e){ flash('Could not generate image: '+e.message,'err'); }
+});
+
+/* ---------- reset ---------- */
+$('btn-reset').addEventListener('click',()=>{
+  if(!confirm('Clear this invoice and start fresh?')) return;
+  lineItems=[];
+  ['f-cust','f-phone','f-color','f-size','f-name','f-price','f-notes'].forEach(id=>$(id).value='');
+  $('f-qty').value='1'; $('f-delivery').value='0'; $('f-discount').value='0'; $('f-deposit').value='0';
+  $('f-catalogue').value='';
+  $('f-invno').value=genInvNo(); $('f-date').value=todayISO();
+  renderLines(); renderPreview();
+});
+
+let flashTimer;
+function flash(msg,type){
+  const s=$('status'); s.textContent=msg; s.className='status show '+type;
+  clearTimeout(flashTimer);
+  if(type!=='load') flashTimer=setTimeout(()=>s.classList.remove('show'),5000);
+}
+
+/* ---------- init ---------- */
+$('f-invno').value=genInvNo();
+$('f-date').value=todayISO();
+renderPreview();
+loadCatalogue();
+</script>
+</body>
+</html>

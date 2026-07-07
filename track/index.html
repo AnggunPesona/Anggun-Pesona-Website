@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Pre-Order — Anggun Pesona</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&family=Homemade+Apple&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <style>
+    /* ---- Tracking page (self-contained) ---- */
+    .track-wrap{max-width:640px;margin:0 auto;padding:0 1.2rem 4rem;}
+    .track-search{display:flex;gap:.6rem;margin:1.4rem 0 .4rem;flex-wrap:wrap;}
+    .track-search input{
+      flex:1 1 200px;min-width:0;padding:.9rem 1.1rem;border:1px solid #e3d4d9;border-radius:14px;
+      font-family:'DM Sans',sans-serif;font-size:1rem;background:#fff;color:#3a2a30;letter-spacing:.5px;
+    }
+    .track-search input:focus{outline:none;border-color:#c98a9e;box-shadow:0 0 0 3px rgba(201,138,158,.15);}
+    .track-search button{
+      flex:0 0 auto;padding:.9rem 1.6rem;border:none;border-radius:14px;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;color:#fff;
+      background:linear-gradient(135deg,#c98a9e,#a86178);transition:transform .15s ease,box-shadow .15s ease;
+    }
+    .track-search button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(168,97,120,.28);}
+    .track-hint{font-family:'DM Sans',sans-serif;font-size:.82rem;color:#9a8188;margin:.2rem .2rem 0;}
+
+    .track-msg{margin:1.6rem 0;padding:1.1rem 1.2rem;border-radius:14px;font-family:'DM Sans',sans-serif;
+      font-size:.92rem;line-height:1.5;}
+    .track-msg.info{background:#fbf3f5;color:#8a6b74;border:1px solid #f0dde3;}
+    .track-msg.error{background:#fdeff0;color:#a2454f;border:1px solid #f5cfd3;}
+
+    .track-card{
+      margin-top:1.6rem;background:#fff;border:1px solid #f0e2e6;border-radius:20px;
+      padding:1.6rem 1.4rem;box-shadow:0 10px 30px rgba(168,97,120,.08);
+      opacity:0;transform:translateY(8px);animation:trackIn .35s ease forwards;
+    }
+    @keyframes trackIn{to{opacity:1;transform:none;}}
+    .track-card-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+      border-bottom:1px dashed #efdde2;padding-bottom:1rem;margin-bottom:.4rem;flex-wrap:wrap;}
+    .track-order-no{font-family:'Playfair Display',serif;font-size:1.35rem;color:#3a2a30;font-weight:600;}
+    .track-order-item{font-family:'DM Sans',sans-serif;font-size:.9rem;color:#8a6b74;margin-top:.15rem;}
+    .track-updated{font-family:'DM Sans',sans-serif;font-size:.75rem;color:#b3a0a6;white-space:nowrap;}
+
+    /* Vertical stepper */
+    .stepper{list-style:none;margin:1.4rem 0 .2rem;padding:0;position:relative;}
+    .stepper li{position:relative;padding:0 0 1.8rem 3rem;min-height:2.2rem;}
+    .stepper li:last-child{padding-bottom:.2rem;}
+    .stepper li::before{ /* the dot */
+      content:'';position:absolute;left:.35rem;top:.1rem;width:1.5rem;height:1.5rem;border-radius:50%;
+      background:#fff;border:2px solid #e6d3d9;z-index:2;box-sizing:border-box;
+    }
+    .stepper li::after{ /* the connector line */
+      content:'';position:absolute;left:1.08rem;top:1.6rem;bottom:-.1rem;width:2px;background:#eddbe1;z-index:1;
+    }
+    .stepper li:last-child::after{display:none;}
+    .step-title{font-family:'DM Sans',sans-serif;font-weight:600;font-size:1rem;color:#c3b0b6;line-height:1.5rem;}
+    .step-sub{font-family:'DM Sans',sans-serif;font-size:.78rem;color:#c3b0b6;margin-top:.1rem;}
+
+    /* done */
+    .stepper li.done::before{background:#c98a9e;border-color:#c98a9e;
+      content:'✓';color:#fff;font-size:.85rem;line-height:1.35rem;text-align:center;font-weight:700;}
+    .stepper li.done::after{background:#c98a9e;}
+    .stepper li.done .step-title{color:#6f5a60;}
+    .stepper li.done .step-sub{color:#a58c93;}
+
+    /* current */
+    .stepper li.current::before{background:#a86178;border-color:#a86178;
+      box-shadow:0 0 0 5px rgba(168,97,120,.16);animation:pulse 1.8s ease-in-out infinite;}
+    .stepper li.current .step-title{color:#a86178;font-size:1.06rem;}
+    .stepper li.current .step-sub{color:#a86178;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(168,97,120,.16);}50%{box-shadow:0 0 0 9px rgba(168,97,120,.05);}}
+
+    .track-status-pill{display:inline-block;margin-top:.2rem;padding:.3rem .8rem;border-radius:999px;
+      font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+      background:#f6e7ec;color:#a86178;}
+    .track-cancelled{background:#fdeff0;color:#a2454f;}
+
+    .track-eta{display:flex;align-items:center;gap:.6rem;margin-top:1rem;padding:.7rem 1rem;border-radius:12px;
+      background:#f6e7ec;border:1px solid #eccdd8;}
+    .track-eta-ic{font-size:1.1rem;line-height:1;flex:0 0 auto;}
+    .track-eta-label{display:block;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;
+      letter-spacing:.6px;text-transform:uppercase;color:#a86178;}
+    .track-eta-val{display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:#3a2a30;margin-top:.05rem;}
+
+    .track-note{display:flex;gap:.55rem;margin-top:1.3rem;padding:.9rem 1rem;border-radius:12px;
+      background:#faf4f6;border:1px solid #f0e2e6;font-family:'DM Sans',sans-serif;font-size:.82rem;
+      line-height:1.5;color:#8a6b74;}
+    .track-note strong{color:#6f5a60;}
+    .track-note-ic{flex:0 0 auto;}
+    .track-note-strong{background:#fbeef2;border-color:#f0c9d6;color:#8a5a68;}
+    .track-note-strong strong{color:#a2454f;}
+
+    .track-help{margin-top:2rem;text-align:center;font-family:'DM Sans',sans-serif;font-size:.85rem;color:#9a8188;}
+    .track-help a{color:#a86178;font-weight:600;text-decoration:none;}
+    .track-spinner{display:inline-block;width:1.1rem;height:1.1rem;border:2px solid #eddbe1;border-top-color:#a86178;
+      border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:.4rem;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="/" class="nav-brand" style="text-decoration:none;">
+    <span class="nav-brand-text">Anggun<span> Pesona</span></span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/">Home</a></li>
+    <li><a href="/preorders">Pre-Orders</a></li>
+    <li><a href="/instocks">In-Stocks</a></li>
+    <li><a href="/bridal">Bridal</a></li>
+    <li><a href="/reviews">Reviews</a></li>
+    <li><a href="/shop" class="soon-link">Shop Soon</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page" id="page-track">
+  <div class="page-hero">
+    <h1>Track Your <em>Pre-Order</em></h1>
+    <p>Enter your order number to see where your order is</p>
+  </div>
+
+  <div class="track-wrap">
+    <div class="track-search">
+      <input type="text" id="trackInput" placeholder="e.g. AP-1042" autocomplete="off"
+             onkeydown="if(event.key==='Enter')trackLookup()">
+      <button type="button" onclick="trackLookup()">Track</button>
+    </div>
+    <p class="track-hint">Your order number is on your invoice / WhatsApp confirmation.</p>
+
+    <div id="trackResult"></div>
+
+    <p class="track-help">
+      Can't find your order? <a id="track-wa" href="#" target="_blank">Message us on WhatsApp</a>
+    </p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Anggun<span> Pesona</span></div>
+  <div class="footer-slogan">"Elevating your basics, for your inner chics"</div>
+  <div class="footer-socials">
+    <a id="footer-wa" href="#" target="_blank" class="btn btn-whatsapp" style="padding:0.6rem 1.3rem;font-size:0.8rem;">WhatsApp</a>
+    <a id="footer-ig" href="#" target="_blank" class="btn btn-instagram" style="padding:0.6rem 1.3rem;font-size:0.8rem;">Instagram</a>
+  </div>
+  <div class="footer-confetti"><span>· · · · · · · · · · · · · · · · · · · · ·</span></div>
+  <hr class="footer-hr">
+  <p class="footer-copy">© 2024 Anggun Pesona · made with love for our dearest angguns 💕</p>
+</footer>
+
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="/script.js?v=7"></script>
+<script>
+/* ============================================================
+   PRE-ORDER TRACKING  (self-contained)
+   ------------------------------------------------------------
+   Reads a PUBLIC "Tracking" tab that contains only:
+     Order No | Item | Status | Updated
+   (No customer names / phone numbers are ever published.)
+   ============================================================ */
+const TRACK_CONFIG = {
+  // PREFERRED (private): the PUBLISHED "Tracking" tab that exposes ONLY
+  // Order No, Status, ETA — never Notes or any personal data. The main sheet
+  // stays unshared. Paste its "Publish to web → CSV" link here:
+  CSV_URL:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHy7_YGVvW16CIzsOmtSSR9XxuuC1Y8Ahiz4AAmTxDTSP1nVYOa5wgW5_PY6yVfJ6b8cInDTLenEJm/pub?gid=671992740&single=true&output=csv',
+  // Fallback: reads the whole sheet via gviz (needs the whole sheet link-shared).
+  SHEET_ID:  '1ZabtuZ5QFJGBUQvlJduhlhCyTamTGIVdWDkRrhcpc0I',
+  SHEET_GID: '0',
+  WHATSAPP:  '6737471323',
+};
+
+// ---- Smart-branch stages ----
+// Shared journey up to arrival, then EITHER self-collect OR delivery (chosen per order).
+// `match` = status words (lowercase) mapping a sheet status to that stage.
+const SHARED_STAGES = [
+  { title:'Order placed',        sub:'We\'ve received your pre-order',       match:['order placed','ordered','confirmed','placed','received'] },
+  { title:'Waiting for Shipment',sub:'Waiting for your order to ship out',   match:['waiting for shipment','waiting','awaiting','submitted','with supplier','ordered from supplier','supplier'] },
+  { title:'In Transit',          sub:'On its way to Brunei',                 match:['in transit','transit','shipped','on the way','en route','enroute'] },
+  { title:'Arrived in Brunei',   sub:'Landed and being checked / sorted',    match:['arrived in brunei','arrived','in brunei','customs','sorting'] },
+];
+const COLLECT_STAGES = [
+  { title:'Ready for collection',sub:'Ready! We\'ll arrange your pickup',    match:['ready for collection','ready for pickup','ready','collection','collect'] },
+  { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
+];
+const DELIVER_STAGES = [
+  { title:'Booked for delivery', sub:'Delivery arranged for your order',     match:['booked for delivery','booked','for delivery','scheduled for delivery'] },
+  { title:'Picked up by courier',sub:'With the courier, on its way to you',  match:['picked up by courier','courier','out for delivery','with courier','dispatched'] },
+  { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
+];
+const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-collect or delivery once it arrives', match:[] };
+const CANCELLED_WORDS = ['cancelled','canceled','refunded','void'];
+
+const anyHit = (s, stages) => stages.some(st => st.match.some(w => s.includes(w)));
+
+// Returns { cancelled } OR { stages, idx, done, arrivedAt }
+function trackResolve(status){
+  const s = (status||'').toString().trim().toLowerCase();
+  if(CANCELLED_WORDS.some(w=>s.includes(w))) return { cancelled:true };
+  let branch;
+  if(anyHit(s, DELIVER_STAGES))      branch = DELIVER_STAGES;   // delivery path
+  else if(anyHit(s, COLLECT_STAGES)) branch = COLLECT_STAGES;   // self-collect path
+  else                               branch = [CHOICE_STAGE];   // not chosen yet
+  const stages = SHARED_STAGES.concat(branch);
+  let idx = 0;
+  for(let i=stages.length-1;i>=0;i--){
+    if(stages[i].match.length && stages[i].match.some(w=>s.includes(w))){ idx=i; break; }
+  }
+  const done = idx === stages.length-1 && stages[idx].match.length > 0;
+  return { cancelled:false, stages, idx, done, arrivedAt:SHARED_STAGES.length-1 };
+}
+
+async function trackFetchSheet(){
+  const url = TRACK_CONFIG.CSV_URL
+    ? TRACK_CONFIG.CSV_URL
+    : `https://docs.google.com/spreadsheets/d/${TRACK_CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&gid=${TRACK_CONFIG.SHEET_GID}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`Could not reach the tracking sheet (HTTP ${res.status}).`);
+  const csv = await res.text();
+  if(csv.toLowerCase().includes('<!doctype html>')) throw new Error('The tracking sheet is private. Publish it as "Anyone with the link can view".');
+  return new Promise((resolve,reject)=>{
+    Papa.parse(csv,{header:true,skipEmptyLines:true,transformHeader:h=>h.trim(),complete:r=>resolve(r.data),error:reject});
+  });
+}
+
+// tolerant column getter (handles "Order No", "order no.", "OrderNo", etc.)
+function col(row, names){
+  const keys = Object.keys(row);
+  for(const n of names){
+    const k = keys.find(k=>k.toLowerCase().replace(/[\s._-]/g,'') === n.toLowerCase().replace(/[\s._-]/g,''));
+    if(k!==undefined) return row[k];
+  }
+  return '';
+}
+
+function esc(s){return (s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+async function trackLookup(){
+  const box   = document.getElementById('trackResult');
+  const raw   = document.getElementById('trackInput').value.trim();
+  const query = raw.toLowerCase().replace(/[\s]/g,'');
+
+  if(!TRACK_CONFIG.CSV_URL && !TRACK_CONFIG.SHEET_ID){
+    box.innerHTML = `<div class="track-msg info"><strong>⚙️ Almost ready.</strong> Paste your published Tracking CSV link into <code>TRACK_CONFIG.CSV_URL</code> in <code>track/index.html</code> (see the setup guide).</div>`;
+    return;
+  }
+  if(!raw){
+    box.innerHTML = `<div class="track-msg error">Please type your order number first.</div>`;
+    return;
+  }
+
+  box.innerHTML = `<div class="track-msg info"><span class="track-spinner"></span>Looking up your order…</div>`;
+
+  let rows;
+  try{ rows = await trackFetchSheet(); }
+  catch(e){ box.innerHTML = `<div class="track-msg error">${esc(e.message)}</div>`; return; }
+
+  const row = rows.find(r=>{
+    const no = col(r,['Order No','Order Number','OrderNo','Order','No','Order ID','Ref']).toString().trim().toLowerCase().replace(/[\s]/g,'');
+    return no && no === query;
+  });
+
+  if(!row){
+    box.innerHTML = `<div class="track-msg error">We couldn't find an order matching <strong>${esc(raw)}</strong>.<br>Double-check the number, or message us on WhatsApp and we'll help.</div>`;
+    return;
+  }
+
+  const orderNo = col(row,['Order No','Order Number','OrderNo','Order','No','Order ID','Ref']);
+  const item    = col(row,['Item','Product','Product Name','Name','Description']);
+  const status  = col(row,['Status','Stage','State']);
+  const updated = col(row,['Updated','Last Updated','Date','Updated On']);
+  const eta     = col(row,['ETA','Upcoming ETA','Targeted ETA','Estimated Arrival','Est Arrival','Arrival','Est. Arrival']).toString().trim();
+  const R = trackResolve(status);
+
+  let stepsHtml, noteHtml = '';
+  if(R.cancelled){
+    stepsHtml = `<div style="margin-top:1rem"><span class="track-status-pill track-cancelled">Cancelled</span>
+      <p class="track-order-item" style="margin-top:.6rem">This order was cancelled. Please contact us if you think this is a mistake.</p></div>`;
+  } else {
+    const { stages, idx, done, arrivedAt } = R;
+    stepsHtml = '<ul class="stepper">' + stages.map((st,i)=>{
+      let cls = '';
+      if(done || i < idx){ cls = 'done'; }
+      else if(i === idx){  cls = 'current'; }
+      return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${esc(st.sub)}</div></li>`;
+    }).join('') + '</ul>';
+    if(done){
+      stepsHtml += `<div style="text-align:center;margin-top:.4rem"><span class="track-status-pill">🎉 ${esc(stages[idx].title)} — thank you!</span></div>`;
+    } else {
+      // Disclaimer: "Arrived in Brunei" isn't the same as "ready" — team still sorts & checks first.
+      const arrived = idx >= arrivedAt;
+      noteHtml = `<div class="track-note ${arrived ? 'track-note-strong' : ''}">
+        <span class="track-note-ic">ℹ️</span>
+        <span><strong>“Arrived in Brunei” doesn't mean it's ready yet.</strong>
+        Once a shipment lands, our team still needs to sort every order and check each item's
+        condition to make sure we've received exactly what's yours. Only after that's done will we
+        contact you to arrange <em>collection or delivery</em>. Thank you for your patience 💕</span>
+      </div>`;
+    }
+  }
+
+  // Upcoming ETA band — shown whenever admin has filled the ETA cell (and order isn't finished/cancelled).
+  const etaHtml = (eta && !R.cancelled && !R.done)
+    ? `<div class="track-eta"><span class="track-eta-ic" aria-hidden="true">📅</span>
+         <span><span class="track-eta-label">Upcoming ETA</span><span class="track-eta-val">${esc(eta)}</span></span></div>`
+    : '';
+
+  box.innerHTML = `
+    <div class="track-card">
+      <div class="track-card-head">
+        <div>
+          <div class="track-order-no">${esc(orderNo)}</div>
+          ${item ? `<div class="track-order-item">${esc(item)}</div>` : ''}
+        </div>
+        ${updated ? `<div class="track-updated">Updated ${esc(updated)}</div>` : ''}
+      </div>
+      ${etaHtml}
+      ${stepsHtml}
+      ${noteHtml}
+    </div>`;
+}
+
+// Wire up WhatsApp help links + allow ?order=AP-1042 deep links
+document.addEventListener('DOMContentLoaded',()=>{
+  const wa = `https://wa.me/${TRACK_CONFIG.WHATSAPP}?text=${encodeURIComponent("Hi Anggun Pesona! I'd like to check on my pre-order 📦")}`;
+  const el = document.getElementById('track-wa'); if(el) el.href = wa;
+  const pre = new URLSearchParams(location.search).get('order');
+  if(pre){ document.getElementById('trackInput').value = pre; trackLookup(); }
+});
+</script>
+</body>
+</html>
