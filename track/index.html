@@ -42,6 +42,16 @@
     .track-order-item{font-family:'DM Sans',sans-serif;font-size:.9rem;color:#8a6b74;margin-top:.15rem;}
     .track-updated{font-family:'DM Sans',sans-serif;font-size:.75rem;color:#b3a0a6;white-space:nowrap;}
 
+    /* Product items list */
+    .track-items-wrap{margin-top:1rem;}
+    .track-items-label{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.6px;
+      text-transform:uppercase;color:#a86178;margin-bottom:.5rem;}
+    .track-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem;}
+    .track-item{display:flex;flex-direction:column;gap:.15rem;padding:.7rem .9rem;border-radius:12px;
+      background:#faf4f6;border:1px solid #f0e2e6;}
+    .track-item-name{font-family:'Playfair Display',serif;font-size:1rem;color:#3a2a30;line-height:1.35;}
+    .track-item-meta{font-family:'DM Sans',sans-serif;font-size:.8rem;color:#8a6b74;letter-spacing:.3px;}
+
     /* Vertical stepper */
     .stepper{list-style:none;margin:1.4rem 0 .2rem;padding:0;position:relative;}
     .stepper li{position:relative;padding:0 0 1.8rem 3rem;min-height:2.2rem;}
@@ -197,7 +207,7 @@ const COLLECT_STAGES = [
 ];
 const DELIVER_STAGES = [
   { title:'Booked for delivery', sub:'Delivery arranged for your order',     match:['booked for delivery','booked','for delivery','scheduled for delivery'] },
-  { title:'Picked up by courier',sub:'With the courier, on its way to you',  match:['picked up by courier','courier','out for delivery','with courier','dispatched'] },
+  { title:'Picked up by runner', sub:'With our runner, on its way to you',    match:['picked up by runner','runner','picked up by courier','courier','out for delivery','with courier','dispatched'] },
   { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
 ];
 const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-collect or delivery once it arrives', match:[] };
@@ -267,21 +277,55 @@ async function trackLookup(){
   try{ rows = await trackFetchSheet(); }
   catch(e){ box.innerHTML = `<div class="track-msg error">${esc(e.message)}</div>`; return; }
 
-  const row = rows.find(r=>{
+  // An order can span several rows — one row per product item. Grab them all.
+  const matches = rows.filter(r=>{
     const no = col(r,['Order No','Order Number','OrderNo','Order','No','Order ID','Ref']).toString().trim().toLowerCase().replace(/[\s]/g,'');
     return no && no === query;
   });
 
-  if(!row){
+  if(!matches.length){
     box.innerHTML = `<div class="track-msg error">We couldn't find an order matching <strong>${esc(raw)}</strong>.<br>Double-check the number, or message us on WhatsApp and we'll help.</div>`;
     return;
   }
 
+  const row = matches[0];
+  // Status / ETA / Updated are per-order — take the first non-empty value across the order's rows.
+  const firstVal = names => { for(const m of matches){ const v=col(m,names).toString().trim(); if(v) return v; } return ''; };
+
   const orderNo = col(row,['Order No','Order Number','OrderNo','Order','No','Order ID','Ref']);
-  const item    = col(row,['Item','Product','Product Name','Name','Description']);
-  const status  = col(row,['Status','Stage','State']);
-  const updated = col(row,['Updated','Last Updated','Date','Updated On']);
-  const eta     = col(row,['ETA','Upcoming ETA','Targeted ETA','Estimated Arrival','Est Arrival','Arrival','Est. Arrival']).toString().trim();
+  const status  = firstVal(['Status','Stage','State']);
+  const updated = firstVal(['Updated','Last Updated','Date','Updated On']);
+  const eta     = firstVal(['ETA','Upcoming ETA','Targeted ETA','Estimated Arrival','Est Arrival','Arrival','Est. Arrival']);
+
+  // Build the item list. Supports BOTH layouts:
+  //  • one row per item  → Product / Color / Size in their own columns
+  //  • one row per order  → a single Product cell packing several items,
+  //    each item on its own line as  "Product||Color||Size"  (from the sheet formula)
+  const items = [];
+  matches.forEach(m=>{
+    const rawProd  = col(m,['Product','Item','Items','Product Name','Name','Description']).toString();
+    const rowColor = col(m,['Color','Colour','Variant']).toString().trim();
+    const rowSize  = col(m,['Size','Sz','Shoe Size']).toString().trim();
+    rawProd.split(/\r?\n/).forEach(line=>{
+      line = line.trim();
+      if(!line && !rowColor && !rowSize) return;
+      const parts   = line.split('||').map(s=>s.trim());
+      const product = parts[0] || '';
+      const color   = parts[1] !== undefined ? parts[1] : rowColor;
+      const size    = parts[2] !== undefined ? parts[2] : rowSize;
+      if(product || color || size) items.push({product, color, size});
+    });
+  });
+
+  const itemsHtml = items.length ? `
+      <div class="track-items-wrap">
+        <div class="track-items-label">${items.length>1 ? `Your items (${items.length})` : 'Your item'}</div>
+        <ul class="track-items">${items.map(it=>{
+          const meta=[]; if(it.color) meta.push(esc(it.color)); if(it.size) meta.push('Size '+esc(it.size));
+          return `<li class="track-item"><span class="track-item-name">${esc(it.product||'Item')}</span>${meta.length?`<span class="track-item-meta">${meta.join(' · ')}</span>`:''}</li>`;
+        }).join('')}</ul>
+      </div>` : '';
+
   const R = trackResolve(status);
 
   let stepsHtml, noteHtml = '';
@@ -322,10 +366,10 @@ async function trackLookup(){
       <div class="track-card-head">
         <div>
           <div class="track-order-no">${esc(orderNo)}</div>
-          ${item ? `<div class="track-order-item">${esc(item)}</div>` : ''}
         </div>
         ${updated ? `<div class="track-updated">Updated ${esc(updated)}</div>` : ''}
       </div>
+      ${itemsHtml}
       ${etaHtml}
       ${stepsHtml}
       ${noteHtml}
