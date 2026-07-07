@@ -314,7 +314,7 @@ async function trackLookup(){
   // Upcoming ETA band — shown whenever admin has filled the ETA cell (and order isn't finished/cancelled).
   const etaHtml = (eta && !R.cancelled && !R.done)
     ? `<div class="track-eta"><span class="track-eta-ic" aria-hidden="true">📅</span>
-         <span><span class="track-eta-label">Upcoming ETA</span><span class="track-eta-val">${esc(eta)}</span></span></div>`
+         <span><span class="track-eta-label">Targeted date ready for collection</span><span class="track-eta-val">${esc(eta)}</span></span></div>`
     : '';
 
   box.innerHTML = `
