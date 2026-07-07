@@ -294,8 +294,9 @@ const SHARED_STAGES = [
   { title:'Arrived in Brunei',   sub:'Landed and being checked / sorted',    match:['arrived in brunei','arrived','in brunei','customs','sorting'] },
 ];
 const COLLECT_STAGES = [
-  { title:'Ready for collection',sub:'Ready! Book your pickup slot below 💕', match:['ready for collection','ready for pickup','ready','collection','collect'] },
-  { title:'Collection booked',   sub:'Slot booked — wait for our confirmation text', match:['collection booked','booked for collection','collect booked','pickup booked'] },
+  { title:'Ready for collection',sub:'Ready! Book your pickup slot below 💕', match:['ready for collection','ready for pickup','ready'] },
+  { title:'Slot requested',      sub:'Awaiting our confirmation text',        match:['slot requested','slot request','collection booked','booked for collection','collect booked','pickup booked'] },
+  { title:'Slot confirmed',      sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
   { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
 ];
 // Sg Liang self-collect: an extra hop — items move to the Sg Liang team first,
@@ -304,11 +305,13 @@ const COLLECT_STAGES = [
 const SGLIANG_STAGES = [
   { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team', match:['sg liang','sgliang','with sg liang','items with sg liang','sg liang team'] },
   { title:'Ready for collection',     sub:'Ready! Book your pickup slot below 💕',   match:['ready'] },
-  { title:'Collection booked',        sub:'Slot booked — wait for our confirmation text', match:['collection booked','booked for collection','pickup booked','booked'] },
+  { title:'Slot requested',           sub:'Awaiting our confirmation text',          match:['slot requested','slot request','collection booked','booked for collection','pickup booked','booked'] },
+  { title:'Slot confirmed',           sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
   { title:'Collected',                sub:'Picked up — thank you! 💕',              match:['collected','picked up'] },
 ];
 const DELIVER_STAGES = [
-  { title:'Booked for delivery', sub:'Slot booked — wait for our confirmation text', match:['booked for delivery','delivery booked','for delivery','scheduled for delivery'] },
+  { title:'Delivery requested',  sub:'Awaiting our confirmation text',        match:['delivery requested','delivery request','booked for delivery','delivery booked','for delivery','scheduled for delivery'] },
+  { title:'Delivery confirmed',  sub:'Our team will update you once your order is out for delivery 🤍', match:['delivery confirmed'] },
   { title:'Picked up by runner', sub:'With our runner, on its way to you',    match:['picked up by runner','runner','picked up by courier','courier','out for delivery','with courier','dispatched'] },
   { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
 ];
@@ -444,8 +447,8 @@ async function trackLookup(){
       if(done || i < idx){ cls = 'done'; }
       else if(i === idx){  cls = 'current'; }
       let subHtml = esc(st.sub);
-      // On a "booked" step, show the confirmed slot (from the sheet) as a chip.
-      if(cls && /booked/i.test(st.title) && slot){
+      // On a requested/confirmed/booked step, show the slot (from the sheet) as a chip.
+      if(cls && /(requested|confirmed|booked)/i.test(st.title) && slot){
         subHtml = `${esc(st.sub)}<br><span class="slot-chip">${esc(slot)}</span>`;
       }
       return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${subHtml}</div></li>`;
