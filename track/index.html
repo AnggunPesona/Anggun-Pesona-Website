@@ -101,6 +101,17 @@
     .track-note-strong{background:#fbeef2;border-color:#f0c9d6;color:#8a5a68;}
     .track-note-strong strong{color:#a2454f;}
 
+    /* Copy shareable link */
+    .track-share{display:flex;align-items:center;gap:.5rem;margin-top:1.2rem;flex-wrap:wrap;}
+    .track-share button{
+      display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border-radius:12px;cursor:pointer;
+      font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;color:#a86178;
+      background:#faf4f6;border:1px solid #eccdd8;transition:background .15s ease,transform .15s ease;
+    }
+    .track-share button:hover{background:#f6e7ec;transform:translateY(-1px);}
+    .track-share button.copied{background:#e9f6ec;border-color:#bfe3c6;color:#3f7a4c;}
+    .track-share-hint{font-family:'DM Sans',sans-serif;font-size:.74rem;color:#b3a0a6;}
+
     .track-help{margin-top:2rem;text-align:center;font-family:'DM Sans',sans-serif;font-size:.85rem;color:#9a8188;}
     .track-help a{color:#a86178;font-weight:600;text-decoration:none;}
     .track-spinner{display:inline-block;width:1.1rem;height:1.1rem;border:2px solid #eddbe1;border-top-color:#a86178;
@@ -205,12 +216,20 @@ const COLLECT_STAGES = [
   { title:'Ready for collection',sub:'Ready! We\'ll arrange your pickup',    match:['ready for collection','ready for pickup','ready','collection','collect'] },
   { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
 ];
+// Sg Liang self-collect: an extra hop — items move to the Sg Liang team first,
+// then become ready for collection there. Any status containing "Sg Liang"
+// routes here. Within this branch, "ready" = ready stage, "collected" = done.
+const SGLIANG_STAGES = [
+  { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team', match:['sg liang','sgliang','with sg liang','items with sg liang','sg liang team'] },
+  { title:'Ready for collection',     sub:'Ready to collect at Sg Liang',           match:['ready'] },
+  { title:'Collected',                sub:'Picked up — thank you! 💕',              match:['collected','picked up'] },
+];
 const DELIVER_STAGES = [
   { title:'Booked for delivery', sub:'Delivery arranged for your order',     match:['booked for delivery','booked','for delivery','scheduled for delivery'] },
   { title:'Picked up by runner', sub:'With our runner, on its way to you',    match:['picked up by runner','runner','picked up by courier','courier','out for delivery','with courier','dispatched'] },
   { title:'Delivered',           sub:'Delivered — thank you! 💕',            match:['delivered','delivery complete','delivery completed'] },
 ];
-const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-collect or delivery once it arrives', match:[] };
+const CHOICE_STAGE = { title:'Collection or delivery', sub:'You\'ll choose self-collect, Sg Liang pickup, or delivery once it arrives', match:[] };
 const CANCELLED_WORDS = ['cancelled','canceled','refunded','void'];
 
 const anyHit = (s, stages) => stages.some(st => st.match.some(w => s.includes(w)));
@@ -220,7 +239,9 @@ function trackResolve(status){
   const s = (status||'').toString().trim().toLowerCase();
   if(CANCELLED_WORDS.some(w=>s.includes(w))) return { cancelled:true };
   let branch;
-  if(anyHit(s, DELIVER_STAGES))      branch = DELIVER_STAGES;   // delivery path
+  if(s.includes('sg liang') || s.includes('sgliang'))
+                                     branch = SGLIANG_STAGES;   // Sg Liang self-collect (extra hop)
+  else if(anyHit(s, DELIVER_STAGES)) branch = DELIVER_STAGES;   // delivery path
   else if(anyHit(s, COLLECT_STAGES)) branch = COLLECT_STAGES;   // self-collect path
   else                               branch = [CHOICE_STAGE];   // not chosen yet
   const stages = SHARED_STAGES.concat(branch);
@@ -373,7 +394,23 @@ async function trackLookup(){
       ${etaHtml}
       ${stepsHtml}
       ${noteHtml}
+      <div class="track-share">
+        <button type="button" onclick="copyTrackLink(this,'${esc(orderNo)}')">🔗 Copy tracking link</button>
+        <span class="track-share-hint">Share this with the customer to open their order directly</span>
+      </div>
     </div>`;
+}
+
+// Build + copy a direct link that auto-opens this order, e.g. .../track?order=May26A1234
+function copyTrackLink(btn, orderNo){
+  const link = location.origin + '/track?order=' + encodeURIComponent(orderNo);
+  const done = ()=>{ const t=btn.textContent; btn.textContent='✓ Link copied!'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent=t; btn.classList.remove('copied'); },1800); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(done).catch(()=>window.prompt('Copy this tracking link:',link));
+  } else {
+    window.prompt('Copy this tracking link:',link);
+  }
 }
 
 // Wire up WhatsApp help links + allow ?order=AP-1042 deep links
