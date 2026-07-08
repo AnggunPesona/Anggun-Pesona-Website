@@ -180,6 +180,9 @@
     .bk-banner{margin-top:1.2rem;padding:1.1rem 1.1rem;border-radius:14px;background:#e6f5ea;border:1px solid #bfe3c6;}
     .bk-banner b{font-family:'DM Sans',sans-serif;color:#1c5c33;font-size:.92rem;}
     .bk-banner p{font-family:'DM Sans',sans-serif;margin:.35rem 0 0;font-size:.82rem;color:#2f6b40;line-height:1.55;}
+    .bk-rebook{margin-top:.8rem;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.01em;color:#1c5c33;background:#fff;border:1px solid #bfe3c6;border-radius:999px;padding:.5rem .95rem;cursor:pointer;transition:.15s;}
+    .bk-rebook:hover{background:#f2fbf4;transform:translateY(-1px);}
+    .bk-rebook.copied{background:#e9f6ec;border-color:#8fca9d;}
     .bk-hide{display:none;}
   </style>
 </head>
@@ -675,13 +678,15 @@ async function bkSubmit(){
     : `<strong>${esc(payload.date)}${payload.slot?', '+esc(payload.slot):''}</strong> at <strong>${esc(payload.method.replace('Self-collect · ',''))}</strong>`;
   document.getElementById('bkPanel').innerHTML =
     `<div class="bk-banner"><b>✓ Your booking request is in!</b>
-       <p>${m==='delivery'?'Delivery':'Collection'}: ${when}. Our team will <strong>text you to confirm the details</strong> shortly — please wait for that message before heading over 💕</p></div>`;
+       <p>${m==='delivery'?'Delivery':'Collection'}: ${when}. Our team will <strong>text you to confirm the details</strong> shortly — please wait for that message before heading over 💕</p>
+       <p>Need to change your slot? Save this link and reopen it anytime to rebook — no need to message us.</p>
+       <button type="button" class="bk-rebook" onclick="copyTrackLink(this,'${esc(bkState.order)}',true)">🔗 Copy my reschedule link</button></div>`;
   const cta = document.getElementById('bkCta'); if(cta) cta.classList.add('bk-hide');
 }
 
 // Build + copy a direct link that auto-opens this order, e.g. .../track?order=May26A1234
-function copyTrackLink(btn, orderNo){
-  const link = location.origin + '/track?order=' + encodeURIComponent(orderNo);
+function copyTrackLink(btn, orderNo, withBook){
+  const link = location.origin + '/track?order=' + encodeURIComponent(orderNo) + (withBook ? '&book=1' : '');
   const done = ()=>{ const t=btn.textContent; btn.textContent='✓ Link copied!'; btn.classList.add('copied');
     setTimeout(()=>{ btn.textContent=t; btn.classList.remove('copied'); },1800); };
   if(navigator.clipboard && navigator.clipboard.writeText){
