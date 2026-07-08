@@ -612,6 +612,17 @@ async function bkRenderPanel(){
 // Minimum bookable date = tomorrow (keeps the 12-hour-ahead promise).
 function bkMinDate(){ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); }
 
+// Format an ISO date (YYYY-MM-DD, from the calendar) as "Fri, 10 Jul" for what customers see and
+// what's saved to the sheet. Non-ISO strings (e.g. a Sg Liang date already typed "Fri 17 Jul")
+// are returned unchanged so nothing double-formats.
+function bkFmtDate(s){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec((s||'').trim()); if(!m) return s||'';
+  const d=new Date(+m[1],+m[2]-1,+m[3]);
+  const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  return WD+', '+(+m[3])+' '+MO;
+}
+
 // Normalise a sheet date (any common format) to ISO YYYY-MM-DD so a calendar pick can match it.
 // NOTE: we deliberately AVOID Date.parse() on partial strings like "10 Jul" — desktop Chrome
 // accepts them but iPhone/Safari returns NaN, which silently broke per-date slot matching on
@@ -741,7 +752,7 @@ async function bkSubmit(){
   const payload = {
     order: bkState.order,
     method: m==='delivery' ? 'Delivery' : (m==='sgliang' ? 'Self-collect · Sg Liang' : 'Self-collect · Lambak Kanan'),
-    date: bkState.date||'', slot: bkState.slot||'',
+    date: bkFmtDate(bkState.date||''), slot: bkState.slot||'',
     batch: m==='delivery' ? (bkState.batch||'') : '',
     address: m==='delivery' ? (bkState.address||'') : '',
     location: m==='delivery' ? (bkState.location||'') : '',
