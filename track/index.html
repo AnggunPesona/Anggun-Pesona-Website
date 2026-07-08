@@ -668,7 +668,7 @@ function bkCollectHtml(avail, locName){
       const iso=bkToISO(k); if(iso) byIso[iso]=loc[k];
     });
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
-        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onclick="try{this.showPicker()}catch(e){}" onchange="bkPickDate(this.value)">
+        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
         <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
         <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
     let slotField='';
@@ -708,7 +708,7 @@ function bkCollectHtml(avail, locName){
   }
   // Fallback if the availability tab has no rows for this location yet.
   return `<div class="bk-field"><label>Preferred date</label>
-      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onclick="try{this.showPicker()}catch(e){}" oninput="bkState.date=this.value">
+      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkState.date=this.value">
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
