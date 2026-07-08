@@ -735,8 +735,7 @@ function bkCollectHtml(avail, locName){
     if(!bkState.date || !loc[bkState.date]) bkState.date = dates[0];
     const dateField = `<div class="bk-field"><label>Pick a date</label>
       <select onchange="bkPickDate(this.value)">${dates.map(d=>`<option value="${esc(d)}" ${d===bkState.date?'selected':''}>${esc(d)}</option>`).join('')}</select>
-      ${sgNote}
-      <p class="bk-hint">⏱️ Slots must be booked <strong>at least 12 hours ahead</strong> so our team can prepare your item.</p></div>`;
+      ${sgNote}</div>`;
     const slots = loc[bkState.date]||[];
     const slotField = `<p class="bk-label">Preferred time slot</p>
       <div class="bk-slots">${slots.map(sl=>{
@@ -750,8 +749,7 @@ function bkCollectHtml(avail, locName){
   // Fallback if the availability tab has no rows for this location yet.
   return `<div class="bk-field"><label>Preferred date</label>
       ${bkCalHtml()}
-      ${sgNote}
-      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
+      ${sgNote}</div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
     <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please arrange an exact time slot with our team — this makes sure someone is there to open the gate for you.</p>`;
 }
