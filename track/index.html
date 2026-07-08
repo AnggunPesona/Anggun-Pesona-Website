@@ -152,6 +152,10 @@
       font-family:'DM Sans',sans-serif;font-size:.95rem;color:#3a2a30;background:#fff;box-sizing:border-box;}
     .bk-field input:focus,.bk-field select:focus,.bk-field textarea:focus{outline:none;border-color:#c98a9e;box-shadow:0 0 0 3px rgba(201,138,158,.15);}
     .bk-field input[readonly]{background:#faf4f6;color:#8a6b74;}
+    /* iOS renders an empty <input type=date> with odd height/alignment — normalise it so the
+       box lines up with the other fields whether or not a date is chosen. */
+    .bk-field input[type=date]{-webkit-appearance:none;appearance:none;min-height:1.35rem;line-height:1.35;text-align:left;}
+    .bk-field input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;}
     .bk-field textarea{resize:vertical;min-height:70px;}
     .bk-slots{display:flex;flex-wrap:wrap;gap:.5rem;}
     .bk-slot{padding:.55rem 1rem;border:1.5px solid #f0e2e6;border-radius:999px;background:#faf4f6;cursor:pointer;
@@ -609,23 +613,33 @@ async function bkRenderPanel(){
 function bkMinDate(){ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); }
 
 // Normalise a sheet date (any common format) to ISO YYYY-MM-DD so a calendar pick can match it.
+// NOTE: we deliberately AVOID Date.parse() on partial strings like "10 Jul" — desktop Chrome
+// accepts them but iPhone/Safari returns NaN, which silently broke per-date slot matching on
+// phones (a date's special slots fell back to the everyday defaults). Parse months explicitly.
 function bkToISO(s){
   s=(s||'').toString().trim(); if(!s) return '';
+  const pad=n=>String(+n).padStart(2,'0');
   let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-  if(m) return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+  if(m) return m[1]+'-'+pad(m[2])+'-'+pad(m[3]);
   // Day-first DD/MM/YYYY or DD-MM-YYYY (Brunei convention)
   m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/);
-  if(m){ let d=+m[1],mo=+m[2],y=+m[3]; if(y<100)y+=2000;
-    return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
-  // Textual e.g. "12 Jul", "Fri 12 July 2026", "July 12, 2026" — strip any leading weekday first
-  const t=Date.parse(s.replace(/^(mon|tue|wed|thu|fri|sat|sun)[a-z]*,?\s+/i,''));
-  if(!isNaN(t)){ const dt=new Date(t);
-    if(!/\d{4}/.test(s)){ // no explicit year in the sheet → assume this year, roll to next if already past
-      const now=new Date(); dt.setFullYear(now.getFullYear());
-      if(dt < new Date(now.getFullYear(),now.getMonth(),now.getDate())) dt.setFullYear(now.getFullYear()+1);
-    }
-    return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
-  return '';
+  if(m){ let d=+m[1],mo=+m[2],y=+m[3]; if(y<100)y+=2000; return y+'-'+pad(mo)+'-'+pad(d); }
+  // Textual, e.g. "Fri 10 Jul", "10 July 2026", "Jul 10", "July 12, 2026".
+  const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+  const t=s.replace(/^(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?,?\s+/i,'').trim();
+  let day,mo,yr=null;
+  const dm=t.match(/^(\d{1,2})\s+([A-Za-z]{3,})\.?(?:\s+(\d{2,4}))?$/);   // 10 Jul [2026]
+  const md=t.match(/^([A-Za-z]{3,})\.?\s+(\d{1,2})(?:,?\s+(\d{2,4}))?$/); // Jul 10[, 2026]
+  if(dm){ day=+dm[1]; mo=MON[dm[2].slice(0,3).toLowerCase()]; if(dm[3])yr=+dm[3]; }
+  else if(md){ mo=MON[md[1].slice(0,3).toLowerCase()]; day=+md[2]; if(md[3])yr=+md[3]; }
+  else return '';
+  if(!mo||!day) return '';
+  if(yr!==null && yr<100) yr+=2000;
+  if(yr===null){ // no year in the sheet → assume this year, roll to next if already past
+    const now=new Date(); yr=now.getFullYear();
+    if(new Date(yr,mo-1,day) < new Date(now.getFullYear(),now.getMonth(),now.getDate())) yr+=1;
+  }
+  return yr+'-'+pad(mo)+'-'+pad(day);
 }
 
 function bkCollectHtml(avail, locName){
@@ -642,7 +656,8 @@ function bkCollectHtml(avail, locName){
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
         <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
         <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
-        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
+        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p>
+        ${bkState.dateWarn?`<p class="bk-hint warn">⏰ That date is too soon — please pick a date at least a day ahead (12+ hours) so we can prepare your item.</p>`:''}</div>`;
     let slotField='';
     if(bkState.date){
       const slots=byIso[bkState.date]||std;
@@ -705,8 +720,12 @@ function bkDeliveryHtml(avail){
     <div class="bk-field"><label>Location link (optional)</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
 }
 
-function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkRenderPanel(); }
-function bkPickDate(v){ bkState.date=v; bkState.slot=''; bkRenderPanel(); }
+function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.dateWarn=false; bkRenderPanel(); }
+function bkPickDate(v){
+  // Reject a too-soon ISO date the moment it's picked — some mobile date pickers ignore the min attribute.
+  if(v && /^\d{4}-\d{2}-\d{2}$/.test(v) && v < bkMinDate()){ bkState.date=''; bkState.slot=''; bkState.dateWarn=true; bkRenderPanel(); return; }
+  bkState.dateWarn=false; bkState.date=v; bkState.slot=''; bkRenderPanel();
+}
 function bkPickSlot(t){ bkState.slot=t; bkRenderPanel(); }
 function bkPickBatch(b){ bkState.batch=b; bkRenderPanel(); }
 
