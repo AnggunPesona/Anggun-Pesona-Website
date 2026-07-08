@@ -191,6 +191,9 @@
     .bk-batch-tag{flex:0 0 auto;width:2.6rem;height:2.6rem;border-radius:50%;background:#f6e7ec;color:#a86178;
       font-family:'Playfair Display',serif;font-weight:600;font-size:1.05rem;display:flex;align-items:center;justify-content:center;}
     .bk-batch.active .bk-batch-tag{background:#a86178;color:#fff;}
+    .bk-batch.req{background:#fff;border-style:dashed;}
+    .bk-batch.req.active{border-style:solid;}
+    .bk-batch.req .bk-batch-tag{background:#f0e2e6;color:#a86178;font-size:1.2rem;}
     .bk-batch-info b{font-family:'DM Sans',sans-serif;font-size:.92rem;color:#3a2a30;}
     .bk-batch-info span{display:block;font-family:'DM Sans',sans-serif;font-size:.78rem;color:#8a6b74;margin-top:.1rem;}
     .bk-hint{font-family:'DM Sans',sans-serif;font-size:.78rem;color:#9a8188;margin:.5rem .1rem 0;line-height:1.5;}
@@ -755,17 +758,27 @@ function bkCollectHtml(avail, locName){
 
 function bkDeliveryHtml(avail){
   const batches = (avail.delivery||[]).filter(b=>b.ok!==false);
+  const isReq = bkState.batch==='__request__';
   let cards;
   if(batches.length){
-    if(!bkState.batch || !batches.some(b=>b.loc===bkState.batch)) bkState.batch = batches[0].loc;
+    // Keep the '__request__' sentinel valid; otherwise fall back to the first real batch.
+    if(!bkState.batch || (!isReq && !batches.some(b=>b.loc===bkState.batch))) bkState.batch = batches[0].loc;
     cards = batches.map(b=>`<div class="bk-batch ${bkState.batch===b.loc?'active':''}" onclick="bkPickBatch('${esc(b.loc)}')">
         <div class="bk-batch-tag">${esc((b.loc.match(/\d+/)||['•'])[0])}</div>
         <div class="bk-batch-info"><b>${esc(b.loc)}</b><span>${esc([b.date,b.time].filter(Boolean).join(' · '))}</span></div></div>`).join('');
   } else {
-    cards = `<div class="bk-field"><label>Preferred batch / date</label>
-      <input type="text" value="${esc(bkState.batch)}" placeholder="e.g. Batch 2, this Saturday" oninput="bkState.batch=this.value"></div>`;
+    cards = '';
   }
-  return `<p class="bk-label">Choose a delivery batch</p>${cards}
+  // "Request another date" — for customers whose preferred day isn't one of the fixed batches.
+  const reqCard = `<div class="bk-batch req ${isReq?'active':''}" onclick="bkPickBatch('__request__')">
+      <div class="bk-batch-tag">🗓️</div>
+      <div class="bk-batch-info"><b>Request another date</b><span>None of the batches suit you? Pick your own preferred day</span></div></div>`;
+  const reqPanel = isReq ? `<div class="bk-field"><label>Your preferred delivery date</label>
+      ${bkCalHtml()}
+      <p class="bk-hint">📅 Choose any day that suits you — our team will text you to confirm a delivery slot for that date.</p>
+      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>
+    <div class="bk-field"><label>Preferred time (optional)</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. after 4:00 PM" oninput="bkState.slot=this.value"></div>` : '';
+  return `<p class="bk-label">Choose a delivery batch</p>${cards}${reqCard}${reqPanel}
     <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
     <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
     <div class="bk-field"><label>Location link (optional)</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
@@ -823,17 +836,22 @@ function bkCalNav(delta){
 async function bkSubmit(){
   if(bkState.sending) return;
   const done = document.getElementById('bkDone'), m = bkState.method;
+  const reqDate = m==='delivery' && bkState.batch==='__request__';
   if(m==='delivery' && !(bkState.address||'').trim()){ done.innerHTML = `<p class="bk-hint warn">Please share your delivery address so we can confirm the rate.</p>`; return; }
-  if(m!=='delivery' && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a date first.</p>`; return; }
+  if(reqDate && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick your preferred delivery date first.</p>`; return; }
   // Belt-and-suspenders: reject too-soon ISO dates even if a mobile date picker ignored the min attribute.
-  if(m!=='delivery' && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date) && bkState.date < bkMinDate()){
+  if(((m!=='delivery') || reqDate) && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date) && bkState.date < bkMinDate()){
     done.innerHTML = `<p class="bk-hint warn">Please pick a date at least a day ahead (12+ hours) so we can prepare your item.</p>`; return;
   }
+  if(m!=='delivery' && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a date first.</p>`; return; }
+  const batchOut = reqDate
+    ? ('Requested date: ' + (bkFmtDate(bkState.date||'') || '(unspecified)') + (bkState.slot ? (' · ' + bkState.slot) : ''))
+    : (bkState.batch||'');
   const payload = {
     order: bkState.order,
     method: m==='delivery' ? 'Delivery' : (m==='sgliang' ? 'Self-collect · Sg Liang' : 'Self-collect · Lambak Kanan'),
     date: bkFmtDate(bkState.date||''), slot: bkState.slot||'',
-    batch: m==='delivery' ? (bkState.batch||'') : '',
+    batch: m==='delivery' ? batchOut : '',
     address: m==='delivery' ? (bkState.address||'') : '',
     location: m==='delivery' ? (bkState.location||'') : '',
     page: location.href, submitted: new Date().toISOString(),
