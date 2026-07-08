@@ -217,11 +217,11 @@
 
   <div class="track-wrap">
     <div class="track-search">
-      <input type="text" id="trackInput" placeholder="e.g. May26AXXYYYY (Y - last 4 digit of your phone no.)" autocomplete="off"
+      <input type="text" id="trackInput" placeholder="e.g. May26AXXYYYY" autocomplete="off"
              onkeydown="if(event.key==='Enter')trackLookup()">
       <button type="button" onclick="trackLookup()">Track</button>
     </div>
-    <p class="track-hint">Your order number is in the form we provided when you placed your order.</p>
+    <p class="track-hint">Your order number is in the form we provided when you placed your order. The last 4 digits (YYYY) are the last 4 digits of your phone number.</p>
 
     <div id="trackResult"></div>
 
@@ -299,14 +299,15 @@ const COLLECT_STAGES = [
   { title:'Slot confirmed',      sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
   { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
 ];
-// Sg Liang self-collect: an extra hop — items move to the Sg Liang team first,
-// then become ready for collection there. Any status containing "Sg Liang"
-// routes here. Within this branch, "ready" = ready stage, "collected" = done.
+// Sg Liang self-collect: customer books first, we confirm, THEN items are handed
+// to the Sg Liang team before collection. Any status containing "Sg Liang" routes
+// here. The hand-off stage matches specific phrases (not bare "sg liang") so the
+// routing keyword doesn't accidentally jump ahead of the requested/confirmed steps.
 const SGLIANG_STAGES = [
-  { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team', match:['sg liang','sgliang','with sg liang','items with sg liang','sg liang team'] },
   { title:'Ready for collection',     sub:'Ready! Book your pickup slot below 💕',   match:['ready'] },
-  { title:'Slot requested',           sub:'Awaiting our confirmation text',          match:['slot requested','slot request','collection booked','booked for collection','pickup booked','booked'] },
+  { title:'Slot requested',           sub:'Awaiting our confirmation text',          match:['slot requested','slot request','collection booked','booked for collection','pickup booked'] },
   { title:'Slot confirmed',           sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
+  { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team',  match:['items with sg liang','sg liang team','with sg liang team','handed to sg liang'] },
   { title:'Collected',                sub:'Picked up — thank you! 💕',              match:['collected','picked up'] },
 ];
 const DELIVER_STAGES = [
@@ -614,7 +615,7 @@ function bkCollectHtml(avail, locName){
         return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
       }).join('') || '<p class="bk-hint">No open slots for this date — please pick another.</p>'}</div>
       <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>
-      <p class="bk-hint warn">⏰ Kindly collect within the hour of your chosen slot. Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
+      <p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
     return dateField + slotField;
   }
   // Fallback if the availability tab has no rows for this location yet.
@@ -623,7 +624,7 @@ function bkCollectHtml(avail, locName){
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
-    <p class="bk-hint warn">⏰ Kindly collect within the hour of your slot. Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule.</p>`;
+    <p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule.</p>`;
 }
 
 function bkDeliveryHtml(avail){

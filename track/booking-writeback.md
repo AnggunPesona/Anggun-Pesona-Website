@@ -38,12 +38,12 @@ function updateTracking(e){
   if(!sh) return;
 
   var values = sh.getDataRange().getValues();
-  var head = values[0].map(function(h){ return String(h).trim().toLowerCase(); });
-  var iOrder  = head.indexOf('order no');
-  if(iOrder < 0) iOrder = head.indexOf('order number');
-  var iStatus = head.indexOf('status');
-  var iSlot   = head.indexOf('slot');
-  var iUpd    = head.indexOf('updated');
+  // tolerant header matching — ignores periods/spaces (e.g. "Order No." works)
+  var norm = values[0].map(function(h){ return String(h).trim().toLowerCase().replace(/[\s._-]/g,''); });
+  var iOrder = norm.indexOf('orderno'); if(iOrder<0) iOrder = norm.indexOf('ordernumber'); if(iOrder<0) iOrder = norm.indexOf('order');
+  var iStatus = norm.indexOf('status'); if(iStatus<0) iStatus = norm.indexOf('stage');
+  var iSlot = norm.indexOf('slot');
+  var iUpd = norm.indexOf('updated'); if(iUpd<0) iUpd = norm.indexOf('lastupdated');
   if(iOrder < 0 || iStatus < 0) return;
 
   var method = String(data.method || '').toLowerCase();
@@ -58,9 +58,9 @@ function updateTracking(e){
       ? [data.batch, data.address].filter(String).join(' · ')
       : [data.date, data.slot].filter(String).join(' · ');
 
-  var target = String(data.order).trim().toLowerCase();
+  var target = String(data.order).trim().toLowerCase().replace(/\s/g,'');
   for(var r = 1; r < values.length; r++){
-    var no = String(values[r][iOrder] || '').trim().toLowerCase();
+    var no = String(values[r][iOrder] || '').trim().toLowerCase().replace(/\s/g,'');
     if(no && no === target){
       sh.getRange(r+1, iStatus+1).setValue(status);
       if(iSlot >= 0 && chip) sh.getRange(r+1, iSlot+1).setValue(chip);
@@ -113,8 +113,14 @@ Copy-paste exactly (the wording matters — it's how the tracker knows which ste
 | Self-collect · Sg Liang        | `Sg Liang — Slot requested` | `Sg Liang — Slot confirmed`| `Collected` |
 | Delivery                       | `Delivery requested`        | `Delivery confirmed`       | `Delivered` |
 
-> For Sg Liang, keep the words **"Sg Liang"** at the front so the tracker keeps showing
-> the Sg Liang steps.
+**Sg Liang has one extra step, in this order:**
+`Ready for collection` → book → `Sg Liang — Slot requested` → you confirm
+`Sg Liang — Slot confirmed` → when you hand the items over, type
+`Items with Sg Liang team` → finally `Collected`.
+
+> For the requested/confirmed steps, keep the words **"Sg Liang"** at the front so the
+> tracker stays on the Sg Liang path. For the hand-off step, type it exactly as
+> `Items with Sg Liang team`.
 
 ---
 
@@ -136,8 +142,9 @@ Use a real test order number that exists in your Tracking sheet, and set its Sta
 
 ### Sg Liang
 Same as above, but choose **Self-collect → Sg Liang**. The sheet should auto-fill
-`Sg Liang — Slot requested`. To confirm, type `Sg Liang — Slot confirmed`, then
-`Collected` at the end.
+`Sg Liang — Slot requested`. To confirm, type `Sg Liang — Slot confirmed`. When you
+hand the items to the Sg Liang team, type `Items with Sg Liang team` (this step now
+comes *after* Slot confirmed). Finish with `Collected`.
 
 ### Delivery
 Choose **Delivery**, pick a batch, fill the address, **Send my booking**. The sheet
