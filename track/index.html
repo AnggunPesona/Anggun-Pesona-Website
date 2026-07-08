@@ -736,14 +736,8 @@ function bkCollectHtml(avail, locName){
     const dateField = `<div class="bk-field"><label>Pick a date</label>
       <select onchange="bkPickDate(this.value)">${dates.map(d=>`<option value="${esc(d)}" ${d===bkState.date?'selected':''}>${esc(d)}</option>`).join('')}</select>
       ${sgNote}</div>`;
-    const slots = loc[bkState.date]||[];
-    const slotField = `<p class="bk-label">Preferred time slot</p>
-      <div class="bk-slots">${slots.map(sl=>{
-        const on = sl.ok!==false, active = bkState.slot===sl.time && on;
-        return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
-      }).join('') || '<p class="bk-hint">No open slots for this date — please pick another.</p>'}</div>
-      <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>
-      <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please arrange an exact time slot with our team — this makes sure someone is there to open the gate for you.</p>`;
+    const slotField = `<div class="bk-field"><label>Preferred time slot</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
+      <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please suggest an exact time and our team will confirm it with you — this makes sure someone is there to open the gate for you.</p>`;
     return dateField + slotField;
   }
   // Fallback if the availability tab has no rows for this location yet.
