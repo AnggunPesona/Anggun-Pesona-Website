@@ -152,11 +152,14 @@
       font-family:'DM Sans',sans-serif;font-size:.95rem;color:#3a2a30;background:#fff;box-sizing:border-box;}
     .bk-field input:focus,.bk-field select:focus,.bk-field textarea:focus{outline:none;border-color:#c98a9e;box-shadow:0 0 0 3px rgba(201,138,158,.15);}
     .bk-field input[readonly]{background:#faf4f6;color:#8a6b74;}
-    /* iOS renders an empty <input type=date> with odd height/alignment — normalise it so the
-       box lines up with the other fields whether or not a date is chosen. */
-    .bk-field input[type=date]{min-height:1.35rem;line-height:1.35;text-align:left;
-      min-width:0;max-width:100%;width:100%;}
+    /* Mobile <input type=date>: appearance:none + min-width:0 keeps the box neatly inside the card;
+       the transparent picker-indicator overlay makes the WHOLE field tappable so the native
+       calendar opens reliably on both iOS and Android. */
+    .bk-field input[type=date]{-webkit-appearance:none;appearance:none;position:relative;
+      min-height:1.35rem;line-height:1.35;text-align:left;min-width:0;max-width:100%;width:100%;}
     .bk-field input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;}
+    .bk-field input[type=date]::-webkit-calendar-picker-indicator{position:absolute;top:0;left:0;
+      right:0;bottom:0;width:auto;height:auto;margin:0;padding:0;opacity:0;cursor:pointer;}
     .bk-field textarea{resize:vertical;min-height:70px;}
     .bk-slots{display:flex;flex-wrap:wrap;gap:.5rem;}
     .bk-slot{padding:.55rem 1rem;border:1.5px solid #f0e2e6;border-radius:999px;background:#faf4f6;cursor:pointer;
@@ -665,7 +668,7 @@ function bkCollectHtml(avail, locName){
       const iso=bkToISO(k); if(iso) byIso[iso]=loc[k];
     });
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
-        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
+        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onclick="try{this.showPicker()}catch(e){}" onchange="bkPickDate(this.value)">
         <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
         <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
     let slotField='';
@@ -705,7 +708,7 @@ function bkCollectHtml(avail, locName){
   }
   // Fallback if the availability tab has no rows for this location yet.
   return `<div class="bk-field"><label>Preferred date</label>
-      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" oninput="bkState.date=this.value">
+      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onclick="try{this.showPicker()}catch(e){}" oninput="bkState.date=this.value">
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
