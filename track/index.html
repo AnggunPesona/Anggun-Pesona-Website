@@ -489,8 +489,8 @@ async function trackLookup(){
       if(cls && /(requested|confirmed|booked)/i.test(st.title) && slot){
         subHtml = `${esc(st.sub)}<br><span class="slot-chip">${esc(slot)}</span>`;
       }
-      // On the CURRENT "…requested" step, offer a reschedule link right below it.
-      if(i===idx && /requested/i.test(st.title) && BOOKING_CONFIG.SUBMIT_URL){
+      // On the CURRENT "…requested" or "…confirmed" step, offer a reschedule link right below it.
+      if(i===idx && /requested|confirmed/i.test(st.title) && BOOKING_CONFIG.SUBMIT_URL){
         subHtml += `<br><button type="button" class="step-rebook" onclick="rescheduleFromTracker()">🔄 Change my slot</button>`;
       }
       return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${subHtml}</div></li>`;
@@ -590,13 +590,13 @@ function mountBooking(orderNo, R, slot){
   if(!area) return;
   const title = ((R.stages[R.idx]||{}).title)||'';
   const isReady     = !R.cancelled && !R.done && /ready/i.test(title);
-  // Already booked but not yet confirmed → let them reschedule from the same panel.
-  const isRequested = !R.cancelled && !R.done && /requested/i.test(title);
+  // Already booked (requested or confirmed) → let them reschedule from the same panel.
+  const isRequested = !R.cancelled && !R.done && /requested|confirmed/i.test(title);
   if(!BOOKING_CONFIG.SUBMIT_URL || (!isReady && !isRequested)){ area.innerHTML=''; return; }
   bkState = { order:orderNo, method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
   bkCalYM = null;
   const ctaLabel = isRequested ? '🔄 Change my slot' : '📅 Book your collection or delivery';
-  // At the "requested" stage the reschedule link in the stepper is the entry point,
+  // At the "requested"/"confirmed" stage the reschedule link in the stepper is the entry point,
   // so the big CTA is hidden by default (it still opens the same panel).
   area.innerHTML = `<button class="bk-cta ${isRequested?'bk-hide':''}" id="bkCta" data-label="${ctaLabel}" onclick="bkToggle()"><span>${ctaLabel}</span></button>
     <div class="bk-panel bk-hide" id="bkPanel"></div>`;
