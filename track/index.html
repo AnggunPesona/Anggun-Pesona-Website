@@ -127,6 +127,10 @@
     /* ---- Booking (self-collect / delivery) ---- */
     .slot-chip{display:inline-block;margin-top:.35rem;padding:.35rem .7rem;border-radius:999px;background:#f6e7ec;
       color:#a86178;font-size:.75rem;font-weight:600;font-family:'DM Sans',sans-serif;}
+    .step-rebook{display:inline-block;margin-top:.5rem;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;
+      letter-spacing:.01em;color:#a86178;background:#fff;border:1px solid #e6c9d3;border-radius:999px;
+      padding:.4rem .8rem;cursor:pointer;transition:.15s;}
+    .step-rebook:hover{background:#fbeef2;transform:translateY(-1px);}
     .bk-cta{margin-top:1.2rem;width:100%;padding:.95rem 1rem;border:none;border-radius:14px;cursor:pointer;
       font-family:'DM Sans',sans-serif;font-weight:600;font-size:.98rem;color:#fff;
       background:linear-gradient(135deg,#c98a9e,#a86178);transition:transform .15s ease,box-shadow .15s ease;
@@ -482,6 +486,10 @@ async function trackLookup(){
       if(cls && /(requested|confirmed|booked)/i.test(st.title) && slot){
         subHtml = `${esc(st.sub)}<br><span class="slot-chip">${esc(slot)}</span>`;
       }
+      // On the CURRENT "…requested" step, offer a reschedule link right below it.
+      if(i===idx && /requested/i.test(st.title) && BOOKING_CONFIG.SUBMIT_URL){
+        subHtml += `<br><button type="button" class="step-rebook" onclick="rescheduleFromTracker()">🔄 Change my slot</button>`;
+      }
       return `<li class="${cls}"><div class="step-title">${esc(st.title)}</div><div class="step-sub">${subHtml}</div></li>`;
     }).join('') + '</ul>';
     if(done){
@@ -577,14 +585,20 @@ async function bkLoadAvail(){
 function mountBooking(orderNo, R, slot){
   const area = document.getElementById('bookingArea');
   if(!area) return;
-  const ready = !R.cancelled && !R.done && /ready/i.test(((R.stages[R.idx]||{}).title)||'');
-  if(!BOOKING_CONFIG.SUBMIT_URL || !ready){ area.innerHTML=''; return; }
+  const title = ((R.stages[R.idx]||{}).title)||'';
+  const isReady     = !R.cancelled && !R.done && /ready/i.test(title);
+  // Already booked but not yet confirmed → let them reschedule from the same panel.
+  const isRequested = !R.cancelled && !R.done && /requested/i.test(title);
+  if(!BOOKING_CONFIG.SUBMIT_URL || (!isReady && !isRequested)){ area.innerHTML=''; return; }
   bkState = { order:orderNo, method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
   bkCalYM = null;
-  area.innerHTML = `<button class="bk-cta" id="bkCta" onclick="bkToggle()"><span>📅 Book your collection or delivery</span></button>
+  const ctaLabel = isRequested ? '🔄 Change my slot' : '📅 Book your collection or delivery';
+  // At the "requested" stage the reschedule link in the stepper is the entry point,
+  // so the big CTA is hidden by default (it still opens the same panel).
+  area.innerHTML = `<button class="bk-cta ${isRequested?'bk-hide':''}" id="bkCta" data-label="${ctaLabel}" onclick="bkToggle()"><span>${ctaLabel}</span></button>
     <div class="bk-panel bk-hide" id="bkPanel"></div>`;
   bkRenderPanel();
-  if(AUTO_OPEN_BOOKING){ AUTO_OPEN_BOOKING=false; bkToggle(true); }
+  if(AUTO_OPEN_BOOKING){ AUTO_OPEN_BOOKING=false; const c=document.getElementById('bkCta'); if(c) c.classList.remove('bk-hide'); bkToggle(true); }
 }
 
 function bkToggle(forceOpen){
@@ -593,8 +607,16 @@ function bkToggle(forceOpen){
   const open = forceOpen===true ? true : panel.classList.contains('bk-hide');
   panel.classList.toggle('bk-hide', !open);
   cta.classList.toggle('open', open);
-  cta.querySelector('span').textContent = open ? '✕ Close booking' : '📅 Book your collection or delivery';
+  cta.querySelector('span').textContent = open ? '✕ Close booking' : (cta.dataset.label || '📅 Book your collection or delivery');
   if(open) panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// Reschedule link shown under the "…requested" step — opens the same booking panel.
+function rescheduleFromTracker(){
+  const panel = document.getElementById('bkPanel'), cta = document.getElementById('bkCta');
+  if(!panel) return;
+  if(cta) cta.classList.remove('bk-hide'); // reveal so it can also close the panel
+  bkToggle(true);
 }
 
 async function bkRenderPanel(){
