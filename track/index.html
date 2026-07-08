@@ -154,7 +154,7 @@
     .bk-field input[readonly]{background:#faf4f6;color:#8a6b74;}
     /* iOS renders an empty <input type=date> with odd height/alignment — normalise it so the
        box lines up with the other fields whether or not a date is chosen. */
-    .bk-field input[type=date]{-webkit-appearance:none;appearance:none;min-height:1.35rem;line-height:1.35;text-align:left;
+    .bk-field input[type=date]{min-height:1.35rem;line-height:1.35;text-align:left;
       min-width:0;max-width:100%;width:100%;}
     .bk-field input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;}
     .bk-field textarea{resize:vertical;min-height:70px;}
@@ -600,7 +600,6 @@ async function bkRenderPanel(){
       <div class="bk-disc-t">A few gentle notes 🤍</div>
       <p>Once you've booked, kindly <strong>wait for our confirmation text</strong> before heading over — we'll have your item prepared outside for a smooth, contactless pickup.</p>
       <p>To keep things easy for both sides, we kindly ask that you <strong>don't drop by unannounced</strong>, as unbooked orders may not be ready.</p>
-      <p>Please arrange your slot <strong>at least 12 hours in advance</strong>.</p>
       <p>After booking, you can always <strong>check your booking confirmation here on the tracker</strong>.</p>
       <p>For self-collect, our team will send your <strong>collection details on the day (or a day before)</strong>, along with a confirmation text that your order is ready for collection.</p>
       <p>For delivery, the time is <strong>tentative</strong> and will be further updated and confirmed on the day based on our routes.</p>
@@ -668,8 +667,7 @@ function bkCollectHtml(avail, locName){
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
         <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
         <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
-        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p>
-        ${bkState.dateWarn?`<p class="bk-hint warn">⏰ That date is too soon — please pick a date at least a day ahead (12+ hours) so we can prepare your item.</p>`:''}</div>`;
+        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
     let slotField='';
     if(bkState.date){
       const slots=byIso[bkState.date]||std;
