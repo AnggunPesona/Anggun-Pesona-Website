@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Booking logic lives inline in this page, so it isn't cache-busted by ?v= like script.js.
+       These tell phones to re-check for a fresh copy instead of showing an old saved one. -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Track Your Pre-Order — Anggun Pesona</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -675,7 +680,7 @@ function bkCollectHtml(avail, locName){
   }
   // Fallback if the availability tab has no rows for this location yet.
   return `<div class="bk-field"><label>Preferred date</label>
-      <input type="date" value="${esc(bkState.date)}" oninput="bkState.date=this.value">
+      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" oninput="bkState.date=this.value">
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
@@ -710,6 +715,10 @@ async function bkSubmit(){
   const done = document.getElementById('bkDone'), m = bkState.method;
   if(m==='delivery' && !(bkState.address||'').trim()){ done.innerHTML = `<p class="bk-hint warn">Please share your delivery address so we can confirm the rate.</p>`; return; }
   if(m!=='delivery' && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a date first.</p>`; return; }
+  // Belt-and-suspenders: reject too-soon ISO dates even if a mobile date picker ignored the min attribute.
+  if(m!=='delivery' && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date) && bkState.date < bkMinDate()){
+    done.innerHTML = `<p class="bk-hint warn">Please pick a date at least a day ahead (12+ hours) so we can prepare your item.</p>`; return;
+  }
   const payload = {
     order: bkState.order,
     method: m==='delivery' ? 'Delivery' : (m==='sgliang' ? 'Self-collect · Sg Liang' : 'Self-collect · Lambak Kanan'),
