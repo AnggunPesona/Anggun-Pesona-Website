@@ -768,7 +768,7 @@ function bkDeliveryHtml(avail){
   const reqPanel = isReq ? `<div class="bk-field"><label>Your preferred delivery date</label>
       ${bkCalHtml()}
       <p class="bk-hint">📅 Choose any day that suits you — our team will text you to confirm a delivery slot for that date.</p>
-      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>` : '';
+      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can arrange your delivery.</p></div>` : '';
   return `<p class="bk-label">Choose a delivery batch</p>${cards}${reqCard}${reqPanel}
     <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
     <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
