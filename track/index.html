@@ -600,8 +600,54 @@ async function bkRenderPanel(){
     <div id="bkDone"></div>`;
 }
 
+// Minimum bookable date = tomorrow (keeps the 12-hour-ahead promise).
+function bkMinDate(){ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); }
+
+// Normalise a sheet date (any common format) to ISO YYYY-MM-DD so a calendar pick can match it.
+function bkToISO(s){
+  s=(s||'').toString().trim(); if(!s) return '';
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m) return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+  // Day-first DD/MM/YYYY or DD-MM-YYYY (Brunei convention)
+  m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/);
+  if(m){ let d=+m[1],mo=+m[2],y=+m[3]; if(y<100)y+=2000;
+    return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+  // Textual e.g. "12 Jul", "Fri 12 July 2026", "July 12, 2026" — strip any leading weekday first
+  const t=Date.parse(s.replace(/^(mon|tue|wed|thu|fri|sat|sun)[a-z]*,?\s+/i,''));
+  if(!isNaN(t)){ const dt=new Date(t);
+    if(!/\d{4}/.test(s)){ // no explicit year in the sheet → assume this year, roll to next if already past
+      const now=new Date(); dt.setFullYear(now.getFullYear());
+      if(dt < new Date(now.getFullYear(),now.getMonth(),now.getDate())) dt.setFullYear(now.getFullYear()+1);
+    }
+    return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+  return '';
+}
+
 function bkCollectHtml(avail, locName){
   const loc = (avail.collect && avail.collect[locName]) || {};
+  // Lambak Kanan: open calendar (any date). If that date has slots in the sheet, show them; else team confirms by text.
+  if(bkState.method==='lambak'){
+    const byIso={}; Object.keys(loc).forEach(k=>{ const iso=bkToISO(k); if(iso) byIso[iso]=loc[k]; });
+    const dateField=`<div class="bk-field"><label>Pick a collection date</label>
+        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
+        <p class="bk-hint">📅 Choose any date that suits you. If we've set time slots for that day they'll show below — otherwise our team will confirm the time with you by text.</p>
+        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
+    let slotField='';
+    if(bkState.date){
+      const slots=byIso[bkState.date]||[];
+      if(slots.length){
+        slotField=`<p class="bk-label">Available time slots</p>
+          <div class="bk-slots">${slots.map(sl=>{ const on=sl.ok!==false, active=bkState.slot===sl.time&&on;
+            return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
+          }).join('')}</div>
+          <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>`;
+      } else {
+        slotField=`<p class="bk-hint info">🕊️ No preset time slots for this date — our team will confirm the exact pickup time with you by text.</p>`;
+      }
+    }
+    return dateField + slotField +
+      `<p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
+  }
   const dates = Object.keys(loc).filter(d=>d);
   const sgNote = bkState.method==='sgliang'
     ? `<p class="bk-hint info">📅 Sg Liang collection is available on <strong>Fridays &amp; Sundays only</strong>.</p>` : '';
