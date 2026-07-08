@@ -738,7 +738,7 @@ function bkCollectHtml(avail, locName){
       ${sgNote}
       <p class="bk-hint">⏱️ Slots must be booked <strong>at least 12 hours ahead</strong> so our team can prepare your item.</p></div>`;
     const slots = loc[bkState.date]||[];
-    const slotField = `<p class="bk-label">Available time slots</p>
+    const slotField = `<p class="bk-label">Preferred time slot</p>
       <div class="bk-slots">${slots.map(sl=>{
         const on = sl.ok!==false, active = bkState.slot===sl.time && on;
         return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
@@ -776,8 +776,7 @@ function bkDeliveryHtml(avail){
   const reqPanel = isReq ? `<div class="bk-field"><label>Your preferred delivery date</label>
       ${bkCalHtml()}
       <p class="bk-hint">📅 Choose any day that suits you — our team will text you to confirm a delivery slot for that date.</p>
-      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>
-    <div class="bk-field"><label>Preferred time (optional)</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. after 4:00 PM" oninput="bkState.slot=this.value"></div>` : '';
+      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>` : '';
   return `<p class="bk-label">Choose a delivery batch</p>${cards}${reqCard}${reqPanel}
     <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
     <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
