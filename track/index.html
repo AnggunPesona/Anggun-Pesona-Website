@@ -744,7 +744,7 @@ function bkCollectHtml(avail, locName){
         return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
       }).join('') || '<p class="bk-hint">No open slots for this date — please pick another.</p>'}</div>
       <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>
-      <p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
+      <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please arrange an exact time slot with our team — this makes sure someone is there to open the gate for you.</p>`;
     return dateField + slotField;
   }
   // Fallback if the availability tab has no rows for this location yet.
@@ -753,7 +753,7 @@ function bkCollectHtml(avail, locName){
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
-    <p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule.</p>`;
+    <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please arrange an exact time slot with our team — this makes sure someone is there to open the gate for you.</p>`;
 }
 
 function bkDeliveryHtml(avail){
