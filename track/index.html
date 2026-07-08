@@ -192,7 +192,8 @@
     .bk-hint{font-family:'DM Sans',sans-serif;font-size:.78rem;color:#9a8188;margin:.5rem .1rem 0;line-height:1.5;}
     .bk-hint.warn{background:#fff6e9;border:1px solid #f0dcc0;color:#8a6a3a;padding:.6rem .8rem;border-radius:10px;margin-top:.7rem;}
     .bk-hint.info{background:#f2f6fb;border:1px solid #cfdcf0;color:#3a5a8a;padding:.6rem .8rem;border-radius:10px;margin-top:.7rem;}
-    .bk-disc{margin-top:1.6rem;padding:1.1rem 1.2rem;border-radius:14px;background:#faf4f6;border:1px solid #f0e2e6;}
+    .bk-disc-lead{margin:1.5rem 0 .5rem;text-align:center;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:#a24d66;}
+    .bk-disc{margin-top:0;padding:1.1rem 1.2rem;border-radius:14px;background:#faf4f6;border:1px solid #f0e2e6;}
     .bk-disc-t{font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;color:#8a5a68;margin-bottom:.5rem;}
     .bk-disc p{font-family:'DM Sans',sans-serif;font-size:.82rem;color:#8a6b74;line-height:1.6;margin:0 0 .55rem;}
     .bk-disc p:last-child{margin-bottom:0;}
@@ -615,6 +616,9 @@ async function bkRenderPanel(){
     <p class="bk-label">Collection method</p>
     <div class="bk-methods">${methodCards}</div>
     ${body}
+    <button class="bk-submit" id="bkSubmit" onclick="bkSubmit()"><span>Send my booking</span></button>
+    <p class="bk-submit-hint">Your booking goes straight to our team — we'll text you to confirm the details.</p>
+    <p class="bk-disc-lead">💌 Please read our gentle notes below.</p>
     <div class="bk-disc">
       <div class="bk-disc-t">A few gentle notes 🤍</div>
       <p>Once you've booked, kindly <strong>wait for our confirmation text</strong> before heading over — we'll have your item prepared outside for a smooth, contactless pickup.</p>
@@ -623,8 +627,6 @@ async function bkRenderPanel(){
       <p>For self-collect, our team will send your <strong>collection details on the day (or a day before)</strong>, along with a confirmation text that your order is ready for collection.</p>
       <p>For delivery, the time is <strong>tentative</strong> and will be further updated and confirmed on the day based on our routes.</p>
     </div>
-    <button class="bk-submit" id="bkSubmit" onclick="bkSubmit()"><span>Send my booking</span></button>
-    <p class="bk-submit-hint">Your booking goes straight to our team — we'll text you to confirm the details.</p>
     <div id="bkDone"></div>`;
 }
 
