@@ -166,6 +166,20 @@
       font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;color:#6f5a60;transition:all .15s ease;}
     .bk-slot:hover{border-color:#e3b9c6;}
     .bk-slot.active{border-color:#a86178;background:#a86178;color:#fff;}
+    /* In-page calendar (replaces the flaky native <input type=date> on mobile). */
+    .bk-cal{border:1px solid #e3d4d9;border-radius:14px;padding:.6rem .7rem .8rem;background:#fff;}
+    .bk-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;}
+    .bk-cal-title{font-family:'DM Sans',sans-serif;font-weight:600;font-size:.95rem;color:#3a2a30;}
+    .bk-cal-nav{width:2rem;height:2rem;border:1px solid #e3d4d9;border-radius:999px;background:#faf4f6;color:#a86178;
+      font-size:1.15rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+    .bk-cal-nav:disabled{opacity:.3;cursor:not-allowed;}
+    .bk-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.25rem;}
+    .bk-cal-dow{text-align:center;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;color:#b39aa1;padding:.2rem 0;}
+    .bk-cal-cell{display:flex;align-items:center;justify-content:center;min-height:2.2rem;border-radius:999px;
+      font-family:'DM Sans',sans-serif;font-size:.9rem;border:none;background:transparent;color:#3a2a30;cursor:pointer;padding:0;}
+    button.bk-cal-cell:hover{background:#f6e7ec;}
+    .bk-cal-cell.active{background:#a86178;color:#fff;font-weight:600;}
+    .bk-cal-cell.disabled,.bk-cal-cell.empty{color:#d8c7cd;cursor:default;}
     .bk-batch{display:flex;align-items:center;gap:.8rem;border:1.5px solid #f0e2e6;border-radius:14px;padding:.9rem 1rem;
       background:#faf4f6;cursor:pointer;margin-bottom:.6rem;transition:all .15s ease;}
     .bk-batch:hover{border-color:#e3b9c6;}
@@ -522,6 +536,7 @@ let AUTO_OPEN_BOOKING = false;
 let _availCache = null;
 const BK_LOC = { lambak:'Lambak Kanan', sgliang:'Sg Liang' };
 let bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
+let bkCalYM = null; // {y, m} of the month currently shown in the in-page calendar (m is 0-11)
 
 function bkCanonLoc(loc){
   const l = (loc||'').toLowerCase();
@@ -565,6 +580,7 @@ function mountBooking(orderNo, R, slot){
   const ready = !R.cancelled && !R.done && /ready/i.test(((R.stages[R.idx]||{}).title)||'');
   if(!BOOKING_CONFIG.SUBMIT_URL || !ready){ area.innerHTML=''; return; }
   bkState = { order:orderNo, method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
+  bkCalYM = null;
   area.innerHTML = `<button class="bk-cta" id="bkCta" onclick="bkToggle()"><span>📅 Book your collection or delivery</span></button>
     <div class="bk-panel bk-hide" id="bkPanel"></div>`;
   bkRenderPanel();
@@ -668,7 +684,7 @@ function bkCollectHtml(avail, locName){
       const iso=bkToISO(k); if(iso) byIso[iso]=loc[k];
     });
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
-        <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
+        ${bkCalHtml()}
         <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
         <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
     let slotField='';
@@ -708,7 +724,7 @@ function bkCollectHtml(avail, locName){
   }
   // Fallback if the availability tab has no rows for this location yet.
   return `<div class="bk-field"><label>Preferred date</label>
-      <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkState.date=this.value">
+      ${bkCalHtml()}
       ${sgNote}
       <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong>. We'll confirm the exact slot by text.</p></div>
     <div class="bk-field"><label>Preferred time</label><input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>
@@ -741,6 +757,46 @@ function bkPickDate(v){
 }
 function bkPickSlot(t){ bkState.slot=t; bkRenderPanel(); }
 function bkPickBatch(b){ bkState.batch=b; bkRenderPanel(); }
+
+// In-page month calendar. Built from plain buttons so it behaves identically on every phone —
+// no reliance on the native <input type=date> picker, which opened-then-instantly-closed on mobile.
+function bkCalHtml(){
+  const min = bkMinDate();                     // ISO YYYY-MM-DD, earliest bookable date (tomorrow)
+  const minY=+min.slice(0,4), minM=+min.slice(5,7)-1;
+  if(!bkCalYM){                                // centre on the picked date, else on the earliest bookable month
+    if(bkState.date && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date)) bkCalYM={ y:+bkState.date.slice(0,4), m:+bkState.date.slice(5,7)-1 };
+    else bkCalYM={ y:minY, m:minM };
+  }
+  const y=bkCalYM.y, m=bkCalYM.m, pad=n=>String(n).padStart(2,'0');
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const startDow=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  const canPrev = y>minY || (y===minY && m>minM);   // don't let them page back past the bookable window
+  let cells='';
+  for(let i=0;i<startDow;i++) cells+='<span class="bk-cal-cell empty"></span>';
+  for(let d=1; d<=days; d++){
+    const iso=`${y}-${pad(m+1)}-${pad(d)}`, disabled=iso<min, active=bkState.date===iso;
+    cells += disabled
+      ? `<span class="bk-cal-cell disabled">${d}</span>`
+      : `<button type="button" class="bk-cal-cell${active?' active':''}" onclick="bkPickDate('${iso}')">${d}</button>`;
+  }
+  return `<div class="bk-cal">
+      <div class="bk-cal-head">
+        <button type="button" class="bk-cal-nav" ${canPrev?'onclick="bkCalNav(-1)"':'disabled'}>&lsaquo;</button>
+        <span class="bk-cal-title">${MONTHS[m]} ${y}</span>
+        <button type="button" class="bk-cal-nav" onclick="bkCalNav(1)">&rsaquo;</button>
+      </div>
+      <div class="bk-cal-grid">
+        ${['S','M','T','W','T','F','S'].map(d=>`<span class="bk-cal-dow">${d}</span>`).join('')}
+        ${cells}
+      </div>
+    </div>`;
+}
+function bkCalNav(delta){
+  if(!bkCalYM) return;
+  let m=bkCalYM.m+delta, y=bkCalYM.y;
+  if(m<0){ m=11; y--; } else if(m>11){ m=0; y++; }
+  bkCalYM={y,m}; bkRenderPanel();
+}
 
 async function bkSubmit(){
   if(bkState.sending) return;
