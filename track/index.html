@@ -625,16 +625,22 @@ function bkToISO(s){
 
 function bkCollectHtml(avail, locName){
   const loc = (avail.collect && avail.collect[locName]) || {};
-  // Lambak Kanan: open calendar (any date). If that date has slots in the sheet, show them; else team confirms by text.
+  // Lambak Kanan: open calendar (any date). Standard slots (sheet rows with a BLANK date) show on every
+  // date; a specific date's own rows override them. If neither exists, our team confirms the time by text.
   if(bkState.method==='lambak'){
-    const byIso={}; Object.keys(loc).forEach(k=>{ const iso=bkToISO(k); if(iso) byIso[iso]=loc[k]; });
+    const byIso={}, std=[];
+    Object.keys(loc).forEach(k=>{
+      const kk=k.trim().toLowerCase();
+      if(kk===''||['all','any','default','daily','everyday'].includes(kk)){ (loc[k]||[]).forEach(s=>{ if(s.ok!==false) std.push(s); }); return; }
+      const iso=bkToISO(k); if(iso) byIso[iso]=loc[k];
+    });
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
         <input type="date" min="${bkMinDate()}" value="${esc(bkState.date)}" onchange="bkPickDate(this.value)">
-        <p class="bk-hint">📅 Choose any date that suits you. If we've set time slots for that day they'll show below — otherwise our team will confirm the time with you by text.</p>
+        <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
         <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
     let slotField='';
     if(bkState.date){
-      const slots=byIso[bkState.date]||[];
+      const slots=byIso[bkState.date]||std;
       if(slots.length){
         slotField=`<p class="bk-label">Available time slots</p>
           <div class="bk-slots">${slots.map(sl=>{ const on=sl.ok!==false, active=bkState.slot===sl.time&&on;
