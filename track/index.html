@@ -131,6 +131,8 @@
       letter-spacing:.01em;color:#a86178;background:#fff;border:1px solid #e6c9d3;border-radius:999px;
       padding:.4rem .8rem;cursor:pointer;transition:.15s;}
     .step-rebook:hover{background:#fbeef2;transform:translateY(-1px);}
+    .step-timing{display:inline-block;margin-top:.3rem;font-family:'DM Sans',sans-serif;font-size:.72rem;
+      font-weight:600;color:#a86178;line-height:1.4;}
     .bk-cta{margin-top:1.2rem;width:100%;padding:.95rem 1rem;border:none;border-radius:14px;cursor:pointer;
       font-family:'DM Sans',sans-serif;font-weight:600;font-size:.98rem;color:#fff;
       background:linear-gradient(135deg,#c98a9e,#a86178);transition:transform .15s ease,box-shadow .15s ease;
@@ -333,7 +335,7 @@ const SHARED_STAGES = [
 const COLLECT_STAGES = [
   { title:'Ready for collection',sub:'Ready! Book your pickup slot below 💕', match:['ready for collection','ready for pickup','ready'] },
   { title:'Slot requested',      sub:'Awaiting our confirmation text',        match:['slot requested','slot request','collection booked','booked for collection','collect booked','pickup booked'] },
-  { title:'Slot confirmed',      sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
+  { title:'Slot confirmed',      sub:'Our team will update you once your item is ready for collection 🤍<br><span class="step-timing">🕑 We\'ll text you the final details at the latest 2 hours before your collection time.</span>', match:['slot confirmed'] },
   { title:'Collected',           sub:'Picked up — thank you! 💕',            match:['collected','self-collected','picked up by you'] },
 ];
 // Sg Liang self-collect: customer books first, we confirm, THEN items are handed
@@ -343,7 +345,7 @@ const COLLECT_STAGES = [
 const SGLIANG_STAGES = [
   { title:'Ready for collection',     sub:'Ready! Book your pickup slot below 💕',   match:['ready'] },
   { title:'Slot requested',           sub:'Awaiting our confirmation text',          match:['slot requested','slot request','collection booked','booked for collection','pickup booked'] },
-  { title:'Slot confirmed',           sub:'Our team will update you once your item is ready for collection 🤍', match:['slot confirmed'] },
+  { title:'Slot confirmed',           sub:'Our team will update you once your item is ready for collection 🤍<br><span class="step-timing">🕑 We\'ll text you the final details at the latest 2 hours before your collection time.</span>', match:['slot confirmed'] },
   { title:'Items with Sg Liang team', sub:'Handed to our Sg Liang collection team',  match:['items with sg liang','sg liang team','with sg liang team','handed to sg liang'] },
   { title:'Collected',                sub:'Picked up — thank you! 💕',              match:['collected','picked up'] },
 ];
@@ -697,6 +699,21 @@ function bkToISO(s){
   return yr+'-'+pad(mo)+'-'+pad(day);
 }
 
+// Guard which sheet dates are allowed to show. Hides anything already past (or sooner than the
+// 12-hour lead time) and — for Sg Liang — anything that isn't a Friday or Sunday, so a date left
+// in the sheet by mistake can never appear on the site. Unparseable dates are left visible.
+function bkDateAllowed(dateStr, forSgLiang){
+  const iso = bkToISO(dateStr);
+  if(!iso) return true;
+  if(iso < bkMinDate()) return false;            // already passed / too soon
+  if(forSgLiang){
+    const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+    const dow=new Date(+m[1],+m[2]-1,+m[3]).getDay(); // 0=Sun … 5=Fri
+    if(dow!==5 && dow!==0) return false;          // Sg Liang = Fri & Sun only
+  }
+  return true;
+}
+
 function bkCollectHtml(avail, locName){
   const loc = (avail.collect && avail.collect[locName]) || {};
   // Lambak Kanan: open calendar (any date). Standard slots (sheet rows with a BLANK date) show on every
@@ -728,11 +745,17 @@ function bkCollectHtml(avail, locName){
     return dateField + slotField +
       `<p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
   }
-  const dates = Object.keys(loc).filter(d=>d);
-  const sgNote = bkState.method==='sgliang'
+  const isSg = bkState.method==='sgliang';
+  const dates = Object.keys(loc).filter(d=>d && bkDateAllowed(d, isSg));
+  const sgNote = isSg
     ? `<p class="bk-hint info">📅 Sg Liang collection is available on <strong>Fridays &amp; Sundays only</strong>.</p>` : '';
+  // All sheet dates for this location are past or invalid → don't fall back to an open calendar
+  // (which for Sg Liang could offer a non-Fri/Sun day). Show a gentle note instead.
+  if(!dates.length && Object.keys(loc).some(d=>d)){
+    return `${sgNote}<p class="bk-hint info">🕊️ No open collection dates right now — please contact us and we'll arrange a time with you.</p>`;
+  }
   if(dates.length){
-    if(!bkState.date || !loc[bkState.date]) bkState.date = dates[0];
+    if(!dates.includes(bkState.date)) bkState.date = dates[0];
     const dateField = `<div class="bk-field"><label>Pick a date</label>
       <select onchange="bkPickDate(this.value)">${dates.map(d=>`<option value="${esc(d)}" ${d===bkState.date?'selected':''}>${esc(d)}</option>`).join('')}</select>
       ${sgNote}</div>`;
