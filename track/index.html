@@ -486,10 +486,10 @@ async function trackLookup(){
       let cls = '';
       if(done || i < idx){ cls = 'done'; }
       else if(i === idx){  cls = 'current'; }
-      let subHtml = esc(st.sub);
+      let subHtml = st.sub; // trusted, hardcoded copy — may contain intentional markup (<br>, <span>)
       // On a requested/confirmed/booked step, show the slot (from the sheet) as a chip.
       if(cls && /(requested|confirmed|booked)/i.test(st.title) && slot){
-        subHtml = `${esc(st.sub)}<br><span class="slot-chip">${esc(slot)}</span>`;
+        subHtml = `${st.sub}<br><span class="slot-chip">${esc(slot)}</span>`;
       }
       // On the CURRENT "…requested" or "…confirmed" step, offer a reschedule link right below it.
       if(i===idx && /requested|confirmed/i.test(st.title) && BOOKING_CONFIG.SUBMIT_URL){
