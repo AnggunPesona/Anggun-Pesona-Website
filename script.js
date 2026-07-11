@@ -7,6 +7,15 @@ const CONFIG = {
   INSTOCK_SHEET_ID:   '1DCvNBnImX3Aktwdc32f9LzHhWuffcYTSLhj9d05XFT0',
   INSTOCK_SHEET_GID:  '0',
 
+  // Site Content sheet — powers the home "favourites" trio + all Reviews.
+  // Paste the ID of your "Anggun Pesona — Site Content" Google Sheet below.
+  // Leave blank to keep using the built-in defaults further down this file.
+  CONTENT_SHEET_ID:   '1pegGwEjddFshFg9MoV51r2PfLwa3Ls76YUv_vEUakLA',
+  FEATURED_TAB:       'Featured',
+  REVIEWS_TAB:        'Reviews',
+  BRIDAL_TAB:         'BridalReviews',
+  SOURCED_TAB:        'Sourced',
+
   WHATSAPP: '6737471323',
   WA_MSG_PREORDER: 'Hi Anggun Pesona! I\'d like to pre-order 🛍️',
   WA_MSG_INSTOCK:  'Hi Anggun Pesona! I\'d like to order an in-stock item ⚡',
@@ -87,6 +96,20 @@ const SOURCED_PHOTOS = [
   {url: 'https://drive.google.com/file/d/1TFgUi5ahZzq7vjsw63YklRIX4x-Q3gxm/view?usp=drive_link', caption: '2nd RAYA PO Batch 2026'},
   {url: 'https://drive.google.com/file/d/1SUt77Uj5khyEDvzYcfj9G8RlqGZz3DCX/view?usp=drive_link', caption: '1st RAYA PO Batch 2026'}
 ];
+
+// DEFAULT_FEATURED: home page "favourites last batch" trio.
+// Used only when CONTENT_SHEET_ID is blank OR the Featured tab is empty.
+const DEFAULT_FEATURED = [
+  {photo: 'https://lh3.googleusercontent.com/d/1tFEE8oN1Tfn-XxGIZWmV7kpGkBhPO1WD', caption: 'Clogs with Bow (B$38)'},
+  {photo: 'https://lh3.googleusercontent.com/d/11MypY-y9POdsxTxA12hxCxC6Q3cyxtJ_', caption: 'Polkadot Ballerina (B$35)'},
+  {photo: 'https://lh3.googleusercontent.com/d/1EKNs5-SPX0DJc0N7OU12OVupgfV6wTSo', caption: 'Dusto Casual Sneaker (B$38)'}
+];
+
+// Live content — starts as the built-in defaults, replaced by sheet rows when loaded.
+let featuredData = DEFAULT_FEATURED;
+let reviewsData  = REVIEW_SCREENSHOTS;
+let bridalData   = BRIDAL_REVIEWS;
+let sourcedData  = SOURCED_PHOTOS;
 
 /* ============================================================
    STATE
@@ -271,10 +294,10 @@ function initCurrentPage() {
       if (productSlug) openProductBySlug(productSlug, 'instocks');
     }
   }
-  if (page === 'reviews')   { renderReviews(); }
+  if (page === 'reviews')   { renderReviews(); loadReviewContent().then(renderReviews); }
   if (page === 'bridal')    { applyContactLinks(); }
   if (page === 'about')     { applyContactLinks(); initBrandsList(); }
-  if (page === 'home')      { applyContactLinks(); }
+  if (page === 'home')      { applyContactLinks(); renderFeatured(); loadFeatured().then(renderFeatured); }
 }
 
 function openProductBySlug(slug, source) {
@@ -296,6 +319,62 @@ async function fetchSheet(id, gid) {
   return new Promise((resolve, reject) => {
     Papa.parse(csv, { header: true, skipEmptyLines: true, transformHeader: h => h.trim(), complete: r => resolve(r.data), error: e => reject(e) });
   });
+}
+
+/* Fetch a tab by its NAME (friendlier than GID for non-technical editors). */
+async function fetchSheetByName(id, sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} — check Sheet ID and sharing settings`);
+  const csv = await res.text();
+  if (csv.toLowerCase().includes('<!doctype html>')) throw new Error('Sheet is private — share as "Anyone with the link can view"');
+  return new Promise((resolve, reject) => {
+    Papa.parse(csv, { header: true, skipEmptyLines: true, transformHeader: h => h.trim(), complete: r => resolve(r.data), error: e => reject(e) });
+  });
+}
+
+/* Load the home "favourites" trio from the Featured tab (falls back to defaults). */
+async function loadFeatured() {
+  if (!CONFIG.CONTENT_SHEET_ID) return;
+  try {
+    const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.FEATURED_TAB);
+    const clean = (rows || []).filter(r => (r.photo || r.photos || '').trim());
+    if (clean.length) featuredData = clean;
+  } catch (e) { console.warn('Featured content load failed — using defaults', e); }
+}
+
+/* Load Reviews / Bridal / Sourced tabs (each falls back to defaults on failure). */
+async function loadReviewContent() {
+  if (!CONFIG.CONTENT_SHEET_ID) return;
+  const grab = async (tab) => {
+    const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, tab);
+    return (rows || []).filter(r => (r.photos || r.photo || r.url || '').trim());
+  };
+  const [rev, bri, sou] = await Promise.allSettled([
+    grab(CONFIG.REVIEWS_TAB), grab(CONFIG.BRIDAL_TAB), grab(CONFIG.SOURCED_TAB)
+  ]);
+  if (rev.status === 'fulfilled' && rev.value.length) reviewsData = rev.value;
+  if (bri.status === 'fulfilled' && bri.value.length) bridalData  = bri.value;
+  if (sou.status === 'fulfilled' && sou.value.length) sourcedData = sou.value;
+  if (rev.status === 'rejected') console.warn('Reviews load failed — using defaults', rev.reason);
+}
+
+/* Render the home "favourites" trio. */
+function renderFeatured() {
+  const grid = document.getElementById('featured-grid');
+  if (!grid) return;
+  const items = (featuredData && featuredData.length) ? featuredData : DEFAULT_FEATURED;
+  grid.innerHTML = items.map(it => {
+    const first = (it.photo || it.photos || '').split(',')[0].trim();
+    const src = driveUrl(first);
+    const cap = (it.caption || '').replace(/</g, '&lt;');
+    return `<div class="gallery-card">
+      <div class="gallery-img-ph">
+        ${src ? `<img src="${src}" alt="${cap.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">` : ''}
+      </div>
+      <p class="caption">${cap}</p>
+    </div>`;
+  }).join('');
 }
 
 function driveUrl(raw) {
@@ -969,9 +1048,9 @@ function renderReviews() {
   if (!$rGrid || !$bGrid || !$sGrid) return; // not on reviews page
 
   // Render regular reviews
-  if (REVIEW_SCREENSHOTS.length) {
+  if (reviewsData.length) {
     $rEmpty.style.display = 'none';
-    $rGrid.innerHTML = REVIEW_SCREENSHOTS.map((item, idx) => {
+    $rGrid.innerHTML = reviewsData.map((item, idx) => {
       const photos = getPhotoList(item);
       if (!photos.length) return '';
 
@@ -1010,9 +1089,9 @@ function renderReviews() {
   }
 
   // Render bridal reviews
-  if (BRIDAL_REVIEWS.length) {
+  if (bridalData.length) {
     $bEmpty.style.display = 'none';
-    $bGrid.innerHTML = BRIDAL_REVIEWS.map((item, idx) => {
+    $bGrid.innerHTML = bridalData.map((item, idx) => {
       const photos = getPhotoList(item);
       if (!photos.length) return '';
 
@@ -1051,9 +1130,9 @@ function renderReviews() {
   }
 
   // Render sourced photos
-  if (SOURCED_PHOTOS.length) {
+  if (sourcedData.length) {
     $sEmpty.style.display = 'none';
-    $sGrid.innerHTML = SOURCED_PHOTOS.map((item, idx) => {
+    $sGrid.innerHTML = sourcedData.map((item, idx) => {
       // Handle both string URLs and objects with url/photo/photos properties
       let photos = [];
       let caption = '';
