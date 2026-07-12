@@ -757,7 +757,7 @@
     .gallery-card:nth-child(1) .gallery-img-ph { background: linear-gradient(135deg, var(--cream-dark), var(--gold)); }
     .gallery-card:nth-child(3) .gallery-img-ph { background: linear-gradient(135deg, var(--green-pale), var(--green-light)); color: var(--green-deep); }
     .gallery-card .caption {
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.75rem;
       color: var(--text-mid);
       text-align: center;
@@ -851,7 +851,7 @@
     }
     .signup-msg {
       margin-top: 1rem;
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.82rem;
       color: var(--pink);
       display: none;
@@ -1657,7 +1657,7 @@
     .detail-cta .btn { flex: 1; min-width: 150px; }
     .detail-cta-note {
       margin-top: 1rem;
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.78rem;
       color: var(--text-mid);
     }
@@ -2215,7 +2215,7 @@
       color: var(--maroon-soft);
     }
     .brands-disclaimer {
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.45rem;
       color: var(--text-light);
       margin-top: 1rem;
@@ -2389,7 +2389,7 @@
     .review-card img { width: 100%; display: block; }
     .review-caption {
       padding: 0.6rem 0.5rem 0.3rem;
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.75rem;
       color: var(--text-mid);
       text-align: center;
@@ -2569,7 +2569,7 @@
     }
     .sourced-caption {
       padding: 0.5rem 0.4rem 0.2rem;
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.72rem;
       color: var(--text-mid);
       text-align: center;
@@ -2791,7 +2791,7 @@
       margin: 1.25rem 0;
     }
     .footer-copy {
-      font-family: 'Homemade Apple', cursive;
+      font-family: 'Architects Daughter', cursive;
       font-size: 0.68rem;
       color: rgba(250,212,222,0.7);
     }
@@ -2908,7 +2908,7 @@
         content: '← Swipe →';
         display: block;
         text-align: center;
-        font-family: 'Homemade Apple', cursive;
+        font-family: 'Architects Daughter', cursive;
         font-size: 0.65rem;
         color: var(--text-light);
         margin-top: 0.5rem;
