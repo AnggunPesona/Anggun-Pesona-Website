@@ -2969,8 +2969,8 @@
       transform: translate(-50%, -50%) rotate(-18deg);
       font-family: 'Playfair Display', serif;
       font-style: italic;
-      color: rgba(255, 255, 255, 0.2);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      color: rgba(255, 255, 255, 0.25);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
       letter-spacing: 0.06em;
       white-space: nowrap;
       pointer-events: none;
