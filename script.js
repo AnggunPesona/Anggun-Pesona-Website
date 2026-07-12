@@ -370,7 +370,7 @@ function renderFeatured() {
     const cap = (it.caption || '').replace(/</g, '&lt;');
     return `<div class="gallery-card">
       <div class="gallery-img-ph">
-        ${src ? `<img src="${src}" alt="${cap.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">` : ''}
+        ${src ? `<span class="wm-box" style="width:100%;height:100%;"><img src="${src}" alt="${cap.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>` : ''}
       </div>
       <p class="caption">${cap}</p>
     </div>`;
@@ -385,7 +385,7 @@ function driveUrl(raw) {
 
 function imgOrPlaceholder(url, emoji = '👠') {
   const src = driveUrl(url);
-  if (src) return `<img class="product-image" src="${src}" alt="Product" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="product-img-placeholder" style="display:none">${emoji}</div>`;
+  if (src) return `<div class="wm-box"><img class="product-image" src="${src}" alt="Product" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="product-img-placeholder" style="display:none">${emoji}</div></div>`;
   return `<div class="product-img-placeholder">${emoji}</div>`;
 }
 
@@ -1065,7 +1065,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'">`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1073,7 +1073,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <img src="${photos[0]}" alt="Customer review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Customer review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
           </div>
         </div>`;
       }
@@ -1106,7 +1106,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'">`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1114,7 +1114,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <img src="${photos[0]}" alt="Bridal review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Bridal review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
           </div>
         </div>`;
       }
@@ -1165,7 +1165,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="sourced-photos-container">
           <div class="sourced-photos-grid sourced-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'">`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1173,7 +1173,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="sourced-photos-container">
           <div class="sourced-photos-grid sourced-photos-grid-wrapper" data-count="1">
-            <img src="${photos[0]}" alt="Sourced find" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Sourced find" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
           </div>
         </div>`;
       }
@@ -1373,4 +1373,25 @@ window.addEventListener('scroll', () => {
 });
 document.addEventListener('DOMContentLoaded', () => {
   initCurrentPage();
+});
+
+/* ============================================================
+   PHOTO PROTECTION — deters casual saving of images.
+   NOTE: a determined person can still capture images (screenshots,
+   dev tools). This stops right-click "Save Image As" and drag-saving,
+   and every photo also carries a visible watermark (see styles.css).
+   ============================================================ */
+// Pre-order catalogue photos come from suppliers (not our own shots),
+// so they are left unwatermarked. This flag turns the watermark off
+// for the whole pre-orders page (grid, detail, carousel & lightbox).
+if (/\/preorders/.test(window.location.pathname)) {
+  document.body.classList.add('wm-off');
+}
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('img, .wm-box, .detail-image-viewer, .carousel-viewer, .lightbox, .product-img-placeholder')) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('dragstart', e => {
+  if (e.target.tagName === 'IMG') e.preventDefault();
 });

@@ -2973,3 +2973,68 @@
       .review-photos-grid img { flex: 0 0 calc(50% - 0.2rem); }
       .sourced-photos-grid img { flex: 0 0 calc(50% - 0.2rem); }
     }
+
+    /* ============================================================
+       PHOTO WATERMARK + SAVE DETERRENTS
+       Adds a faint centered "Anggun Pesona" mark over every photo
+       and blocks dragging / long-press saving. (Right-click is
+       blocked in script.js.) Determined users can still screenshot.
+       ============================================================ */
+    img {
+      -webkit-user-drag: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .wm-box { position: relative; display: block; }
+    .carousel-viewer { position: relative; }
+
+    /* Pre-order photos aren't ours to mark — body.wm-off skips them. */
+    body:not(.wm-off) .wm-box::after,
+    body:not(.wm-off) .detail-image-viewer::after,
+    body:not(.wm-off) .carousel-viewer::after,
+    body:not(.wm-off) .lightbox.open::after {
+      content: 'Anggun Pesona';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-18deg);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.2);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .wm-box::after { font-size: clamp(0.7rem, 4vw, 1.3rem); }
+    .detail-image-viewer::after { font-size: clamp(0.9rem, 2.4vw, 1.5rem); }
+    .carousel-viewer::after,
+    .lightbox.open::after { font-size: clamp(1rem, 2.8vw, 1.8rem); }
+
+    /* Full coverage: review, bridal, sourced & home-featured thumbnails.
+       Each photo is wrapped in .wm-box (script.js) so the mark above
+       applies. These rules preserve each grid's layout + shrink the
+       mark for the small tiled thumbnails. */
+    .gallery-img-ph .wm-box { width: 100%; height: 100%; }
+    .review-photos-grid .wm-box,
+    .sourced-photos-grid .wm-box { min-width: 0; }
+    .review-photos-grid .wm-box:nth-child(n+5),
+    .sourced-photos-grid .wm-box:nth-child(n+5) { display: none; }
+    .review-photos-grid .wm-box::after,
+    .sourced-photos-grid .wm-box::after {
+      font-size: clamp(0.45rem, 2.2vw, 0.8rem);
+      letter-spacing: 0.03em;
+    }
+    @media (max-width: 768px) {
+      .review-photos-grid .wm-box,
+      .sourced-photos-grid .wm-box {
+        flex: 0 0 calc(50% - 0.2rem);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+      .review-photos-grid[data-count="1"] .wm-box,
+      .sourced-photos-grid[data-count="1"] .wm-box { flex: 1 1 100%; }
+      .review-photos-grid .wm-box img,
+      .sourced-photos-grid .wm-box img { height: 100%; }
+    }
