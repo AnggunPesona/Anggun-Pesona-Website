@@ -2917,21 +2917,22 @@
       }
       .products-grid .product-info .product-cta { margin-top: 0.5rem; }
       .reviews-grid {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-        max-height: 520px;
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(2, auto);
+        grid-auto-columns: 220px;
+        max-height: none;
         overflow-x: auto;
         overflow-y: hidden;
-        gap: 0.6rem;
+        gap: 1.6rem 0.9rem;
         -webkit-overflow-scrolling: touch;
         scroll-snap-type: x proximity;
         padding-bottom: 0.5rem;
+        justify-content: start;
       }
       .reviews-grid .review-card {
-        width: 140px;
-        min-width: 140px;
-        flex: 0 0 auto;
+        width: auto;
+        min-width: 0;
         scroll-snap-align: start;
       }
       .reviews-section { position: relative; }
@@ -2956,11 +2957,11 @@
 
     @media (max-width: 600px) {
       .reviews-grid {
-        max-height: 440px;
+        grid-auto-columns: 200px;
       }
       .reviews-grid .review-card {
-        width: 120px;
-        min-width: 120px;
+        width: auto;
+        min-width: 0;
       }
       .sourced-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 0.5rem; }
       .review-card, .sourced-item { padding: 0.35rem 0.35rem 0.25rem; }
