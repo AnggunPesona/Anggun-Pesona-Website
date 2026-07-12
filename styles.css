@@ -2416,6 +2416,7 @@
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 1rem;
       margin-top: 2.5rem;
+      align-items: start;
     }
     .sourced-item {
       background: var(--cream);
@@ -2452,9 +2453,9 @@
     .sourced-photos-grid[data-count="2"] {
       grid-template-columns: 1fr 1fr;
     }
-    /* 3 photos: three columns */
+    /* 3 photos: 2x2 grid (2 on top, 1 bottom) to match 4-photo cards */
     .sourced-photos-grid[data-count="3"] {
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
     }
     /* 4+ photos: 2x2 grid (default) */
     .sourced-photos-grid[data-count="4"],
