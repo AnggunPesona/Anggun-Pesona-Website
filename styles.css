@@ -2309,9 +2309,9 @@
     .review-photos-grid[data-count="2"] {
       grid-template-columns: 1fr 1fr;
     }
-    /* 3 photos: three columns */
+    /* 3 photos: 2x2 grid (2 on top, 1 bottom) to match 4-photo cards */
     .review-photos-grid[data-count="3"] {
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
     }
     /* 4+ photos: 2x2 grid (default) */
     .review-photos-grid[data-count="4"],
@@ -2361,62 +2361,29 @@
     .review-photos-more-badge:hover {
       background: rgba(0, 0, 0, 0.85);
     }
-    /* Mobile: Horizontal Carousel with scroll snap */
+    /* Mobile: static 2x2 grid (no inner scroll) — tap any photo to open the full carousel.
+       This avoids a second horizontal scroller competing with the row swipe. */
     @media (max-width: 768px) {
       .review-photos-container {
-        overflow-x: auto;
-        overflow-y: hidden;
-        scroll-behavior: smooth;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
       }
       .review-photos-grid {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 0.4rem;
-        width: auto;
-        min-width: 100%;
-        max-height: none;
-        height: 160px;
-      }
-      .review-photos-grid img {
-        flex: 0 0 calc(50% - 0.2rem);
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-      }
-      /* Show scroll indicator hint on mobile */
-      .review-photos-container::after {
-        content: '← Scroll →';
-        position: absolute;
-        right: 4px;
-        bottom: 4px;
-        background: rgba(0, 0, 0, 0.5);
-        color: white;
-        font-size: 0.6rem;
-        padding: 2px 6px;
-        border-radius: 2px;
-        font-family: 'DM Sans', sans-serif;
-        pointer-events: none;
-      }
-      /* Single photo: no scroll needed */
-      .review-photos-container:has(.review-photos-grid[data-count="1"]) {
-        overflow-x: hidden;
-        scroll-snap-type: none;
-      }
-      .review-photos-container:has(.review-photos-grid[data-count="1"])::after {
-        display: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.3rem;
+        width: 100%;
+        height: auto;
       }
       .review-photos-grid[data-count="1"] {
-        height: auto;
-        flex-wrap: wrap;
-        min-width: unset;
-        width: 100%;
+        grid-template-columns: 1fr;
       }
-      .review-photos-grid[data-count="1"] img {
-        flex: 1 1 100%;
-        scroll-snap-align: none;
-        height: auto;
+      .review-photos-grid img {
         aspect-ratio: 1 / 1;
+        object-fit: cover;
+      }
+      /* keep only first 4 visible; the "+N more" badge covers the rest */
+      .review-photos-grid img:nth-child(n+5) {
+        display: none;
       }
     }
     .review-card img { width: 100%; display: block; }
