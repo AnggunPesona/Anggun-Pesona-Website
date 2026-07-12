@@ -757,7 +757,7 @@
     .gallery-card:nth-child(1) .gallery-img-ph { background: linear-gradient(135deg, var(--cream-dark), var(--gold)); }
     .gallery-card:nth-child(3) .gallery-img-ph { background: linear-gradient(135deg, var(--green-pale), var(--green-light)); color: var(--green-deep); }
     .gallery-card .caption {
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.0rem;
       color: var(--text-mid);
       text-align: center;
@@ -851,7 +851,7 @@
     }
     .signup-msg {
       margin-top: 1rem;
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.08rem;
       color: var(--pink);
       display: none;
@@ -1657,7 +1657,7 @@
     .detail-cta .btn { flex: 1; min-width: 150px; }
     .detail-cta-note {
       margin-top: 1rem;
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.05rem;
       color: var(--text-mid);
     }
@@ -2215,7 +2215,7 @@
       color: var(--maroon-soft);
     }
     .brands-disclaimer {
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 0.62rem;
       color: var(--text-light);
       margin-top: 1rem;
@@ -2390,11 +2390,11 @@
     .review-card img { width: 100%; display: block; }
     .review-caption {
       padding: 0.6rem 0.5rem 0.3rem;
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 1.25rem;
-      color: var(--text-mid);
+      color: var(--maroon-soft);
       text-align: center;
-      line-height: 1.3;
+      line-height: 1.45;
     }
     .review-thumbs {
       display: flex; gap: 0.4rem;
@@ -2570,10 +2570,11 @@
     }
     .sourced-caption {
       padding: 0.5rem 0.4rem 0.2rem;
-      font-family: 'Dancing Script', cursive; font-weight: 600;
-      font-size: 1.15rem;
-      color: var(--text-mid);
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.2rem;
+      color: var(--maroon-soft);
       text-align: center;
+      line-height: 1.4;
     }
     .lightbox {
       display: none;
@@ -2792,7 +2793,7 @@
       margin: 1.25rem 0;
     }
     .footer-copy {
-      font-family: 'Dancing Script', cursive; font-weight: 600;
+      font-family: 'Dancing Script', cursive;
       font-size: 0.9rem;
       color: rgba(250,212,222,0.7);
     }
@@ -2909,7 +2910,7 @@
         content: '← Swipe →';
         display: block;
         text-align: center;
-        font-family: 'Dancing Script', cursive; font-weight: 600;
+        font-family: 'Dancing Script', cursive;
         font-size: 0.88rem;
         color: var(--text-light);
         margin-top: 0.5rem;
