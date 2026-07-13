@@ -370,7 +370,7 @@ function renderFeatured() {
     const cap = (it.caption || '').replace(/</g, '&lt;');
     return `<div class="gallery-card">
       <div class="gallery-img-ph">
-        ${src ? `<span class="wm-box" style="width:100%;height:100%;"><img src="${src}" alt="${cap.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>` : ''}
+        ${src ? `<span class="wm-box" style="width:100%;height:100%;"><img src="${src}" alt="${cap.replace(/"/g, '&quot;')}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>` : ''}
       </div>
       <p class="caption">${cap}</p>
     </div>`;
@@ -849,7 +849,7 @@ function renderDetail(index, source) {
     : '';
   const thumbsHtml = hasMultiple
     ? `<div class="detail-thumbs">${photoList.map((src, i) =>
-        `<img class="detail-thumb${i===0?' active':''}" src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();detailImgGoTo(${i})" onerror="this.style.display='none'">`
+        `<img class="detail-thumb${i===0?' active':''}" src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();detailImgGoTo(${i})" onerror="reviewImgFail(this)">`
       ).join('')}</div>`
     : '';
   window._detailPhotos = photoList;
@@ -1038,6 +1038,17 @@ function getPhotoList(item) {
   return raw.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
 }
 
+// When a review photo fails to load, hide it. If a card ends up with no visible
+// photos, hide the whole card so its decorative "tape" strip doesn't float alone.
+function reviewImgFail(img) {
+  img.style.display = 'none';
+  const card = img.closest('.review-card');
+  if (!card) return;
+  const anyLeft = [...card.querySelectorAll('.review-photos-grid img')]
+    .some(i => i.style.display !== 'none');
+  if (!anyLeft) card.style.display = 'none';
+}
+
 function renderReviews() {
   const $rGrid  = document.getElementById('reviews-grid');
   const $rEmpty = document.getElementById('reviews-empty');
@@ -1065,7 +1076,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1073,7 +1084,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Customer review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Customer review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
           </div>
         </div>`;
       }
@@ -1106,7 +1117,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1114,7 +1125,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="review-photos-container">
           <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Bridal review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Bridal review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
           </div>
         </div>`;
       }
@@ -1165,7 +1176,7 @@ function renderReviews() {
         }
         photosHtml = `<div class="sourced-photos-container">
           <div class="sourced-photos-grid sourced-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="this.style.display='none'"></span>`).join('')}
+            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
             ${moreBadge}
           </div>
         </div>`;
@@ -1173,7 +1184,7 @@ function renderReviews() {
         const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
         photosHtml = `<div class="sourced-photos-container">
           <div class="sourced-photos-grid sourced-photos-grid-wrapper" data-count="1">
-            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Sourced find" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"></span>
+            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Sourced find" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
           </div>
         </div>`;
       }

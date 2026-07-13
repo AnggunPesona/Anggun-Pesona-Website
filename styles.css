@@ -2252,17 +2252,45 @@
       border-top: 2px dashed var(--green-light);
     }
     .sourced-inner { max-width: 1280px; margin: 0 auto; }
+    /* Horizontal 2-row swipe carousel — keeps reviews compact and side-scrolling
+       instead of a tall masonry column that leaves big vertical gaps. */
     .reviews-grid {
-      column-width: 220px;
-      column-gap: 1rem;
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-rows: repeat(2, auto);
+      grid-auto-columns: 200px;
+      gap: 1.6rem 1rem;
       margin-top: 2.5rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x proximity;
+      padding: 0.5rem 0.25rem 0.6rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--pink) transparent;
     }
+    .reviews-grid::-webkit-scrollbar { height: 8px; }
+    .reviews-grid::-webkit-scrollbar-thumb {
+      background: var(--pink);
+      border-radius: 999px;
+    }
+    .reviews-grid::-webkit-scrollbar-track { background: transparent; }
     .reviews-grid .review-card {
-      width: 100%;
+      width: auto;
       min-width: 0;
-      margin-bottom: 1.5rem;
-      break-inside: avoid;
-      -webkit-column-break-inside: avoid;
+      margin-bottom: 0;
+      scroll-snap-align: start;
+    }
+    /* Swipe hint under each reviews carousel (shown on desktop + mobile) */
+    .reviews-section { position: relative; }
+    .reviews-section::after {
+      content: '← Swipe →';
+      display: block;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-top: 0.75rem;
     }
     .review-card {
       background: var(--cream);
@@ -2886,36 +2914,9 @@
         border-width: 1px;
       }
       .products-grid .product-info .product-cta { margin-top: 0.5rem; }
-      .reviews-grid {
-        display: grid;
-        grid-auto-flow: column;
-        grid-template-rows: repeat(2, auto);
-        grid-auto-columns: 220px;
-        max-height: none;
-        overflow-x: auto;
-        overflow-y: hidden;
-        gap: 1.6rem 0.9rem;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x proximity;
-        padding-bottom: 0.5rem;
-        justify-content: start;
-      }
-      .reviews-grid .review-card {
-        width: auto;
-        min-width: 0;
-        margin-bottom: 0;
-        scroll-snap-align: start;
-      }
-      .reviews-section { position: relative; }
-      .reviews-section::after {
-        content: '← Swipe →';
-        display: block;
-        text-align: center;
-        font-family: 'Dancing Script', cursive;
-        font-size: 0.88rem;
-        color: var(--text-light);
-        margin-top: 0.5rem;
-      }
+      /* Base .reviews-grid is already a horizontal 2-row swipe carousel;
+         mobile only needs slightly narrower cards. */
+      .reviews-grid { grid-auto-columns: 200px; gap: 1.4rem 0.9rem; }
       .sourced-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; }
       .review-photos-grid, .sourced-photos-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
       .section { padding: 4rem 1.25rem; }
