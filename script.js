@@ -365,7 +365,8 @@ async function loadNews() {
   if (!CONFIG.CONTENT_SHEET_ID) return;
   try {
     const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_TAB);
-    const clean = (rows || []).filter(r => (r.headline || '').trim());
+    // Accept either the rich columns (chip_text/headline) or the simple photo+caption format.
+    const clean = (rows || []).filter(r => (r.chip_text || r.headline || r.caption || '').trim());
     // Newest first: sheet is edited top-to-bottom, so reverse to show latest rows first.
     newsData = clean.length ? clean.slice().reverse() : [];
   } catch (e) { console.warn('News content load failed — using defaults', e); }
@@ -426,7 +427,7 @@ function renderNews() {
     if (wrap) wrap.style.display = '';
     // Each chip is a toggle button; tapping it opens the panel below with more info.
     chips.innerHTML = items.map((n, i) => {
-      const label = (n.chip_text || n.tag || n.headline || '').trim();
+      const label = (n.chip_text || n.tag || n.headline || n.caption || '').trim();
       const cls = 'nc' + ((i % 3) + 1);   // cycle 3 soft colour variants
       return `<button type="button" class="hero-chip ${cls}" aria-expanded="false" onclick="toggleNewsPanel(this, ${i})"><span class="chip-dot"></span>${esc(label)}<span class="chip-caret">⌄</span></button>`;
     }).join('');
@@ -438,7 +439,7 @@ function renderNews() {
   if (ticker) {
     ticker.style.display = '';
     // Duplicate the headline set so the marquee loops seamlessly.
-    const heads = items.map(n => `<span>✦ ${esc(n.headline)}</span>`).join('');
+    const heads = items.map(n => `<span>✦ ${esc((n.headline || n.caption || n.chip_text || '').trim())}</span>`).join('');
     ticker.innerHTML = `<div class="ticker-track">${heads}${heads}</div>`;
   }
 }
@@ -456,7 +457,18 @@ function toggleNewsPanel(btn, i) {
 
   if (wasActive) { panel.classList.remove('open'); return; }
 
-  panel.querySelector('.np-title').textContent = (item.headline || item.chip_text || '').trim();
+  panel.querySelector('.np-title').textContent = (item.headline || item.caption || item.chip_text || '').trim();
+
+  // Optional photo (from a "photo" column of Google Drive links).
+  const imgEl = panel.querySelector('.np-img');
+  const photo = driveUrl((item.photo || item.photos || '').split(',')[0].trim());
+  if (photo) {
+    imgEl.src = photo;
+    imgEl.style.display = '';
+    imgEl.onerror = () => { imgEl.style.display = 'none'; };
+  } else {
+    imgEl.style.display = 'none';
+  }
 
   const blurbEl = panel.querySelector('.np-blurb');
   const blurb = (item.blurb || '').trim();
