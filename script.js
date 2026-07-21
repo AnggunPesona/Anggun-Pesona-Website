@@ -121,7 +121,7 @@ let prevPage = 'preorders';
 let currentPoFilter = [], currentPoBrand = [], currentPoSize = [], currentPoSort = 'default';
 let currentIsFilter = [], currentIsBrand = [], currentIsSize = [];
 let poCurrentPage = 1;
-const PO_PER_PAGE = 12;
+const PO_PER_PAGE = 24;
 
 /* ============================================================
    PRODUCT URL ROUTING
