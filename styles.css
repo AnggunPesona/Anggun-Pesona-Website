@@ -761,7 +761,7 @@
       transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
     }
     .hero-news-panel.open {
-      max-height: 340px;
+      max-height: 620px;
       opacity: 1;
       margin-top: 0.9rem;
     }
@@ -775,10 +775,11 @@
     }
     .np-img {
       width: 100%;
-      max-height: 160px;
-      object-fit: cover;
+      max-height: 300px;
+      object-fit: contain;
       border-radius: 10px;
       margin-bottom: 0.7rem;
+      background: var(--pink-pale);
     }
     .np-title {
       font-family: 'Playfair Display', serif;
