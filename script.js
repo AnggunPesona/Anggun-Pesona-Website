@@ -433,13 +433,18 @@ function renderNews() {
   newsItems = items;   // remember for toggleNewsPanel()
 
   if (chips) {
-    if (wrap) wrap.style.display = '';
-    // Each chip is a toggle button; tapping it opens the panel below with more info.
-    chips.innerHTML = items.map((n, i) => {
-      const label = (n.chip_text || n.tag || n.headline || n.caption || '').trim();
+    // Only rows that have chip_text become chips. A row with a headline but a
+    // BLANK chip_text is "ticker-only" — it's skipped here but still scrolls in
+    // the ticker below. (Index i is kept aligned with newsItems for the panel.)
+    const chipHTML = items.map((n, i) => {
+      const label = (n.chip_text || '').trim();
+      if (!label) return '';   // no chip_text = ticker-only, no chip
       const cls = 'nc' + ((i % 3) + 1);   // cycle 3 soft colour variants
       return `<button type="button" class="hero-chip ${cls}" aria-expanded="false" onclick="toggleNewsPanel(this, ${i})"><span class="chip-dot"></span>${esc(label)}<span class="chip-caret">⌄</span></button>`;
     }).join('');
+    chips.innerHTML = chipHTML;
+    // Hide the whole "What's New" chip block if no row has chip_text.
+    if (wrap) wrap.style.display = chipHTML ? '' : 'none';
     // Reset any open panel on re-render.
     const panel = document.getElementById('hero-news-panel');
     if (panel) panel.classList.remove('open');
