@@ -122,7 +122,7 @@ const DEFAULT_NEWS = [
 
 // Live content — starts as the built-in defaults, replaced by sheet rows when loaded.
 let featuredData = DEFAULT_FEATURED;
-let newsData     = DEFAULT_NEWS;
+let newsData     = [];   // stays empty (What's New hidden) until a real News tab is found
 let newsItems    = [];   // filtered list currently on screen (used by the chip panel toggle)
 let reviewsData  = REVIEW_SCREENSHOTS;
 let bridalData   = BRIDAL_REVIEWS;
@@ -367,8 +367,19 @@ async function loadNews() {
     const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_TAB);
     // Accept either the rich columns (chip_text/headline) or the simple photo+caption format.
     const clean = (rows || []).filter(r => (r.chip_text || r.headline || r.caption || '').trim());
+
+    // Safety guard: if the "News" tab doesn't exist, Google returns the FIRST tab
+    // (Featured) instead. Detect that by comparing photos against the Featured tab,
+    // and treat it as "no News" so the chips never mirror the favourites section.
+    let featKeys = new Set();
+    try {
+      const feat = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.FEATURED_TAB);
+      (feat || []).forEach(f => { const p = (f.photo || f.photos || '').trim(); if (p) featKeys.add(p); });
+    } catch (_) {}
+    const looksLikeFeatured = clean.length > 0 && clean.every(r => featKeys.has((r.photo || r.photos || '').trim()));
+
     // Newest first: sheet is edited top-to-bottom, so reverse to show latest rows first.
-    newsData = clean.length ? clean.slice().reverse() : [];
+    newsData = (clean.length && !looksLikeFeatured) ? clean.slice().reverse() : [];
   } catch (e) { console.warn('News content load failed — using defaults', e); }
 }
 
