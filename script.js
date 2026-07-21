@@ -16,6 +16,7 @@ const CONFIG = {
   BRIDAL_TAB:         'BridalReviews',
   SOURCED_TAB:        'Sourced',
   NEWS_TAB:           'News',
+  NEWS_GID:           '1967713786',   // stable ID of the News tab (name-based fetch is unreliable)
 
   WHATSAPP: '6737471323',
   WA_MSG_PREORDER: 'Hi Anggun Pesona! I\'d like to pre-order 🛍️',
@@ -364,22 +365,19 @@ async function loadFeatured() {
 async function loadNews() {
   if (!CONFIG.CONTENT_SHEET_ID) return;
   try {
-    const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_TAB);
+    // Fetch the News tab by its stable GID, NOT by name. Google Sheets' gviz "sheet="
+    // name parameter is unreliable and can silently return the FIRST tab (Featured)
+    // instead of News — which is why the ticker was showing nothing. The GID always
+    // resolves to the correct tab. (GID stays fixed even if the tab is renamed.)
+    const rows = CONFIG.NEWS_GID
+      ? await fetchSheet(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_GID)
+      : await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_TAB);
+
     // Accept either the rich columns (chip_text/headline) or the simple photo+caption format.
     const clean = (rows || []).filter(r => (r.chip_text || r.headline || r.caption || '').trim());
 
-    // Safety guard: if the "News" tab doesn't exist, Google returns the FIRST tab
-    // (Featured) instead. Detect that by comparing photos against the Featured tab,
-    // and treat it as "no News" so the chips never mirror the favourites section.
-    let featKeys = new Set();
-    try {
-      const feat = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.FEATURED_TAB);
-      (feat || []).forEach(f => { const p = (f.photo || f.photos || '').trim(); if (p) featKeys.add(p); });
-    } catch (_) {}
-    const looksLikeFeatured = clean.length > 0 && clean.every(r => featKeys.has((r.photo || r.photos || '').trim()));
-
     // Newest first: sheet is edited top-to-bottom, so reverse to show latest rows first.
-    newsData = (clean.length && !looksLikeFeatured) ? clean.slice().reverse() : [];
+    newsData = clean.length ? clean.slice().reverse() : [];
   } catch (e) { console.warn('News content load failed — using defaults', e); }
 }
 
