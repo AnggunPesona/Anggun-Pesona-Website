@@ -445,9 +445,11 @@ function renderNews() {
     chips.innerHTML = chipHTML;
     // Hide the whole "What's New" chip block if no row has chip_text.
     if (wrap) wrap.style.display = chipHTML ? '' : 'none';
-    // Reset any open panel on re-render.
+    // Reset any open panel on re-render (and restore the "tap a tag" hint).
     const panel = document.getElementById('hero-news-panel');
     if (panel) panel.classList.remove('open');
+    const hint = document.getElementById('hero-news-hint');
+    if (hint) hint.style.display = '';
   }
 
   if (ticker) {
@@ -462,6 +464,7 @@ function renderNews() {
 function toggleNewsPanel(btn, i) {
   const panel = document.getElementById('hero-news-panel');
   const chips = document.getElementById('hero-news-chips');
+  const hint  = document.getElementById('hero-news-hint');
   if (!panel || !chips) return;
   const item = newsItems[i] || {};
   const wasActive = btn.classList.contains('active');
@@ -469,7 +472,10 @@ function toggleNewsPanel(btn, i) {
   // Clear all chips, then re-activate this one (unless we're closing it).
   chips.querySelectorAll('.hero-chip').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-expanded', 'false'); });
 
-  if (wasActive) { panel.classList.remove('open'); return; }
+  if (wasActive) { panel.classList.remove('open'); if (hint) hint.style.display = ''; return; }
+
+  // A panel is opening — retire the "tap a tag" nudge.
+  if (hint) hint.style.display = 'none';
 
   panel.querySelector('.np-title').textContent = (item.headline || item.caption || item.chip_text || '').trim();
 
