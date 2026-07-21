@@ -15,6 +15,7 @@ const CONFIG = {
   REVIEWS_TAB:        'Reviews',
   BRIDAL_TAB:         'BridalReviews',
   SOURCED_TAB:        'Sourced',
+  NEWS_TAB:           'News',
 
   WHATSAPP: '6737471323',
   WA_MSG_PREORDER: 'Hi Anggun Pesona! I\'d like to pre-order 🛍️',
@@ -105,8 +106,24 @@ const DEFAULT_FEATURED = [
   {photo: 'https://lh3.googleusercontent.com/d/1EKNs5-SPX0DJc0N7OU12OVupgfV6wTSo', caption: 'Dusto Casual Sneaker (B$38)'}
 ];
 
+// DEFAULT_NEWS: home page "What's New" chips (+ ticker headlines).
+// Used only when CONTENT_SHEET_ID is blank OR the News tab is empty.
+// One entry = one chip. Newest first. Sheet columns: chip_text, headline, blurb, link, link_text
+//   chip_text = short label shown on the chip (e.g. "Chic Finds dropped")
+//   headline  = title shown when the chip is tapped + the line in the scrolling ticker
+//   blurb     = short paragraph revealed in the panel when the chip is tapped
+//   link      = where the panel button goes (e.g. /preorders) — optional
+//   link_text = label on that button (e.g. "Browse Chic Finds") — optional
+const DEFAULT_NEWS = [
+  {chip_text: 'Chic Finds dropped', headline: 'New “Chic Finds” category just dropped', blurb: 'Our new curated edit of everyday elevated pairs is now live in pre-orders — go take a peek.', link: '/preorders', link_text: 'Browse Chic Finds'},
+  {chip_text: 'New in-stocks',      headline: 'More in-stocks added this week',           blurb: 'Fresh ready-to-ship pieces just landed. Limited pairs, no restock — if you see it, grab it.', link: '/instocks', link_text: 'Shop in-stocks'},
+  {chip_text: 'Bridal slots open',  headline: 'Bridal concierge slots open for August',   blurb: 'Booking bridal shoes for August? A few curation and custom-heel slots just opened up.', link: '/bridal', link_text: 'Book bridal'}
+];
+
 // Live content — starts as the built-in defaults, replaced by sheet rows when loaded.
 let featuredData = DEFAULT_FEATURED;
+let newsData     = DEFAULT_NEWS;
+let newsItems    = [];   // filtered list currently on screen (used by the chip panel toggle)
 let reviewsData  = REVIEW_SCREENSHOTS;
 let bridalData   = BRIDAL_REVIEWS;
 let sourcedData  = SOURCED_PHOTOS;
@@ -297,7 +314,7 @@ function initCurrentPage() {
   if (page === 'reviews')   { renderReviews(); loadReviewContent().then(renderReviews); }
   if (page === 'bridal')    { applyContactLinks(); }
   if (page === 'about')     { applyContactLinks(); initBrandsList(); }
-  if (page === 'home')      { applyContactLinks(); renderFeatured(); loadFeatured().then(renderFeatured); }
+  if (page === 'home')      { applyContactLinks(); renderFeatured(); loadFeatured().then(renderFeatured); renderNews(); loadNews().then(renderNews); }
 }
 
 function openProductBySlug(slug, source) {
@@ -343,6 +360,17 @@ async function loadFeatured() {
   } catch (e) { console.warn('Featured content load failed — using defaults', e); }
 }
 
+/* Load the home "What's New" news column from the News tab (falls back to defaults). */
+async function loadNews() {
+  if (!CONFIG.CONTENT_SHEET_ID) return;
+  try {
+    const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, CONFIG.NEWS_TAB);
+    const clean = (rows || []).filter(r => (r.headline || '').trim());
+    // Newest first: sheet is edited top-to-bottom, so reverse to show latest rows first.
+    newsData = clean.length ? clean.slice().reverse() : [];
+  } catch (e) { console.warn('News content load failed — using defaults', e); }
+}
+
 /* Load Reviews / Bridal / Sourced tabs (each falls back to defaults on failure). */
 async function loadReviewContent() {
   if (!CONFIG.CONTENT_SHEET_ID) return;
@@ -375,6 +403,79 @@ function renderFeatured() {
       <p class="caption">${cap}</p>
     </div>`;
   }).join('');
+}
+
+/* Render the home "What's New" hero chips + the scrolling ticker bar. */
+function renderNews() {
+  const esc = s => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const items = (newsData || []).filter(n => (n.headline || '').trim());
+  const wrap   = document.getElementById('hero-news');
+  const chips  = document.getElementById('hero-news-chips');
+  const ticker = document.getElementById('news-ticker');
+
+  // Hide both blocks entirely when there's no news.
+  if (!items.length) {
+    if (wrap)   wrap.style.display   = 'none';
+    if (ticker) ticker.style.display = 'none';
+    return;
+  }
+
+  newsItems = items;   // remember for toggleNewsPanel()
+
+  if (chips) {
+    if (wrap) wrap.style.display = '';
+    // Each chip is a toggle button; tapping it opens the panel below with more info.
+    chips.innerHTML = items.map((n, i) => {
+      const label = (n.chip_text || n.tag || n.headline || '').trim();
+      const cls = 'nc' + ((i % 3) + 1);   // cycle 3 soft colour variants
+      return `<button type="button" class="hero-chip ${cls}" aria-expanded="false" onclick="toggleNewsPanel(this, ${i})"><span class="chip-dot"></span>${esc(label)}<span class="chip-caret">⌄</span></button>`;
+    }).join('');
+    // Reset any open panel on re-render.
+    const panel = document.getElementById('hero-news-panel');
+    if (panel) panel.classList.remove('open');
+  }
+
+  if (ticker) {
+    ticker.style.display = '';
+    // Duplicate the headline set so the marquee loops seamlessly.
+    const heads = items.map(n => `<span>✦ ${esc(n.headline)}</span>`).join('');
+    ticker.innerHTML = `<div class="ticker-track">${heads}${heads}</div>`;
+  }
+}
+
+/* Expand/collapse the "What's New" info panel under the chips. */
+function toggleNewsPanel(btn, i) {
+  const panel = document.getElementById('hero-news-panel');
+  const chips = document.getElementById('hero-news-chips');
+  if (!panel || !chips) return;
+  const item = newsItems[i] || {};
+  const wasActive = btn.classList.contains('active');
+
+  // Clear all chips, then re-activate this one (unless we're closing it).
+  chips.querySelectorAll('.hero-chip').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-expanded', 'false'); });
+
+  if (wasActive) { panel.classList.remove('open'); return; }
+
+  panel.querySelector('.np-title').textContent = (item.headline || item.chip_text || '').trim();
+
+  const blurbEl = panel.querySelector('.np-blurb');
+  const blurb = (item.blurb || '').trim();
+  blurbEl.textContent = blurb;
+  blurbEl.style.display = blurb ? '' : 'none';
+
+  const linkEl = panel.querySelector('.np-link');
+  const link = (item.link || '').trim();
+  if (link) {
+    linkEl.setAttribute('href', link);
+    linkEl.textContent = (item.link_text || 'View more').trim() + ' →';
+    linkEl.style.display = '';
+  } else {
+    linkEl.style.display = 'none';
+  }
+
+  btn.classList.add('active');
+  btn.setAttribute('aria-expanded', 'true');
+  panel.classList.add('open');
 }
 
 function driveUrl(raw) {
