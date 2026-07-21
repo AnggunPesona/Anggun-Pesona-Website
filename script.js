@@ -420,7 +420,7 @@ function renderFeatured() {
 /* Render the home "What's New" hero chips + the scrolling ticker bar. */
 function renderNews() {
   const esc = s => String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const items = (newsData || []).filter(n => (n.headline || '').trim());
+  const items = (newsData || []).filter(n => (n.headline || n.caption || n.chip_text || '').trim());
   const wrap   = document.getElementById('hero-news');
   const chips  = document.getElementById('hero-news-chips');
   const ticker = document.getElementById('news-ticker');
