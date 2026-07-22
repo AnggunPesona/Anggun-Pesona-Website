@@ -65,7 +65,12 @@ const DEMO_INSTOCKS = [
 // The optional "product" field links a review to a specific shoe. When set, the
 // review ALSO appears on that product's detail page (matched loosely, so small
 // spelling/spacing differences still work). Leave it blank for general/service
-// reviews — those only show on the Reviews page, in the "Kind words" group.
+// reviews — those land in the "Service & kind words" group.
+//
+// On the Reviews page, reviews are auto-sorted into three groups: Shoes, Bags,
+// and Service. Blank product = Service; a product name containing "bag/tote/
+// pouch/clutch" = Bags; everything else = Shoes. To force a group, add an
+// optional "category" field (e.g. category: 'bags').
 const REVIEW_SCREENSHOTS = [
   {photos: 'https://drive.google.com/file/d/1sByTAeX6INMrnq8TbJc2HZWt3Ul240DG/view?usp=drive_link, https://drive.google.com/file/d/1kCP6eui-s0GIvkhp_18r_oNPBpLSjXHv/view?usp=drive_link, https://drive.google.com/file/d/1BGybdGrzSFstnuTuJrH8Rd1D-NTikEwT/view?usp=drive_link,https://drive.google.com/file/d/1wsJ8ySasCV003gySHKf_yQldazG0BIys/view?usp=drive_link, https://drive.google.com/file/d/1_scTc1IS4WiVk18h_HglUGCcV45nMFNc/view?usp=drive_link, https://drive.google.com/file/d/1QDxxQA2dezaj8oW3v4YhRnTm5-aibSN9/view?usp=drive_link', caption: 'Kind words from our new and regular Angguns for our service experiences!!', product: ''},
   {photos: 'https://drive.google.com/file/d/1d6j2d06GaOyUxybBB6JU2rQnGoGttGDN/view?usp=drive_link, https://drive.google.com/file/d/1gQ-UYandm6lAALw7Q1MA-6iMUc155YB_/view?usp=drive_link, https://drive.google.com/file/d/1lOwXs43gNwQcsgRt1CrcAto9I6PzLnvL/view?usp=drive_link,https://drive.google.com/file/d/1-wCbng6yiBjGBoySu_stHEmI6CMLjtCz/view?usp=drive_link', caption:'Review on Flowerstrap Ballerina & Compliments to Anggun Pesona!', product: 'Flowerstrap Ballerina'},
@@ -1323,11 +1328,20 @@ function reviewImgFail(img) {
   if (!anyLeft) card.style.display = 'none';
 }
 
-function filterReviews(btn, key) {
-  document.querySelectorAll('#reviews-filter .review-filter-chip').forEach(c => c.classList.toggle('active', c === btn));
-  document.querySelectorAll('#reviews-groups .review-group').forEach(g => {
-    g.style.display = (key === '__all__' || g.getAttribute('data-group') === key) ? '' : 'none';
-  });
+// Sort one review into 'shoes', 'bags', or 'service'.
+// An optional "category" field on the review wins; otherwise we guess from
+// the product name (blank product = service, name mentions a bag = bags).
+function reviewCategory(item) {
+  const explicit = (item.category || '').trim().toLowerCase();
+  if (explicit) {
+    if (/serv|kind|word/.test(explicit)) return 'service';
+    if (/bag|tote|pouch|clutch|purse|backpack/.test(explicit)) return 'bags';
+    return 'shoes';
+  }
+  const prod = (item.product || '').trim().toLowerCase();
+  if (!prod) return 'service';
+  if (/bag|tote|pouch|clutch|purse|backpack|handbag/.test(prod)) return 'bags';
+  return 'shoes';
 }
 
 function renderReviews() {
@@ -1340,49 +1354,38 @@ function renderReviews() {
   const $sEmpty  = document.getElementById('sourced-empty');
   if (!$rGroups || !$bGrid || !$sGrid) return; // not on reviews page
 
-  // Render regular reviews — grouped by product, with filter chips.
+  // The filter bar is retired — reviews are now grouped into three simple
+  // categories, so a chip filter would just duplicate the group headings.
+  if ($rFilter) { $rFilter.innerHTML = ''; $rFilter.style.display = 'none'; }
+
+  // Render regular reviews — sorted into three fixed categories.
   const usable = (reviewsData || []).filter(it => getPhotoList(it).length);
   if (usable.length) {
     $rEmpty.style.display = 'none';
 
-    // Group by the "product" tag. Untagged reviews fall into a "general"
-    // bucket that is always shown last.
-    const GENERAL = '__general__';
-    const order  = [];      // preserve first-seen order of product groups
-    const groups = {};      // key -> { label, items }
-    usable.forEach(item => {
-      const prod = (item.product || '').trim();
-      const key  = prod ? normStr(prod) : GENERAL;
-      if (!groups[key]) { groups[key] = { label: prod || 'Kind words & service', items: [] }; order.push(key); }
-      groups[key].items.push(item);
-    });
-    const ordered = order.filter(k => k !== GENERAL).concat(order.includes(GENERAL) ? [GENERAL] : []);
-    const multi = ordered.length > 1;
+    // Three buckets, shown in this order. Each review is sorted by
+    // reviewCategory() — blank product = service, "bag/tote/…" = bags,
+    // everything else = shoes.
+    const CATS = [
+      { key: 'shoes',   label: 'Shoe reviews' },
+      { key: 'bags',    label: 'Bag reviews' },
+      { key: 'service', label: 'Service &amp; kind words' }
+    ];
+    const buckets = { shoes: [], bags: [], service: [] };
+    usable.forEach(item => buckets[reviewCategory(item)].push(item));
 
-    // Filter chips — only worth showing when there's more than one group.
-    if ($rFilter) {
-      if (multi) {
-        const chips = ['<button type="button" class="review-filter-chip active" data-group="__all__" onclick="filterReviews(this,\'__all__\')">All</button>']
-          .concat(ordered.map(k => `<button type="button" class="review-filter-chip" data-group="${k}" onclick="filterReviews(this,'${k}')">${groups[k].label.replace(/</g, '&lt;')}</button>`));
-        $rFilter.innerHTML = chips.join('');
-        $rFilter.style.display = '';
-      } else {
-        $rFilter.innerHTML = '';
-        $rFilter.style.display = 'none';
-      }
-    }
-
-    // One block per group: a small product heading + its own photo carousel.
-    $rGroups.innerHTML = ordered.map(k => {
-      const g = groups[k];
-      const cards = g.items.map(it => buildReviewCard(it, 'Customer review')).filter(Boolean).join('');
-      return `<div class="review-group" data-group="${k}">
-        ${multi ? `<h3 class="review-group-title">${g.label.replace(/</g, '&lt;')}</h3>` : ''}
+    // Only render categories that actually have reviews. Show the heading
+    // only when more than one category is present (a lone group needs none).
+    const present = CATS.filter(c => buckets[c.key].length);
+    const multi = present.length > 1;
+    $rGroups.innerHTML = present.map(c => {
+      const cards = buckets[c.key].map(it => buildReviewCard(it, 'Customer review')).filter(Boolean).join('');
+      return `<div class="review-group" data-group="${c.key}">
+        ${multi ? `<h3 class="review-group-title">${c.label}</h3>` : ''}
         <div class="reviews-grid">${cards}</div>
       </div>`;
     }).join('');
   } else {
-    if ($rFilter) { $rFilter.innerHTML = ''; $rFilter.style.display = 'none'; }
     $rGroups.innerHTML = '';
     $rEmpty.style.display = 'block';
   }

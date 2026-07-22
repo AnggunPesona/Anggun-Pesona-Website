@@ -2505,17 +2505,18 @@
       border-color: var(--pink-hot);
       color: var(--cream);
     }
-    /* One product group on the Reviews page */
-    .review-group { margin-top: 1rem; }
+    /* One category group (Shoes / Bags / Service) on the Reviews page */
+    .review-group { margin-top: 2.75rem; }
+    .review-group:first-child { margin-top: 1.5rem; }
     .review-group-title {
       text-align: center;
       font-family: 'Playfair Display', serif;
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       font-weight: 600;
       color: var(--pink-hot);
-      margin: 1.75rem 0 0;
+      margin: 0;
     }
-    .review-group .reviews-grid { margin-top: 1.25rem; }
+    .review-group .reviews-grid { margin-top: 1.5rem; }
     /* "Reviews for this pair" block on a product detail page */
     .product-reviews {
       background: var(--pink-pale);
