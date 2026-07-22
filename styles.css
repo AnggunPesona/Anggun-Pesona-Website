@@ -2441,29 +2441,18 @@
       border-top: 2px dashed var(--green-light);
     }
     .sourced-inner { max-width: 1280px; margin: 0 auto; }
-    /* Horizontal 2-row swipe carousel — keeps reviews compact and side-scrolling
-       instead of a tall masonry column that leaves big vertical gaps. */
+    /* Desktop: centered wrapping grid of larger cards, so a handful of reviews
+       fills the width nicely instead of huddling in a narrow centre strip.
+       (On phones this becomes a horizontal swipe carousel — see the 880px query.) */
     .reviews-grid {
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-rows: repeat(2, auto);
-      grid-auto-columns: 200px;
-      gap: 1.6rem 1rem;
-      margin-top: 2.5rem;
-      /* Shrink to the cards' width and center, so a short list doesn't leave
-         a big empty gap on the right; a long list still scrolls (max-width). */
-      width: fit-content;
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      justify-content: start;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-snap-type: x proximity;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: start;
+      gap: 2.25rem 1.75rem;
+      margin: 1.75rem auto 0;
+      max-width: 1040px;
       padding: 0.5rem 0.25rem 0.6rem;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      scrollbar-color: var(--pink) transparent;
     }
     .reviews-grid::-webkit-scrollbar { height: 8px; }
     .reviews-grid::-webkit-scrollbar-thumb {
@@ -2472,7 +2461,8 @@
     }
     .reviews-grid::-webkit-scrollbar-track { background: transparent; }
     .reviews-grid .review-card {
-      width: auto;
+      width: 300px;
+      max-width: 88vw;
       min-width: 0;
       margin-bottom: 0;
       scroll-snap-align: start;
@@ -2554,11 +2544,12 @@
       box-shadow: 0 3px 8px rgba(107,15,26,0.22);
       pointer-events: none;
     }
-    /* Swipe hint under each reviews carousel (shown on desktop + mobile) */
+    /* Swipe hint — only shown on phones, where the grid becomes a swipe carousel
+       (enabled in the 880px query below). Hidden on desktop. */
     .reviews-section { position: relative; }
     .reviews-section::after {
       content: '← Swipe →';
-      display: block;
+      display: none;
       text-align: center;
       font-family: 'Dancing Script', cursive;
       font-size: 0.9rem;
@@ -3187,9 +3178,27 @@
         border-width: 1px;
       }
       .products-grid .product-info .product-cta { margin-top: 0.5rem; }
-      /* Base .reviews-grid is already a horizontal 2-row swipe carousel;
-         mobile only needs slightly narrower cards. */
-      .reviews-grid { grid-auto-columns: 200px; gap: 1.4rem 0.9rem; }
+      /* Phones: switch the reviews grid to a horizontal 2-row swipe carousel
+         (the desktop default is a centered wrap grid of larger cards). */
+      .reviews-grid {
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: repeat(2, auto);
+        grid-auto-columns: 200px;
+        gap: 1.4rem 0.9rem;
+        width: fit-content;
+        max-width: 100%;
+        margin: 1.5rem auto 0;
+        justify-content: start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--pink) transparent;
+      }
+      .reviews-grid .review-card { width: auto; max-width: none; min-width: 0; scroll-snap-align: start; }
+      .reviews-section::after { display: block; }
       .sourced-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.6rem; }
       .review-photos-grid, .sourced-photos-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
       .section { padding: 4rem 1.25rem; }
