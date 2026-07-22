@@ -41,10 +41,10 @@ const COLOUR_MAP = {
 const DEFAULT_CATEGORIES = ['Chic Finds', 'Flats', 'Heels', 'Sandals', 'Sneakers', 'Boots', 'Bags', 'Leopard Series', 'Tabi', 'Bag Finds'];
 
 const DEMO_PREORDERS = [
-  { category:'Flats', name:'Ribbed Ballet Flats', brand:'Studio Chic', price:'89', qty:'8', photo:'', photos:'', sizeChart:'', desc:'Minimalist ribbed ballet flats in ivory. The perfect elevated basic.', colors:'Ivory, Black, Nude', sizes:'Ivory:35,36,37,38,39|Black:36,37,38,39,40|Nude:35,36,37,38' },
-  { category:'Heels', name:'Block Heel Mule', brand:'Elara Co.', price:'149', qty:'5', photo:'', photos:'', sizeChart:'', desc:'Structured block heel mule in nude beige. Office to dinner, effortlessly.', colors:'Nude, Black, Cream', sizes:'Nude:35,36,37,38,39|Black:36,37,38,39|Cream:35,36,37' },
+  { category:'Flats', name:'Ribbed Ballet Flats', brand:'Studio Chic', price:'89', qty:'8', photo:'', photos:'', sizeChart:'', desc:'Minimalist ribbed ballet flats in ivory. The perfect elevated basic.', colors:'Ivory, Black, Nude', sizes:'Ivory:35,36,37,38,39|Black:36,37,38,39,40|Nude:35,36,37,38', popular:'x' },
+  { category:'Heels', name:'Block Heel Mule', brand:'Elara Co.', price:'149', qty:'5', photo:'', photos:'', sizeChart:'', desc:'Structured block heel mule in nude beige. Office to dinner, effortlessly.', colors:'Nude, Black, Cream', sizes:'Nude:35,36,37,38,39|Black:36,37,38,39|Cream:35,36,37', popular:'x' },
   { category:'Sandals', name:'Woven Kitten Heel', brand:'Maeve Label', price:'119', qty:'10', photo:'', photos:'', sizeChart:'', desc:'Delicate woven kitten heel sandal in tan. Summer-ready chic.', colors:'Tan, Black, Brown', sizes:'36, 37, 38, 39, 40' },
-  { category:'Heels', name:'Pointed Toe Pump', brand:'Studio Chic', price:'139', qty:'3', photo:'', photos:'', sizeChart:'', desc:'Classic pointed-toe pump in dusty rose. A timeless wardrobe staple.', colors:'Dusty Rose, Black, Nude', sizes:'35, 36, 37, 38, 39, 40' },
+  { category:'Heels', name:'Pointed Toe Pump', brand:'Studio Chic', price:'139', qty:'3', photo:'', photos:'', sizeChart:'', desc:'Classic pointed-toe pump in dusty rose. A timeless wardrobe staple.', colors:'Dusty Rose, Black, Nude', sizes:'35, 36, 37, 38, 39, 40', popular:'x' },
   { category:'Chic Finds', name:'Platform Loafer', brand:'Elara Co.', price:'159', qty:'12', photo:'', photos:'', sizeChart:'', desc:'Chunky platform loafer in chocolate brown. Bold, grounded, chic.', colors:'Chocolate, Black, Camel', sizes:'36, 37, 38, 39, 40, 41' },
   { category:'Sandals', name:'Strappy Sandal', brand:'Lumière', price:'129', qty:'7', photo:'', photos:'', sizeChart:'', desc:'Delicate strappy sandal with gold hardware. Made for golden hour.', colors:'Nude, Gold, Black', sizes:'35, 36, 37, 38, 39, 40' },
   { category:'Heels', name:'Slingback Kitten Heel', brand:'Maeve Label', price:'135', qty:'0', photo:'', photos:'', sizeChart:'', desc:'Elegant slingback in cream patent. Barely-there, completely chic.', colors:'Cream, Black', sizes:'Cream:36,37,38,39,40|Black:36,37,38,39,40' },
@@ -142,7 +142,7 @@ let poLoaded = false, isLoaded = false;
 let poProducts = [], isProducts = [];
 let prevPage = 'preorders';
 /* Filter selections are arrays (multi-select). Empty array = no filter / "all". */
-let currentPoFilter = [], currentPoBrand = [], currentPoSize = [], currentPoSort = 'default';
+let currentPoFilter = [], currentPoBrand = [], currentPoSize = [], currentPoSort = 'default', currentPoPopular = false;
 let currentIsFilter = [], currentIsBrand = [], currentIsSize = [];
 let poCurrentPage = 1;
 const PO_PER_PAGE = 24;
@@ -560,6 +560,12 @@ function matchesCat(product, filters) {
   return filters.some(f => cats.includes(f));
 }
 
+/* Is this product flagged as "popular"? Accepts x, yes, y, true, ✓, 1 (any case). */
+function isPopular(product) {
+  const v = String(product && product.popular != null ? product.popular : '').trim().toLowerCase();
+  return ['x', 'yes', 'y', 'true', '✓', '1'].includes(v);
+}
+
 /* Get all unique sizes available for a product
    Handles both "35,36,37" and "Color1:35,36|Color2:37,38" formats */
 function getProductSizes(product) {
@@ -610,7 +616,7 @@ function closeFilterSheet(ns) {
 }
 function clearFilters(ns) {
   if (ns === 'po') {
-    currentPoFilter = []; currentPoBrand = []; currentPoSize = [];
+    currentPoFilter = []; currentPoBrand = []; currentPoSize = []; currentPoPopular = false;
     poCurrentPage = 1; renderPreorders();
   } else {
     currentIsFilter = []; currentIsBrand = []; currentIsSize = [];
@@ -622,7 +628,8 @@ function updateFilterCount(ns) {
   const groups = ns === 'po'
     ? [currentPoFilter, currentPoBrand, currentPoSize]
     : [currentIsFilter, currentIsBrand, currentIsSize];
-  const n = groups.reduce((acc, arr) => acc + arr.length, 0);
+  let n = groups.reduce((acc, arr) => acc + arr.length, 0);
+  if (ns === 'po' && currentPoPopular) n += 1;
   const badge = document.getElementById(ns === 'po' ? 'poFilterCount' : 'isFilterCount');
   if (!badge) return;
   badge.textContent = n;
@@ -671,6 +678,7 @@ async function loadPreorders() {
         colors: r['Colors'] || r['colors'] || '',
         sizes: r['Sizes'] || r['sizes'] || '',
         sizeChart: r['Size Chart'] || r['sizeChart'] || '',
+        popular: r['Popular'] || r['popular'] || '',
       }));
     } catch(e) {
       poProducts = DEMO_PREORDERS;
@@ -680,7 +688,7 @@ async function loadPreorders() {
     }
   }
   $load.style.display = 'none';
-  currentPoFilter = []; currentPoBrand = []; currentPoSize = [];
+  currentPoFilter = []; currentPoBrand = []; currentPoSize = []; currentPoPopular = false;
   renderPreorders();
 }
 
@@ -699,6 +707,7 @@ function buildPageNumbers(current, total) {
 function togglePoFilter(v) { toggleVal(currentPoFilter, v); poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function togglePoBrand(v)  { toggleVal(currentPoBrand, v);  poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function togglePoSize(v)   { toggleVal(currentPoSize, v);   poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
+function togglePoPopular() { currentPoPopular = !currentPoPopular; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function setPoSort(s)   { currentPoSort   = s; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 
 /* Extract a numeric price for sorting. Strips currency prefixes (B$, RM) and
@@ -744,6 +753,21 @@ function renderPreorders() {
   // SPA partial may have been swapped out while async load was in flight.
   if (!$grid || !$catChips) return;
 
+  /* Popular chip — only shown when at least one product is tagged popular */
+  const $popularRow  = document.getElementById('poPopularRow');
+  const $popularChips = document.getElementById('poPopularChips');
+  const hasPopular   = poProducts.some(isPopular);
+  if ($popularRow && $popularChips) {
+    if (hasPopular) {
+      $popularRow.style.display = 'block';
+      $popularChips.innerHTML =
+        `<button type="button" class="fchip${currentPoPopular ? ' on' : ''}" onclick="togglePoPopular()">⭐ Popular</button>`;
+    } else {
+      $popularRow.style.display = 'none';
+      if (currentPoPopular) currentPoPopular = false;
+    }
+  }
+
   const sheetCats   = [...new Set(poProducts.flatMap(p => parseCats(p.category)))];
   const orderedCats = [...sheetCats].sort((a, b) => a.localeCompare(b));
   $catChips.innerHTML = buildChips(orderedCats, filter, 'togglePoFilter');
@@ -777,6 +801,7 @@ function renderPreorders() {
     matchesCat(p, filter) &&
     (brandFilter.length === 0 || brandFilter.includes(p.brand)) &&
     matchesSize(p, sizeFilter) &&
+    (!currentPoPopular || isPopular(p)) &&
     (!searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.brand || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm))
   );
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }
