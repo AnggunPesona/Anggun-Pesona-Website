@@ -57,16 +57,20 @@ const DEMO_INSTOCKS = [
   { category:'Sneakers', name:'Slip-On Sneaker', brand:'AVRE', price:'89', photo:'', photos:'', sizeChart:'', desc:'Clean minimalist slip-on in white canvas. Casual, elevated.', colors:'White, Black', sizes:'36, 37, 38, 39, 40, 41' },
 ];
 
-// REVIEW_SCREENSHOTS: Array of customer reviews with photos and optional captions
+// REVIEW_SCREENSHOTS: Array of customer reviews with photos and optional captions.
 // Format: [
-//   { photo: 'Google Drive URL', caption: 'Optional caption text' },
-//   { photos: 'URL1, URL2, URL3', caption: 'Multiple photos' }
+//   { photo: 'Google Drive URL', caption: 'Optional caption text', product: 'Optional product name' },
+//   { photos: 'URL1, URL2, URL3', caption: 'Multiple photos', product: 'Dr Cardin Drift Ballet' }
 // ]
+// The optional "product" field links a review to a specific shoe. When set, the
+// review ALSO appears on that product's detail page (matched loosely, so small
+// spelling/spacing differences still work). Leave it blank for general/service
+// reviews — those only show on the Reviews page, in the "Kind words" group.
 const REVIEW_SCREENSHOTS = [
-  {photos: 'https://drive.google.com/file/d/1sByTAeX6INMrnq8TbJc2HZWt3Ul240DG/view?usp=drive_link, https://drive.google.com/file/d/1kCP6eui-s0GIvkhp_18r_oNPBpLSjXHv/view?usp=drive_link, https://drive.google.com/file/d/1BGybdGrzSFstnuTuJrH8Rd1D-NTikEwT/view?usp=drive_link,https://drive.google.com/file/d/1wsJ8ySasCV003gySHKf_yQldazG0BIys/view?usp=drive_link, https://drive.google.com/file/d/1_scTc1IS4WiVk18h_HglUGCcV45nMFNc/view?usp=drive_link, https://drive.google.com/file/d/1QDxxQA2dezaj8oW3v4YhRnTm5-aibSN9/view?usp=drive_link', caption: 'Kind words from our new and regular Angguns for our service experiences!!'},
-  {photos: 'https://drive.google.com/file/d/1d6j2d06GaOyUxybBB6JU2rQnGoGttGDN/view?usp=drive_link, https://drive.google.com/file/d/1gQ-UYandm6lAALw7Q1MA-6iMUc155YB_/view?usp=drive_link, https://drive.google.com/file/d/1lOwXs43gNwQcsgRt1CrcAto9I6PzLnvL/view?usp=drive_link,https://drive.google.com/file/d/1-wCbng6yiBjGBoySu_stHEmI6CMLjtCz/view?usp=drive_link', caption:'Review on Flowerstrap Ballerina & Compliments to Anggun Pesona!'},
-  {photos: 'https://drive.google.com/file/d/1r_XNA_Z05vSU6zEZIsL9iQh8izCs1XQp/view?usp=drive_link, https://drive.google.com/file/d/1IxigyeXKvzumTaD4r007q8gWs-dPDlzl/view?usp=drive_link, https://drive.google.com/file/d/1BGAqESXPpNv4ouE4TN44pGHpNdfsJQCF/view?usp=drive_link, https://drive.google.com/file/d/1CZdtXB2e4OaAOdMVK7LLd8kwGvkQ8zLD/view?usp=drive_link', caption: 'Review on Dr Cardin Drift Ballet'},
-  {photos: 'https://drive.google.com/file/d/1yNjl1c8CSrrKtLEoxPucn7qMjy8sofEw/view?usp=drive_link, https://drive.google.com/file/d/1ZTrMYg7igotdQg7-ebtuui3HwqY1TLx_/view?usp=drive_link, https://drive.google.com/file/d/18nuMPd4N_UUaq8QLBGWhv33f23hlX_92/view?usp=drive_link, https://drive.google.com/file/d/1EbGJT50QFheCMkAaMNlin84ItTWKYLyd/view?usp=drive_link', caption: 'Review on Sport Ballerina and our service'},
+  {photos: 'https://drive.google.com/file/d/1sByTAeX6INMrnq8TbJc2HZWt3Ul240DG/view?usp=drive_link, https://drive.google.com/file/d/1kCP6eui-s0GIvkhp_18r_oNPBpLSjXHv/view?usp=drive_link, https://drive.google.com/file/d/1BGybdGrzSFstnuTuJrH8Rd1D-NTikEwT/view?usp=drive_link,https://drive.google.com/file/d/1wsJ8ySasCV003gySHKf_yQldazG0BIys/view?usp=drive_link, https://drive.google.com/file/d/1_scTc1IS4WiVk18h_HglUGCcV45nMFNc/view?usp=drive_link, https://drive.google.com/file/d/1QDxxQA2dezaj8oW3v4YhRnTm5-aibSN9/view?usp=drive_link', caption: 'Kind words from our new and regular Angguns for our service experiences!!', product: ''},
+  {photos: 'https://drive.google.com/file/d/1d6j2d06GaOyUxybBB6JU2rQnGoGttGDN/view?usp=drive_link, https://drive.google.com/file/d/1gQ-UYandm6lAALw7Q1MA-6iMUc155YB_/view?usp=drive_link, https://drive.google.com/file/d/1lOwXs43gNwQcsgRt1CrcAto9I6PzLnvL/view?usp=drive_link,https://drive.google.com/file/d/1-wCbng6yiBjGBoySu_stHEmI6CMLjtCz/view?usp=drive_link', caption:'Review on Flowerstrap Ballerina & Compliments to Anggun Pesona!', product: 'Flowerstrap Ballerina'},
+  {photos: 'https://drive.google.com/file/d/1r_XNA_Z05vSU6zEZIsL9iQh8izCs1XQp/view?usp=drive_link, https://drive.google.com/file/d/1IxigyeXKvzumTaD4r007q8gWs-dPDlzl/view?usp=drive_link, https://drive.google.com/file/d/1BGAqESXPpNv4ouE4TN44pGHpNdfsJQCF/view?usp=drive_link, https://drive.google.com/file/d/1CZdtXB2e4OaAOdMVK7LLd8kwGvkQ8zLD/view?usp=drive_link', caption: 'Review on Dr Cardin Drift Ballet', product: 'Dr Cardin Drift Ballet'},
+  {photos: 'https://drive.google.com/file/d/1yNjl1c8CSrrKtLEoxPucn7qMjy8sofEw/view?usp=drive_link, https://drive.google.com/file/d/1ZTrMYg7igotdQg7-ebtuui3HwqY1TLx_/view?usp=drive_link, https://drive.google.com/file/d/18nuMPd4N_UUaq8QLBGWhv33f23hlX_92/view?usp=drive_link, https://drive.google.com/file/d/1EbGJT50QFheCMkAaMNlin84ItTWKYLyd/view?usp=drive_link', caption: 'Review on Sport Ballerina and our service', product: 'Sport Ballerina'},
   {photo: 'https://drive.google.com/file/d/1xIuYX9qHsVLkJYNevBQXCwhFgVCmYzGl/view?usp=drive_link, https://drive.google.com/file/d/1ZmPUQ0_3mvg5bnP7FcGtGp4GjHDVWYNf/view?usp=drive_link', caption: 'Receiving defect item can happen and being transparent matters, we worked it out with our Anggun, always.'}
 ];
 
@@ -128,6 +132,8 @@ let newsItems    = [];   // filtered list currently on screen (used by the chip 
 let reviewsData  = REVIEW_SCREENSHOTS;
 let bridalData   = BRIDAL_REVIEWS;
 let sourcedData  = SOURCED_PHOTOS;
+let reviewContentLoaded = false;   // true once the Reviews sheet has been fetched
+let _reviewsLoadPromise = null;    // de-dupes concurrent loads
 
 /* ============================================================
    STATE
@@ -395,6 +401,15 @@ async function loadReviewContent() {
   if (bri.status === 'fulfilled' && bri.value.length) bridalData  = bri.value;
   if (sou.status === 'fulfilled' && sou.value.length) sourcedData = sou.value;
   if (rev.status === 'rejected') console.warn('Reviews load failed — using defaults', rev.reason);
+  reviewContentLoaded = true;
+}
+
+/* Fetch the Reviews sheet at most once, then run cb. Used by product detail
+   pages so tagged reviews show there too (the Reviews page loads it directly). */
+function ensureReviewsLoaded(cb) {
+  if (reviewContentLoaded) { if (cb) cb(); return; }
+  if (!_reviewsLoadPromise) _reviewsLoadPromise = loadReviewContent().catch(() => {});
+  _reviewsLoadPromise.then(() => { if (cb) cb(); });
 }
 
 /* Render the home "favourites" trio. */
@@ -1061,6 +1076,13 @@ function renderDetail(index, source) {
 
   showPage('detail');
   buildWaLink();
+  window._currentDetailProduct = p;
+  renderProductReviews(p);
+  // Product pages don't fetch the Reviews sheet on load — do it lazily the first
+  // time a detail page is opened, then re-render this product's reviews section.
+  ensureReviewsLoaded(() => {
+    if (window._currentDetailProduct === p) renderProductReviews(p);
+  });
 }
 
 /* Detail image navigation */
@@ -1171,6 +1193,91 @@ function getPhotoList(item) {
   return raw.split(',').map(u => driveUrl(u.trim())).filter(Boolean);
 }
 
+/* ------------------------------------------------------------------
+   Review ↔ product matching (forgiving)
+   A review is linked to a product via the "product" column in the
+   Reviews sheet. Matching is deliberately loose so small differences
+   don't break it: case-insensitive, punctuation-insensitive, and a
+   "contains" test in BOTH directions — so a tag of "Drift Ballet"
+   still matches the product "Dr Cardin Drift Ballet", and vice versa.
+   ------------------------------------------------------------------ */
+function normStr(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function reviewMatchesProduct(review, productName) {
+  const tag  = normStr(review && review.product);
+  const name = normStr(productName);
+  // Require a real tag of at least 3 chars so a stray letter can't match everything.
+  if (tag.length < 3 || name.length < 3) return false;
+  return name.includes(tag) || tag.includes(name);
+}
+function getReviewsForProduct(productName) {
+  return (reviewsData || []).filter(r => reviewMatchesProduct(r, productName));
+}
+
+/* Build one review "polaroid" card from a review/bridal item.
+   Returns '' when the item has no usable photos. Shared by the Reviews
+   page groups AND the product-detail reviews section. */
+function buildReviewCard(item, altLabel) {
+  const photos = getPhotoList(item);
+  if (!photos.length) return '';
+  const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  let photosHtml = '';
+  if (photos.length > 1) {
+    const moreCnt = photos.length - 4;
+    const moreBadge = moreCnt > 0
+      ? `<div class="review-photos-more-badge" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 4)" style="cursor:pointer;">+${moreCnt} more</div>`
+      : '';
+    photosHtml = `<div class="review-photos-container">
+      <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
+        ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
+        ${moreBadge}
+      </div>
+    </div>`;
+  } else {
+    photosHtml = `<div class="review-photos-container">
+      <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
+        <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="${altLabel || 'Customer review'}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
+      </div>
+    </div>`;
+  }
+  return `<div class="review-card" onclick="event.stopPropagation()">
+    ${photosHtml}
+    ${item.caption ? `<div class="review-caption">${item.caption}</div>` : ''}
+  </div>`;
+}
+
+/* Inject the "reviews for this pair" section on a product detail page.
+   Hidden entirely (nothing rendered) when the product has no tagged reviews. */
+function renderProductReviews(p) {
+  const body = document.querySelector('#page-detail .detail-body');
+  if (!body) return;
+  const existing = document.getElementById('detail-reviews-section');
+  if (existing) existing.remove();
+  if (!p || !p.name) return;
+
+  const matches = getReviewsForProduct(p.name);
+  if (!matches.length) return;
+
+  const cards = matches.map(item => buildReviewCard(item, 'Customer review')).filter(Boolean).join('');
+  if (!cards) return;
+
+  const n = matches.length;
+  const safeName = String(p.name).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sec = document.createElement('div');
+  sec.id = 'detail-reviews-section';
+  sec.className = 'product-reviews';
+  sec.innerHTML = `
+    <div class="product-reviews-inner">
+      <div style="text-align:center"><span class="eyebrow">Real reviews</span></div>
+      <h2 class="section-title" style="margin-top:0.5rem;">What our <em>angguns</em> say about this pair</h2>
+      <p class="section-sub">${n} ${n === 1 ? 'review' : 'reviews'} from customers who bought the ${safeName}</p>
+      <div class="reviews-grid">${cards}</div>
+      <div class="pr-more"><a href="/reviews" class="pr-more-link">See all reviews →</a></div>
+    </div>`;
+  body.appendChild(sec);
+}
+
 // When a review photo fails to load, hide it. If a card ends up with no visible
 // photos, hide the whole card so its decorative "tape" strip doesn't float alone.
 function reviewImgFail(img) {
@@ -1182,92 +1289,74 @@ function reviewImgFail(img) {
   if (!anyLeft) card.style.display = 'none';
 }
 
+function filterReviews(btn, key) {
+  document.querySelectorAll('#reviews-filter .review-filter-chip').forEach(c => c.classList.toggle('active', c === btn));
+  document.querySelectorAll('#reviews-groups .review-group').forEach(g => {
+    g.style.display = (key === '__all__' || g.getAttribute('data-group') === key) ? '' : 'none';
+  });
+}
+
 function renderReviews() {
-  const $rGrid  = document.getElementById('reviews-grid');
-  const $rEmpty = document.getElementById('reviews-empty');
-  const $bGrid  = document.getElementById('bridal-reviews-grid');
-  const $bEmpty = document.getElementById('bridal-reviews-empty');
-  const $sGrid  = document.getElementById('sourced-grid');
-  const $sEmpty = document.getElementById('sourced-empty');
-  if (!$rGrid || !$bGrid || !$sGrid) return; // not on reviews page
+  const $rFilter = document.getElementById('reviews-filter');
+  const $rGroups = document.getElementById('reviews-groups');
+  const $rEmpty  = document.getElementById('reviews-empty');
+  const $bGrid   = document.getElementById('bridal-reviews-grid');
+  const $bEmpty  = document.getElementById('bridal-reviews-empty');
+  const $sGrid   = document.getElementById('sourced-grid');
+  const $sEmpty  = document.getElementById('sourced-empty');
+  if (!$rGroups || !$bGrid || !$sGrid) return; // not on reviews page
 
-  // Render regular reviews
-  if (reviewsData.length) {
+  // Render regular reviews — grouped by product, with filter chips.
+  const usable = (reviewsData || []).filter(it => getPhotoList(it).length);
+  if (usable.length) {
     $rEmpty.style.display = 'none';
-    $rGrid.innerHTML = reviewsData.map((item, idx) => {
-      const photos = getPhotoList(item);
-      if (!photos.length) return '';
 
-      // Generate grid for multiple photos (2 columns)
-      let photosHtml = '';
-      let moreBadge = '';
-      if (photos.length > 1) {
-        const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-        const moreCnt = photos.length - 4;
-        if (moreCnt > 0) {
-          moreBadge = `<div class="review-photos-more-badge" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 4)" style="cursor:pointer;">+${moreCnt} more</div>`;
-        }
-        photosHtml = `<div class="review-photos-container">
-          <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
-            ${moreBadge}
-          </div>
-        </div>`;
-      } else if (photos.length === 1) {
-        const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-        photosHtml = `<div class="review-photos-container">
-          <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Customer review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
-          </div>
-        </div>`;
+    // Group by the "product" tag. Untagged reviews fall into a "general"
+    // bucket that is always shown last.
+    const GENERAL = '__general__';
+    const order  = [];      // preserve first-seen order of product groups
+    const groups = {};      // key -> { label, items }
+    usable.forEach(item => {
+      const prod = (item.product || '').trim();
+      const key  = prod ? normStr(prod) : GENERAL;
+      if (!groups[key]) { groups[key] = { label: prod || 'Kind words & service', items: [] }; order.push(key); }
+      groups[key].items.push(item);
+    });
+    const ordered = order.filter(k => k !== GENERAL).concat(order.includes(GENERAL) ? [GENERAL] : []);
+    const multi = ordered.length > 1;
+
+    // Filter chips — only worth showing when there's more than one group.
+    if ($rFilter) {
+      if (multi) {
+        const chips = ['<button type="button" class="review-filter-chip active" data-group="__all__" onclick="filterReviews(this,\'__all__\')">All</button>']
+          .concat(ordered.map(k => `<button type="button" class="review-filter-chip" data-group="${k}" onclick="filterReviews(this,'${k}')">${groups[k].label.replace(/</g, '&lt;')}</button>`));
+        $rFilter.innerHTML = chips.join('');
+        $rFilter.style.display = '';
+      } else {
+        $rFilter.innerHTML = '';
+        $rFilter.style.display = 'none';
       }
+    }
 
-      return `<div class="review-card" onclick="event.stopPropagation()">
-        ${photosHtml}
-        ${item.caption ? `<div class="review-caption">${item.caption}</div>` : ''}
+    // One block per group: a small product heading + its own photo carousel.
+    $rGroups.innerHTML = ordered.map(k => {
+      const g = groups[k];
+      const cards = g.items.map(it => buildReviewCard(it, 'Customer review')).filter(Boolean).join('');
+      return `<div class="review-group" data-group="${k}">
+        ${multi ? `<h3 class="review-group-title">${g.label.replace(/</g, '&lt;')}</h3>` : ''}
+        <div class="reviews-grid">${cards}</div>
       </div>`;
     }).join('');
   } else {
-    $rGrid.innerHTML = '';
+    if ($rFilter) { $rFilter.innerHTML = ''; $rFilter.style.display = 'none'; }
+    $rGroups.innerHTML = '';
     $rEmpty.style.display = 'block';
   }
 
   // Render bridal reviews
   if (bridalData.length) {
     $bEmpty.style.display = 'none';
-    $bGrid.innerHTML = bridalData.map((item, idx) => {
-      const photos = getPhotoList(item);
-      if (!photos.length) return '';
-
-      // Generate grid for multiple photos (2 columns)
-      let photosHtml = '';
-      let moreBadge = '';
-      if (photos.length > 1) {
-        const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-        const moreCnt = photos.length - 4;
-        if (moreCnt > 0) {
-          moreBadge = `<div class="review-photos-more-badge" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 4)" style="cursor:pointer;">+${moreCnt} more</div>`;
-        }
-        photosHtml = `<div class="review-photos-container">
-          <div class="review-photos-grid review-photos-grid-wrapper" data-count="${photos.length}">
-            ${photos.map((src, i) => `<span class="wm-box"><img src="${src}" alt="Photo ${i+1}" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', ${i})" style="cursor:pointer;" onerror="reviewImgFail(this)"></span>`).join('')}
-            ${moreBadge}
-          </div>
-        </div>`;
-      } else if (photos.length === 1) {
-        const photosJson = JSON.stringify(photos).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-        photosHtml = `<div class="review-photos-container">
-          <div class="review-photos-grid review-photos-grid-wrapper" data-count="1">
-            <span class="wm-box" style="width:100%;height:100%;"><img src="${photos[0]}" alt="Bridal review" onclick="event.stopPropagation();openCarouselFromBadge('${photosJson}', 0)" style="cursor:pointer;width:100%;height:100%;object-fit:cover;display:block;" onerror="reviewImgFail(this)"></span>
-          </div>
-        </div>`;
-      }
-
-      return `<div class="review-card" onclick="event.stopPropagation()">
-        ${photosHtml}
-        ${item.caption ? `<div class="review-caption">${item.caption}</div>` : ''}
-      </div>`;
-    }).join('');
+    $bGrid.innerHTML = bridalData.map(item => buildReviewCard(item, 'Bridal review')).filter(Boolean).join('');
   } else {
     $bGrid.innerHTML = '';
     $bEmpty.style.display = 'block';

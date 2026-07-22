@@ -2477,6 +2477,65 @@
       margin-bottom: 0;
       scroll-snap-align: start;
     }
+    /* Filter chips (jump to a product's reviews) */
+    .reviews-filter {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem auto 0.5rem;
+      max-width: 900px;
+    }
+    .review-filter-chip {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      background: var(--cream);
+      border: 1.5px solid var(--pink-soft);
+      border-radius: 999px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    .review-filter-chip:hover { border-color: var(--pink); }
+    .review-filter-chip.active {
+      background: var(--pink-hot);
+      border-color: var(--pink-hot);
+      color: var(--cream);
+    }
+    /* One product group on the Reviews page */
+    .review-group { margin-top: 1rem; }
+    .review-group-title {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--pink-hot);
+      margin: 1.75rem 0 0;
+    }
+    .review-group .reviews-grid { margin-top: 1.25rem; }
+    /* "Reviews for this pair" block on a product detail page */
+    .product-reviews {
+      background: var(--pink-pale);
+      border-top: 2px dashed var(--pink-soft);
+      padding: 3rem 2rem 3.25rem;
+    }
+    .product-reviews-inner { max-width: 1280px; margin: 0 auto; }
+    .product-reviews .reviews-grid { margin-top: 2rem; }
+    .pr-more { text-align: center; margin-top: 1.5rem; }
+    .pr-more-link {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--pink-hot);
+      text-decoration: none;
+      border-bottom: 2px solid var(--pink-soft);
+      padding-bottom: 2px;
+      transition: border-color 0.25s ease;
+    }
+    .pr-more-link:hover { border-color: var(--pink-hot); }
     /* Swipe hint under each reviews carousel (shown on desktop + mobile) */
     .reviews-section { position: relative; }
     .reviews-section::after {
