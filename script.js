@@ -147,7 +147,7 @@ let poLoaded = false, isLoaded = false;
 let poProducts = [], isProducts = [];
 let prevPage = 'preorders';
 /* Filter selections are arrays (multi-select). Empty array = no filter / "all". */
-let currentPoFilter = [], currentPoBrand = [], currentPoSize = [], currentPoSort = 'default', currentPoPopular = false;
+let currentPoFilter = [], currentPoBrand = [], currentPoSize = [], currentPoSort = 'default';
 let currentIsFilter = [], currentIsBrand = [], currentIsSize = [];
 let poCurrentPage = 1;
 const PO_PER_PAGE = 24;
@@ -621,7 +621,7 @@ function closeFilterSheet(ns) {
 }
 function clearFilters(ns) {
   if (ns === 'po') {
-    currentPoFilter = []; currentPoBrand = []; currentPoSize = []; currentPoPopular = false;
+    currentPoFilter = []; currentPoBrand = []; currentPoSize = [];
     poCurrentPage = 1; renderPreorders();
   } else {
     currentIsFilter = []; currentIsBrand = []; currentIsSize = [];
@@ -633,8 +633,7 @@ function updateFilterCount(ns) {
   const groups = ns === 'po'
     ? [currentPoFilter, currentPoBrand, currentPoSize]
     : [currentIsFilter, currentIsBrand, currentIsSize];
-  let n = groups.reduce((acc, arr) => acc + arr.length, 0);
-  if (ns === 'po' && currentPoPopular) n += 1;
+  const n = groups.reduce((acc, arr) => acc + arr.length, 0);
   const badge = document.getElementById(ns === 'po' ? 'poFilterCount' : 'isFilterCount');
   if (!badge) return;
   badge.textContent = n;
@@ -693,7 +692,7 @@ async function loadPreorders() {
     }
   }
   $load.style.display = 'none';
-  currentPoFilter = []; currentPoBrand = []; currentPoSize = []; currentPoPopular = false;
+  currentPoFilter = []; currentPoBrand = []; currentPoSize = [];
   renderPreorders();
 }
 
@@ -712,7 +711,6 @@ function buildPageNumbers(current, total) {
 function togglePoFilter(v) { toggleVal(currentPoFilter, v); poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function togglePoBrand(v)  { toggleVal(currentPoBrand, v);  poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function togglePoSize(v)   { toggleVal(currentPoSize, v);   poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
-function togglePoPopular() { currentPoPopular = !currentPoPopular; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 function setPoSort(s)   { currentPoSort   = s; poCurrentPage = 1; history.replaceState({}, '', '/preorders'); renderPreorders(); }
 
 /* Extract a numeric price for sorting. Strips currency prefixes (B$, RM) and
@@ -740,6 +738,10 @@ function sortProducts(list, sortKey) {
   if (sortKey === 'name-asc') {
     return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   }
+  if (sortKey === 'popular') {
+    /* Popular items float to the top; everything else keeps its original order. */
+    return list.sort((a, b) => (isPopular(b) ? 1 : 0) - (isPopular(a) ? 1 : 0));
+  }
   return list;
 }
 function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
@@ -758,20 +760,9 @@ function renderPreorders() {
   // SPA partial may have been swapped out while async load was in flight.
   if (!$grid || !$catChips) return;
 
-  /* Popular chip — only shown when at least one product is tagged popular */
-  const $popularRow  = document.getElementById('poPopularRow');
-  const $popularChips = document.getElementById('poPopularChips');
-  const hasPopular   = poProducts.some(isPopular);
-  if ($popularRow && $popularChips) {
-    if (hasPopular) {
-      $popularRow.style.display = 'block';
-      $popularChips.innerHTML =
-        `<button type="button" class="fchip${currentPoPopular ? ' on' : ''}" onclick="togglePoPopular()">⭐ Popular</button>`;
-    } else {
-      $popularRow.style.display = 'none';
-      if (currentPoPopular) currentPoPopular = false;
-    }
-  }
+  /* Show "Most Popular" as a sort option only when at least one item is tagged. */
+  const $popularOpt = document.querySelector('#sortSelectPO option[value="popular"]');
+  if ($popularOpt) $popularOpt.style.display = poProducts.some(isPopular) ? '' : 'none';
 
   const sheetCats   = [...new Set(poProducts.flatMap(p => parseCats(p.category)))];
   const orderedCats = [...sheetCats].sort((a, b) => a.localeCompare(b));
@@ -806,7 +797,6 @@ function renderPreorders() {
     matchesCat(p, filter) &&
     (brandFilter.length === 0 || brandFilter.includes(p.brand)) &&
     matchesSize(p, sizeFilter) &&
-    (!currentPoPopular || isPopular(p)) &&
     (!searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.brand || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm))
   );
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }

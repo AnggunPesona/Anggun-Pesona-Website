@@ -61,6 +61,7 @@
       <label for="sortSelectPO">Sort</label>
       <select class="filter-select" id="sortSelectPO" onchange="setPoSort(this.value)">
         <option value="default">Featured</option>
+        <option value="popular">⭐ Most Popular</option>
         <option value="price-asc">Price: Low to High</option>
         <option value="price-desc">Price: High to Low</option>
         <option value="name-asc">Name: A to Z</option>
@@ -75,10 +76,6 @@
       <button type="button" class="sheet-x" onclick="closeFilterSheet('po')" aria-label="Close filters">✕</button>
     </div>
     <div class="sheet-body">
-      <div class="sheet-row" id="poPopularRow" style="display:none;">
-        <div class="sheet-row-label">Popular</div>
-        <div class="chip-row" id="poPopularChips"></div>
-      </div>
       <div class="sheet-row" id="poCatRow">
         <div class="sheet-row-label">Category</div>
         <div class="chip-row" id="poCatChips"></div>
@@ -180,6 +177,6 @@
 <button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="/script.js?v=23"></script>
+<script src="/script.js?v=24"></script>
 </body>
 </html>
