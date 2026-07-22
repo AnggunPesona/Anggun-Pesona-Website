@@ -308,6 +308,8 @@ function initCurrentPage() {
       renderPreorders();
       if (productSlug) openProductBySlug(productSlug, 'preorders');
     }
+    // Load reviews in the background so "★ Reviewed" badges appear on cards.
+    ensureReviewsLoaded(() => renderPreorders());
   }
   if (page === 'instocks') {
     if (!isLoaded) loadInstocks().then(() => {
@@ -317,6 +319,8 @@ function initCurrentPage() {
       renderInstocks();
       if (productSlug) openProductBySlug(productSlug, 'instocks');
     }
+    // Load reviews in the background so "★ Reviewed" badges appear on cards.
+    ensureReviewsLoaded(() => renderInstocks());
   }
   if (page === 'reviews')   { renderReviews(); loadReviewContent().then(renderReviews); }
   if (page === 'bridal')    { applyContactLinks(); }
@@ -798,6 +802,7 @@ function renderPreorders() {
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
     return `
     <div class="product-card" onclick="openProduct(${origIndex}, 'preorders')">
+      ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto)}
       <div class="product-info">
         <div>${parseCats(p.category).map(c => `<span class="tag tag-cat">${c}</span>`).join('')}</div>
@@ -943,6 +948,7 @@ function renderInstocks() {
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
     return `
     <div class="product-card" onclick="openProduct(${origIndex}, 'instocks')">
+      ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto, '⚡')}
       <div class="product-info">
         ${parseCats(p.category).map(c => `<span class="tag tag-cat">${c}</span>`).join('')}
@@ -1213,6 +1219,9 @@ function reviewMatchesProduct(review, productName) {
 }
 function getReviewsForProduct(productName) {
   return (reviewsData || []).filter(r => reviewMatchesProduct(r, productName));
+}
+function productHasReviews(p) {
+  return !!(p && p.name) && getReviewsForProduct(p.name).some(r => getPhotoList(r).length);
 }
 
 /* Build one review "polaroid" card from a review/bridal item.

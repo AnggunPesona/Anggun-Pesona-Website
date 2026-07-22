@@ -2536,6 +2536,23 @@
       transition: border-color 0.25s ease;
     }
     .pr-more-link:hover { border-color: var(--pink-hot); }
+    /* "★ Reviewed" badge on catalogue product cards */
+    .review-badge {
+      position: absolute;
+      top: 0.85rem;
+      left: 0.85rem;
+      z-index: 3;
+      background: var(--pink-hot);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 0.28rem 0.6rem;
+      border-radius: 999px;
+      box-shadow: 0 3px 8px rgba(107,15,26,0.22);
+      pointer-events: none;
+    }
     /* Swipe hint under each reviews carousel (shown on desktop + mobile) */
     .reviews-section { position: relative; }
     .reviews-section::after {
