@@ -3281,6 +3281,26 @@
       pointer-events: none;
       z-index: 3;
     }
+    /* When a review / real-life photo is ENLARGED in the shared carousel, that
+       viewer is ours to mark too. openCarouselFromBadge (script.js) adds
+       .wm-content; product-photo enlargements don't, so supplier shots on
+       pre-order pages stay clean. */
+    body.wm-off .carousel-modal.wm-content .carousel-viewer::after {
+      content: 'Anggun Pesona';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-18deg);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.25);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 3;
+      font-size: clamp(1rem, 2.8vw, 1.8rem);
+    }
 
     .wm-box::after { font-size: clamp(0.7rem, 4vw, 1.3rem); }
     .detail-image-viewer::after { font-size: clamp(0.9rem, 2.4vw, 1.5rem); }

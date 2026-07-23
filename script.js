@@ -1532,6 +1532,9 @@ function openCarousel(photos, startIndex = 0) {
   carouselState.currentIndex = Math.max(0, Math.min(startIndex, photos.length - 1));
   const modal = document.getElementById('carousel-modal');
   modal.classList.add('open');
+  // Default: assume product photos (supplier shots on pre-orders stay clean).
+  // openCarouselFromBadge re-adds 'wm-content' for our review/real-life photos.
+  modal.classList.remove('wm-content');
   document.body.style.overflow = 'hidden';
   updateCarousel();
 
@@ -1545,6 +1548,9 @@ function openCarouselFromBadge(photosJson, startIndex) {
   try {
     const photos = JSON.parse(photosJson);
     openCarousel(photos, startIndex);
+    // These are our own review / real-life photos, so mark the enlarged
+    // viewer as watermarkable even on pre-order pages (body.wm-off).
+    document.getElementById('carousel-modal').classList.add('wm-content');
   } catch (e) {
     console.error('Failed to parse photos:', e);
   }
