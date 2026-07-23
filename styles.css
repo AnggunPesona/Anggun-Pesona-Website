@@ -1358,9 +1358,26 @@
     .product-card.popular-pick {
       background: linear-gradient(160deg, #fff8ee 0%, #fce8ee 100%);
       border: 2px solid #7a2b3a;
+      /* Let the badge + tape poke above the card's top edge without being clipped.
+         The .product-image below keeps its own border-radius so the photo stays rounded. */
+      overflow: visible;
     }
-    /* Replace the default pink tape with the sticker badge on popular cards */
-    .product-card.popular-pick::before { display: none; }
+    /* Re-enable the translucent pink masking-tape strip behind the "Anggun's Pick" badge */
+    .product-card.popular-pick::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%) rotate(-4deg);
+      width: 150px; height: 34px;
+      background: rgba(242,164,187,0.6);
+      border-left: 1px dashed rgba(255,255,255,0.4);
+      border-right: 1px dashed rgba(255,255,255,0.4);
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(107,15,26,0.1);
+      z-index: 5; /* behind the badge (z-index 6), above the card face */
+      pointer-events: none;
+    }
 
     /* =====================================================
        PRE-ORDER HIGHLIGHT STRIP (Picks & Just Sourced)
