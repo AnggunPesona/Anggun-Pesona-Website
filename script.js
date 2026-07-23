@@ -759,6 +759,60 @@ function sortProducts(list, sortKey) {
 }
 function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
 
+/* True when we have our own real-life ("sourced") photos tagged for this product. */
+function hasProductRealLife(p) {
+  return !!(p && p.name) && getRealLifeForProduct(p.name).some(r => getPhotoList(r).length);
+}
+
+/* Build the "Anggun's Picks & Just Sourced" highlight strip that sits above the
+   grid. Shows products flagged Popular OR that have real-life photos. Hidden
+   while a search/filter is active so it never fights the filtered view. */
+function renderPoHighlights() {
+  const $wrap  = document.getElementById('po-highlights');
+  const $track = document.getElementById('po-highlights-track');
+  if (!$wrap || !$track) return;
+
+  /* If the customer is searching or filtering, step out of the way. */
+  const searchEl = document.getElementById('poSearchInput');
+  const searching = !!(searchEl && searchEl.value.trim());
+  const filtering = currentPoFilter.length || currentPoBrand.length || currentPoSize.length;
+  if (searching || filtering) { $wrap.style.display = 'none'; return; }
+
+  /* Picks first, then sourced-only, then reviewed-only — a product is listed once,
+     in its highest-priority group, but carries every badge it qualifies for. */
+  const picks    = poProducts.filter(isPopular);
+  const sourced  = poProducts.filter(p => !isPopular(p) && hasProductRealLife(p));
+  const reviewed = poProducts.filter(p => !isPopular(p) && !hasProductRealLife(p) && productHasReviews(p));
+  const items    = [...picks, ...sourced, ...reviewed];
+
+  if (!items.length) { $wrap.style.display = 'none'; return; }
+
+  $track.innerHTML = items.map(p => {
+    const origIndex = poProducts.indexOf(p);
+    const pick = isPopular(p);
+    const real = hasProductRealLife(p);
+    const rev  = productHasReviews(p);
+    const price = fmtPrice(p.price);
+    const cat = parseCats(p.category)[0] || '';
+    const firstPhoto = (p.photos || p.photo || '').split(',')[0];
+    return `
+    <div class="po-hl-card" onclick="openProduct(${origIndex}, 'preorders')">
+      <div class="po-hl-badges">
+        ${pick ? `<span class="po-hl-badge po-hl-badge-pick">Anggun's Pick</span>` : ''}
+        ${real ? `<span class="po-hl-badge po-hl-badge-real">★ Real photos</span>` : ''}
+        ${rev ? `<span class="po-hl-badge po-hl-badge-rev">★ Reviewed</span>` : ''}
+      </div>
+      <div class="po-hl-img">${imgOrPlaceholder(firstPhoto)}</div>
+      <div class="po-hl-info">
+        ${cat ? `<div class="po-hl-cat">${cat}</div>` : ''}
+        <div class="po-hl-name">${p.name}</div>
+        <div class="po-hl-price">${price}</div>
+      </div>
+    </div>`;
+  }).join('');
+  $wrap.style.display = 'block';
+}
+
 function renderPreorders() {
   const filter      = currentPoFilter;
   const brandFilter = currentPoBrand;
@@ -801,6 +855,9 @@ function renderPreorders() {
   }
 
   updateFilterCount('po');
+
+  /* Refresh the picks/sourced highlight strip above the grid. */
+  renderPoHighlights();
 
   /* Search filter */
   const searchEl = document.getElementById('poSearchInput');
