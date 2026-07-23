@@ -834,7 +834,8 @@ function renderPreorders() {
     const price = fmtPrice(p.price);
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
     return `
-    <div class="product-card" onclick="openProduct(${origIndex}, 'preorders')">
+    <div class="product-card${isPopular(p) ? ' popular-pick' : ''}" onclick="openProduct(${origIndex}, 'preorders')">
+      ${isPopular(p) ? `<span class="popular-badge">Anggun's Pick</span>` : ''}
       ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto)}
       <div class="product-info">
@@ -980,7 +981,8 @@ function renderInstocks() {
     const origIndex = isProducts.indexOf(p);
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
     return `
-    <div class="product-card" onclick="openProduct(${origIndex}, 'instocks')">
+    <div class="product-card${isPopular(p) ? ' popular-pick' : ''}" onclick="openProduct(${origIndex}, 'instocks')">
+      ${isPopular(p) ? `<span class="popular-badge">Anggun's Pick</span>` : ''}
       ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto, '⚡')}
       <div class="product-info">

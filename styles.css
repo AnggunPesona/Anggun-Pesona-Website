@@ -1354,6 +1354,31 @@
       border-right: 1px dashed rgba(255,255,255,0.4);
       box-shadow: 0 2px 4px rgba(107,15,26,0.1);
     }
+    /* ── Most Popular / "Anggun's Pick" cards ── */
+    .product-card.popular-pick {
+      background: linear-gradient(160deg, #fff8ee 0%, #fce8ee 100%);
+      border: 2px solid #7a2b3a;
+    }
+    /* Replace the default pink tape with the sticker badge on popular cards */
+    .product-card.popular-pick::before { display: none; }
+    .popular-badge {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-4deg);
+      z-index: 6;
+      font-family: 'Caveat', cursive;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      color: #fbe9ec;
+      background: #7a2b3a;
+      padding: 5px 14px;
+      border-radius: 3px;
+      box-shadow: 0 3px 8px rgba(107,15,26,0.25);
+    }
     .product-image {
       width: 100%;
       aspect-ratio: 4/5;
