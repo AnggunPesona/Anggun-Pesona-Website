@@ -3262,6 +3262,26 @@
       pointer-events: none;
       z-index: 3;
     }
+    /* Even on the pre-orders page (body.wm-off), the customer-review and our
+       real-life "how it looks like" photos ARE ours to mark — so re-enable the
+       watermark for just those sections. The pre-order PRODUCT shots stay clean. */
+    body.wm-off .product-reviews .wm-box::after,
+    body.wm-off .product-reallife .wm-box::after {
+      content: 'Anggun Pesona';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-18deg);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.25);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 3;
+    }
+
     .wm-box::after { font-size: clamp(0.7rem, 4vw, 1.3rem); }
     .detail-image-viewer::after { font-size: clamp(0.9rem, 2.4vw, 1.5rem); }
     .carousel-viewer::after,

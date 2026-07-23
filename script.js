@@ -15,6 +15,7 @@ const CONFIG = {
   REVIEWS_TAB:        'Reviews',
   BRIDAL_TAB:         'BridalReviews',
   SOURCED_TAB:        'Sourced',
+  REALLIFE_TAB:       'RealLife',
   NEWS_TAB:           'News',
   NEWS_GID:           '1967713786',   // stable ID of the News tab (name-based fetch is unreliable)
 
@@ -108,6 +109,16 @@ const SOURCED_PHOTOS = [
   {url: 'https://drive.google.com/file/d/1SUt77Uj5khyEDvzYcfj9G8RlqGZz3DCX/view?usp=drive_link', caption: '1st RAYA PO Batch 2026'}
 ];
 
+// REALLIFE_PHOTOS: "How it looks like" — our own real-life photos of a shoe
+// order after we've sourced/received it. Shown on that shoe's PRE-ORDER detail
+// page (matched by the "product" column, same loose matching as reviews).
+// Format: [
+//   { product: 'Flowerstrap Ballerina', photos: 'URL1, URL2, URL3', caption: 'Mid June batch' }
+// ]
+// Leave this empty — real entries come from the "RealLife" tab of the Content
+// sheet (columns: product, photos, caption). Nothing shows until a product is tagged.
+const REALLIFE_PHOTOS = [];
+
 // DEFAULT_FEATURED: home page "favourites last batch" trio.
 // Used only when CONTENT_SHEET_ID is blank OR the Featured tab is empty.
 const DEFAULT_FEATURED = [
@@ -137,6 +148,7 @@ let newsItems    = [];   // filtered list currently on screen (used by the chip 
 let reviewsData  = REVIEW_SCREENSHOTS;
 let bridalData   = BRIDAL_REVIEWS;
 let sourcedData  = SOURCED_PHOTOS;
+let reallifeData = REALLIFE_PHOTOS;
 let reviewContentLoaded = false;   // true once the Reviews sheet has been fetched
 let _reviewsLoadPromise = null;    // de-dupes concurrent loads
 
@@ -403,12 +415,13 @@ async function loadReviewContent() {
     const rows = await fetchSheetByName(CONFIG.CONTENT_SHEET_ID, tab);
     return (rows || []).filter(r => (r.photos || r.photo || r.url || '').trim());
   };
-  const [rev, bri, sou] = await Promise.allSettled([
-    grab(CONFIG.REVIEWS_TAB), grab(CONFIG.BRIDAL_TAB), grab(CONFIG.SOURCED_TAB)
+  const [rev, bri, sou, rea] = await Promise.allSettled([
+    grab(CONFIG.REVIEWS_TAB), grab(CONFIG.BRIDAL_TAB), grab(CONFIG.SOURCED_TAB), grab(CONFIG.REALLIFE_TAB)
   ]);
   if (rev.status === 'fulfilled' && rev.value.length) reviewsData = rev.value;
   if (bri.status === 'fulfilled' && bri.value.length) bridalData  = bri.value;
   if (sou.status === 'fulfilled' && sou.value.length) sourcedData = sou.value;
+  if (rea.status === 'fulfilled' && rea.value.length) reallifeData = rea.value;
   if (rev.status === 'rejected') console.warn('Reviews load failed — using defaults', rev.reason);
   reviewContentLoaded = true;
 }
@@ -1103,11 +1116,12 @@ function renderDetail(index, source) {
   showPage('detail');
   buildWaLink();
   window._currentDetailProduct = p;
+  renderProductRealLife(p);
   renderProductReviews(p);
-  // Product pages don't fetch the Reviews sheet on load — do it lazily the first
-  // time a detail page is opened, then re-render this product's reviews section.
+  // Product pages don't fetch the Content sheet on load — do it lazily the first
+  // time a detail page is opened, then re-render the real-life + reviews sections.
   ensureReviewsLoaded(() => {
-    if (window._currentDetailProduct === p) renderProductReviews(p);
+    if (window._currentDetailProduct === p) { renderProductRealLife(p); renderProductReviews(p); }
   });
 }
 
@@ -1243,6 +1257,10 @@ function getReviewsForProduct(productName) {
 function productHasReviews(p) {
   return !!(p && p.name) && getReviewsForProduct(p.name).some(r => getPhotoList(r).length);
 }
+// Same loose product matching, but for our own "real life" (sourced) photos.
+function getRealLifeForProduct(productName) {
+  return (reallifeData || []).filter(r => reviewMatchesProduct(r, productName));
+}
 
 /* Build one review "polaroid" card from a review/bridal item.
    Returns '' when the item has no usable photos. Shared by the Reviews
@@ -1303,6 +1321,38 @@ function renderProductReviews(p) {
       <p class="section-sub">${n} ${n === 1 ? 'review' : 'reviews'} from customers who bought the ${safeName}</p>
       <div class="reviews-grid">${cards}</div>
       <div class="pr-more"><a href="/reviews" class="pr-more-link">See all reviews →</a></div>
+    </div>`;
+  body.appendChild(sec);
+}
+
+/* Inject the "How it looks like" section — our own real-life photos of a shoe
+   we've sourced for our angguns. Pre-order pages only. Hidden entirely when the
+   product has no tagged real-life photos. */
+function renderProductRealLife(p) {
+  const body = document.querySelector('#page-detail .detail-body');
+  if (!body) return;
+  const existing = document.getElementById('detail-reallife-section');
+  if (existing) existing.remove();
+  // Pre-orders only.
+  if (!/\/preorders/.test(window.location.pathname)) return;
+  if (!p || !p.name) return;
+
+  const matches = getRealLifeForProduct(p.name);
+  if (!matches.length) return;
+
+  const cards = matches.map(item => buildReviewCard(item, 'Real-life photo')).filter(Boolean).join('');
+  if (!cards) return;
+
+  const safeName = String(p.name).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sec = document.createElement('div');
+  sec.id = 'detail-reallife-section';
+  sec.className = 'product-reviews product-reallife';
+  sec.innerHTML = `
+    <div class="product-reviews-inner">
+      <div style="text-align:center"><span class="eyebrow">How it looks like</span></div>
+      <h2 class="section-title" style="margin-top:0.5rem;">The <em>${safeName}</em> in real life</h2>
+      <p class="section-sub">the actual pairs we’ve sourced for our angguns</p>
+      <div class="reviews-grid">${cards}</div>
     </div>`;
   body.appendChild(sec);
 }
