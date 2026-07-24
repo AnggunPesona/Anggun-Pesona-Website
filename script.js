@@ -1303,11 +1303,30 @@ function getPhotoList(item) {
 function normStr(s) {
   return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
+// All catalogue product names (normalised), used to keep a shared name fragment
+// from leaking a badge onto a longer product. Both arrays may not be populated
+// yet depending on which page loaded — that's fine, we just match on what we know.
+function knownProductNames() {
+  return [...(poProducts || []), ...(isProducts || [])]
+    .map(p => normStr(p && p.name))
+    .filter(n => n.length >= 3);
+}
 function reviewMatchesProduct(review, productName) {
   const tag  = normStr(review && review.product);
   const name = normStr(productName);
   // Require a real tag of at least 3 chars so a stray letter can't match everything.
   if (tag.length < 3 || name.length < 3) return false;
+
+  // Exact match always wins.
+  if (tag === name) return true;
+
+  // Otherwise fall back to forgiving "contains" matching (so a tag of
+  // "Drift Ballet" still links to "Dr Cardin Drift Ballet"). BUT if the review's
+  // tag is itself the exact name of a DIFFERENT product, don't let it leak — this
+  // stops "Sport Ballerina" from badging "Vanessa Suede Sport Ballerina".
+  const tagIsAnotherProduct = knownProductNames().some(n => n === tag && n !== name);
+  if (tagIsAnotherProduct) return false;
+
   return name.includes(tag) || tag.includes(name);
 }
 function getReviewsForProduct(productName) {
