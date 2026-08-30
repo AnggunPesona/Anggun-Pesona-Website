@@ -154,6 +154,8 @@
     .bk-method-s{display:block;font-family:'DM Sans',sans-serif;font-size:.66rem;color:#9a8188;margin-top:.15rem;}
     .bk-field{margin-top:1.5rem;}
     .bk-field label{display:block;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:#6f5a60;margin-bottom:.4rem;}
+    .bk-req{display:inline-block;margin-left:.35rem;font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+      color:#8a5a3a;background:#fff3e2;border:1px solid #f0dcc0;border-radius:999px;padding:.15rem .45rem;vertical-align:middle;}
     .bk-field input,.bk-field select,.bk-field textarea{width:100%;padding:.8rem 1rem;border:1px solid #e3d4d9;border-radius:12px;
       font-family:'DM Sans',sans-serif;font-size:.95rem;color:#3a2a30;background:#fff;box-sizing:border-box;}
     .bk-field input:focus,.bk-field select:focus,.bk-field textarea:focus{outline:none;border-color:#c98a9e;box-shadow:0 0 0 3px rgba(201,138,158,.15);}
@@ -782,11 +784,9 @@ function bkCollectHtml(avail, locName){
       <div class="bk-batch-tag">${+c.iso.slice(8,10)}</div>
       <div class="bk-batch-info"><b>${esc(bkFmtDate(c.iso))}</b><span>${c.time ? esc(c.time) : 'Time confirmed by text'}</span></div>
     </div>`).join('');
-  // A sheet row with no Time → let the customer suggest one. Otherwise the card IS the time.
-  const askTime = !cards[bkState.sgSel].time
-    ? `<div class="bk-field"><label>Your preferred time</label>
-        <input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>` : '';
-  return `<p class="bk-label">Choose a collection slot</p>${cardsHtml}${sgNote}${askTime}
+  // No free-text time box here: the card the customer taps IS the slot. A sheet row left
+  // without a Time simply reads "Time confirmed by text" and our team fixes it by message.
+  return `<p class="bk-label">Choose a collection slot</p>${cardsHtml}${sgNote}
     <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so our team will confirm your slot by text before you head over — this makes sure someone is there to open the gate for you.</p>`;
 }
 
@@ -814,7 +814,8 @@ function bkDeliveryHtml(avail){
   return `<p class="bk-label">Choose a delivery batch</p>${cards}${reqCard}${reqPanel}
     <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
     <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
-    <div class="bk-field"><label>Location link (optional)</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
+    <div class="bk-field"><label>Location link <span class="bk-req">highly recommended</span></label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>
+    <p class="bk-hint">📍 A live location or Google Maps pin helps our runner reach you quickly — without one, deliveries are often delayed or missed.</p>`;
 }
 
 function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.sgSel=-1; bkState.dateWarn=false; bkRenderPanel(); }
