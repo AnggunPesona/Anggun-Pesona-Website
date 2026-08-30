@@ -548,7 +548,8 @@ async function trackLookup(){
 let AUTO_OPEN_BOOKING = false;
 let _availCache = null;
 const BK_LOC = { lambak:'Lambak Kanan', sgliang:'Sg Liang' };
-let bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false };
+let bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false,
+  sgSel:-1, sgCards:[] };  // sgSel = index of the chosen Sg Liang slot card in sgCards
 let bkCalYM = null; // {y, m} of the month currently shown in the in-page calendar (m is 0-11)
 
 function bkCanonLoc(loc){
@@ -753,45 +754,40 @@ function bkCollectHtml(avail, locName){
       `<p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
   }
   // ── Sg Liang ───────────────────────────────────────────────────────────────
-  // Closed by default: only the Fri/Sun dates marked Available = Yes in the Booking
-  // sheet are offered, and we never fall back to an open calendar (which could hand
-  // a customer a day we aren't there). Dates are keyed by ISO so a booking always
-  // saves as a clean "Fri, 4 Sep" no matter how the date was typed in the sheet.
-  const openIso = [], rowsByIso = {};
+  // Closed by default, and presented like the delivery batches: every open date+time
+  // row in the Booking sheet becomes one tappable slot card, so the customer picks a
+  // ready-made slot instead of typing a date and a time. We never fall back to an open
+  // calendar, which could hand someone a day we aren't there.
+  const cards = [], seen = {};
   Object.keys(loc).forEach(d=>{
     if(!d || !bkSgOpen(d, loc[d])) return;
     const iso = bkToISO(d);
-    if(!openIso.includes(iso)) openIso.push(iso);
-    rowsByIso[iso] = (rowsByIso[iso]||[]).concat(loc[d]);
+    loc[d].forEach(r=>{
+      if(!bkSgYes(r.av)) return;
+      const time = (r.time||'').trim(), k = iso+'|'+time;
+      if(seen[k]) return; seen[k] = 1;
+      cards.push({iso, time});
+    });
   });
-  openIso.sort();
-  const sgNote = `<p class="bk-hint info">📅 Sg Liang collection runs on <strong>Fridays &amp; Sundays only</strong>, and each date is <strong>subject to availability</strong> — only the days we're open are listed here.</p>`;
-  if(!openIso.length){
-    return `${sgNote}<p class="bk-hint info">🕊️ We don't have an open Sg Liang date at the moment. Please message us and we'll arrange one with you — or choose <strong>Lambak Kanan</strong> or <strong>delivery</strong> above.</p>`;
+  cards.sort((a,b)=> a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);   // soonest first; sheet order within a date
+  bkState.sgCards = cards;
+  const sgNote = `<p class="bk-hint info">📅 Sg Liang collection runs on <strong>Fridays &amp; Sundays only</strong>, and each slot is <strong>subject to availability</strong> — only the dates and times we're open are shown here.</p>`;
+  if(!cards.length){
+    return `${sgNote}<p class="bk-hint info">🕊️ We don't have an open Sg Liang slot at the moment. Please message us and we'll arrange one with you — or choose <strong>Lambak Kanan</strong> or <strong>delivery</strong> above.</p>`;
   }
-  if(!openIso.includes(bkState.date)) bkState.date = openIso[0];
-  const dateField = `<div class="bk-field"><label>Pick a date</label>
-      <select onchange="bkPickDate(this.value)">${openIso.map(iso=>`<option value="${iso}" ${iso===bkState.date?'selected':''}>${esc(bkFmtDate(iso))}</option>`).join('')}</select>
-      ${sgNote}</div>`;
-  // Per-day timing comes from the sheet's Time column for that date:
-  //   • several rows for one date  → each Time becomes a tappable slot chip
-  //   • a single row               → treated as the window we're there, customer states an exact time
-  //   • no Time at all             → customer suggests a time and we confirm it
-  const times = (rowsByIso[bkState.date]||[]).filter(r=>bkSgYes(r.av)).map(r=>(r.time||'').trim()).filter(Boolean);
-  let slotField;
-  if(times.length > 1){
-    if(!times.includes(bkState.slot)) bkState.slot = '';
-    slotField = `<p class="bk-label">Available times on this date</p>
-      <div class="bk-slots">${times.map(t=>`<div class="bk-slot ${bkState.slot===t?'active':''}" onclick="bkPickSlot('${esc(t)}')">${esc(t)}</div>`).join('')}</div>
-      <p class="bk-hint">Tap the time that suits you — these are the times our team is at Sg Liang on this day.</p>`;
-  } else {
-    const win = times[0] || '';
-    slotField = `<div class="bk-field"><label>Preferred time slot</label>
-        <input type="text" value="${esc(bkState.slot)}" placeholder="${win ? 'e.g. 11:00 AM' : 'e.g. 4:00 PM onwards'}" oninput="bkState.slot=this.value"></div>
-      ${win ? `<p class="bk-hint">🕑 We're at Sg Liang <strong>${esc(win)}</strong> on this date — please suggest an exact time within that window.</p>` : ''}`;
+  if(!(bkState.sgSel >= 0 && bkState.sgSel < cards.length)){        // default to the soonest slot
+    bkState.sgSel = 0; bkState.date = cards[0].iso; bkState.slot = cards[0].time;
   }
-  slotField += `<p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so please give us an exact time and our team will confirm it with you — this makes sure someone is there to open the gate for you.</p>`;
-  return dateField + slotField;
+  const cardsHtml = cards.map((c,i)=>`<div class="bk-batch ${i===bkState.sgSel?'active':''}" onclick="bkPickSg(${i})">
+      <div class="bk-batch-tag">${+c.iso.slice(8,10)}</div>
+      <div class="bk-batch-info"><b>${esc(bkFmtDate(c.iso))}</b><span>${c.time ? esc(c.time) : 'Time confirmed by text'}</span></div>
+    </div>`).join('');
+  // A sheet row with no Time → let the customer suggest one. Otherwise the card IS the time.
+  const askTime = !cards[bkState.sgSel].time
+    ? `<div class="bk-field"><label>Your preferred time</label>
+        <input type="text" value="${esc(bkState.slot)}" placeholder="e.g. 4:00 PM onwards" oninput="bkState.slot=this.value"></div>` : '';
+  return `<p class="bk-label">Choose a collection slot</p>${cardsHtml}${sgNote}${askTime}
+    <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so our team will confirm your slot by text before you head over — this makes sure someone is there to open the gate for you.</p>`;
 }
 
 function bkDeliveryHtml(avail){
@@ -821,7 +817,7 @@ function bkDeliveryHtml(avail){
     <div class="bk-field"><label>Location link (optional)</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
 }
 
-function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.dateWarn=false; bkRenderPanel(); }
+function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.sgSel=-1; bkState.dateWarn=false; bkRenderPanel(); }
 function bkPickDate(v){
   // Reject a too-soon ISO date the moment it's picked — some mobile date pickers ignore the min attribute.
   if(v && /^\d{4}-\d{2}-\d{2}$/.test(v) && v < bkMinDate()){ bkState.date=''; bkState.slot=''; bkState.dateWarn=true; bkRenderPanel(); return; }
@@ -829,6 +825,13 @@ function bkPickDate(v){
 }
 function bkPickSlot(t){ bkState.slot=t; bkRenderPanel(); }
 function bkPickBatch(b){ bkState.batch=b; bkRenderPanel(); }
+// Sg Liang: one card = one date+time slot from the Booking sheet, so picking a card
+// sets the date AND the time in one tap (same feel as choosing a delivery batch).
+function bkPickSg(i){
+  const c = (bkState.sgCards||[])[i]; if(!c) return;
+  bkState.sgSel = i; bkState.date = c.iso; bkState.slot = c.time;
+  bkRenderPanel();
+}
 
 // In-page month calendar. Built from plain buttons so it behaves identically on every phone —
 // no reliance on the native <input type=date> picker, which opened-then-instantly-closed on mobile.
