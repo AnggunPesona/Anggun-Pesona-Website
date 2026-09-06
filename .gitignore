@@ -4,3 +4,10 @@ admin.html
 
 # Apps Script files contain the Telegram bot token — never publish
 *.gs
+
+# ...and ANY copy of them, whatever the extension (.txt, .rtf, backups).
+# digest-apps-script.txt holds the live Telegram bot token.
+*apps-script*
+
+# Generated preview, not part of the site
+_setup/instock-preview.html
