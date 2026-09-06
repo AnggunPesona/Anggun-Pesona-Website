@@ -222,6 +222,14 @@
     .bk-rebook:hover{background:#f2fbf4;transform:translateY(-1px);}
     .bk-rebook.copied{background:#e9f6ec;border-color:#8fca9d;}
     .bk-hide{display:none;}
+    /* Admin-only in-stock booking link (/book) */
+    .is-bar{background:#3a2a30;color:#f0dde3;font-family:'DM Sans',sans-serif;font-size:.72rem;
+      letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:.5rem 1rem;}
+    .is-ref{display:inline-block;font-family:'DM Sans',sans-serif;font-weight:700;letter-spacing:.04em;
+      color:#1c5c33;background:#fff;border:1px solid #bfe3c6;border-radius:999px;padding:.25rem .7rem;}
+    .is-again{margin-top:.9rem;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:#1c5c33;
+      background:#fff;border:1px solid #bfe3c6;border-radius:999px;padding:.55rem 1rem;cursor:pointer;}
+    .is-again:hover{background:#f2fbf4;}
   </style>
 </head>
 <body>
@@ -250,23 +258,24 @@
   </button>
 </nav>
 
+<div class="is-bar bk-hide" id="isBar">Admin only · in-stock booking</div>
 <div class="page" id="page-track">
-  <div class="page-hero">
-    <h1>Track Your <em>Pre-Order</em></h1>
-    <p>Enter your order number to see where your order is</p>
+  <div class="page-hero" id="trackHero">
+    <h1 id="trackHeroH1">Track Your <em>Pre-Order</em></h1>
+    <p id="trackHeroP">Enter your order number to see where your order is</p>
   </div>
 
   <div class="track-wrap">
-    <div class="track-search">
+    <div class="track-search" id="trackSearchBox">
       <input type="text" id="trackInput" placeholder="e.g. May26AXXYYYY" autocomplete="off"
              onkeydown="if(event.key==='Enter')trackLookup()">
       <button type="button" onclick="trackLookup()">Track</button>
     </div>
-    <p class="track-hint">Your order number is in the form we provided when you placed your order. The last 4 digits (YYYY) are the last 4 digits of your phone number.</p>
+    <p class="track-hint" id="trackHintP">Your order number is in the form we provided when you placed your order. The last 4 digits (YYYY) are the last 4 digits of your phone number.</p>
 
     <div id="trackResult"></div>
 
-    <p class="track-help">
+    <p class="track-help" id="trackHelpP">
       Can't find your order? <a id="track-wa" href="#" target="_blank">Contact us</a>
     </p>
   </div>
@@ -548,6 +557,10 @@ async function trackLookup(){
    NOT back to WhatsApp. Availability is read from AVAIL_CSV.
    ============================================================ */
 let AUTO_OPEN_BOOKING = false;
+// ADMIN-ONLY in-stock booking mode (/book -> /track?instock=1).
+// No order lookup, no stepper, none of the customer-facing reminders —
+// just Order no / Name / Item + a slot, saved straight to the Bookings sheet.
+let IS_MODE = false;
 let _availCache = null;
 const BK_LOC = { lambak:'Lambak Kanan', sgliang:'Sg Liang' };
 let bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'', sending:false,
@@ -563,30 +576,40 @@ function bkCanonLoc(loc){
 
 async function bkLoadAvail(){
   if(_availCache) return _availCache;
-  if(!BOOKING_CONFIG.AVAIL_CSV){ _availCache = {collect:{}, delivery:[]}; return _availCache; }
+  if(!BOOKING_CONFIG.AVAIL_CSV){ _availCache = {collect:{}, delivery:[], blocked:[]}; return _availCache; }
   try{
     const res = await fetch(BOOKING_CONFIG.AVAIL_CSV);
     const csv = await res.text();
     const rows = Papa.parse(csv,{header:true,skipEmptyLines:true,transformHeader:h=>h.trim()}).data;
-    const collect = {}, delivery = [];
+    const collect = {}, delivery = [], blocked = [];
     rows.forEach(r=>{
       const method=(col(r,['Method','Type'])||'').toString().trim().toLowerCase();
       const locRaw=(col(r,['Location','Place','Branch','Batch'])||'').toString().trim();
       const date=(col(r,['Date','Day'])||'').toString().trim();
+      const dateTo=(col(r,['Date To','DateTo','End Date','EndDate','End','To','Until'])||'').toString().trim();
       const time=(col(r,['Time','Slot','Timing'])||'').toString().trim();
       const av=(col(r,['Available','Open','Status'])||'').toString().trim().toLowerCase();
       const ok = !(['no','n','false','0','closed','full','unavailable'].includes(av));
       if(!method && !locRaw) return;
       if(method.indexOf('deliver')===0 || /batch/i.test(locRaw)){
         delivery.push({loc:locRaw, date, time, ok});
+        // A delivery row marked Available = No is a BLOCK-OUT: "Date" is the first
+        // day off and "Date To" the last (leave Date To empty for a single day).
+        // Used by the admin everyday calendar to grey those days out.
+        // Rows whose Location says "Batch" are EXCLUDED: switching an old batch row
+        // to Available = No should just retire that batch, not close its date.
+        if(!ok && !/batch/i.test(locRaw)){
+          const from = bkToISO(date);
+          if(from) blocked.push({ from, to: (bkToISO(dateTo) || from), why: locRaw });
+        }
       } else {
         const loc = bkCanonLoc(locRaw);
         (collect[loc] = collect[loc]||{});
         (collect[loc][date] = collect[loc][date]||[]).push({time, ok, av});
       }
     });
-    _availCache = {collect, delivery};
-  }catch(e){ _availCache = {collect:{}, delivery:[]}; }
+    _availCache = {collect, delivery, blocked};
+  }catch(e){ _availCache = {collect:{}, delivery:[], blocked:[]}; }
   return _availCache;
 }
 
@@ -640,12 +663,13 @@ async function bkRenderPanel(){
       <span class="bk-method-ic">${ic}</span><span class="bk-method-t">${t}</span><span class="bk-method-s">${s}</span></div>`).join('');
   const body = m==='delivery' ? bkDeliveryHtml(avail) : bkCollectHtml(avail, BK_LOC[m]);
   panel.innerHTML = `
-    <p class="bk-title">Book your collection or delivery</p>
-    <p class="bk-sub">Choose how you'd like to receive order <strong>${esc(bkState.order)}</strong>.</p>
+    <p class="bk-title">${IS_MODE ? `Collection or delivery` : `Book your collection or delivery`}</p>
+    <p class="bk-sub">${IS_MODE ? `How is this order going out?` : `Choose how you'd like to receive order <strong>${esc(bkState.order)}</strong>.`}</p>
     <p class="bk-label">Collection method</p>
     <div class="bk-methods">${methodCards}</div>
     ${body}
-    <button class="bk-submit" id="bkSubmit" onclick="bkSubmit()"><span>Send my booking</span></button>
+    <button class="bk-submit" id="bkSubmit" onclick="bkSubmit()"><span>${IS_MODE ? `Save booking` : `Send my booking`}</span></button>
+    ${IS_MODE ? `` : `
     <p class="bk-submit-hint">Your booking goes straight to our team — we'll text you to confirm the details.</p>
     <div class="bk-disc">
       <div class="bk-disc-t">A few gentle notes 🤍</div>
@@ -654,12 +678,39 @@ async function bkRenderPanel(){
       <p>After booking, you can always <strong>check your booking confirmation here on the tracker</strong>.</p>
       <p>For self-collect, our team will send your <strong>collection details on the day (or a day before)</strong>, along with a confirmation text that your order is ready for collection.</p>
       <p>For delivery, the time is <strong>tentative</strong> and will be further updated and confirmed on the day based on our routes.</p>
-    </div>
+    </div>`}
     <div id="bkDone"></div>`;
 }
 
+/* ---- Delivery block-out days (admin everyday calendar) --------------------
+   Every day is a delivery day unless the Booking tab says otherwise. A row with
+   Method = Delivery and Available = No blocks from its Date to its "Date To"
+   (inclusive). Only applies to the admin /book link — customers still choose
+   from the fixed batch cards, which are unaffected. */
+function bkClosed(iso){
+  if(!IS_MODE || !iso) return null;
+  const list = (_availCache && _availCache.blocked) || [];
+  for(const b of list){ if(iso >= b.from && iso <= b.to) return b; }
+  return null;
+}
+
+// A short "you're away on these days" line, so the greyed-out squares make sense.
+function bkClosedNote(){
+  const today = new Date().toISOString().slice(0,10);
+  const list = ((_availCache && _availCache.blocked) || [])
+    .filter(b => b.to >= today).sort((a,b)=> a.from < b.from ? -1 : 1).slice(0,4);
+  if(!list.length) return '';
+  const bits = list.map(b=>{
+    const span = b.from === b.to ? bkFmtDate(b.from) : (bkFmtDate(b.from) + ' – ' + bkFmtDate(b.to));
+    return esc(span) + (b.why ? ' <span style="opacity:.7">(' + esc(b.why) + ')</span>' : '');
+  });
+  return `<p class="bk-hint">🚫 Blocked out: ${bits.join(' · ')}</p>`;
+}
+
 // Minimum bookable date = tomorrow (keeps the 12-hour-ahead promise).
-function bkMinDate(){ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); }
+// Customers must book at least a day ahead. The admin /book link can log a
+// same-day pickup, because in-stock items are already on the shelf.
+function bkMinDate(){ const d=new Date(); d.setDate(d.getDate() + (IS_MODE ? 0 : 1)); return d.toISOString().slice(0,10); }
 
 // Format an ISO date (YYYY-MM-DD, from the calendar) as "Fri, 10 Jul" for what customers see and
 // what's saved to the sheet. Non-ISO strings (e.g. a Sg Liang date already typed "Fri 17 Jul")
@@ -737,8 +788,8 @@ function bkCollectHtml(avail, locName){
     });
     const dateField=`<div class="bk-field"><label>Pick a collection date</label>
         ${bkCalHtml()}
-        <p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
-        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p></div>`;
+        ${IS_MODE ? `` : `<p class="bk-hint">📅 Choose any date that suits you, then pick a time slot below.</p>
+        <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can prepare your item.</p>`}</div>`;
     let slotField='';
     if(bkState.date){
       const slots=byIso[bkState.date]||std;
@@ -747,13 +798,13 @@ function bkCollectHtml(avail, locName){
           <div class="bk-slots">${slots.map(sl=>{ const on=sl.ok!==false, active=bkState.slot===sl.time&&on;
             return `<div class="bk-slot ${active?'active':''}" style="${on?'':'opacity:.4;cursor:not-allowed;text-decoration:line-through'}" ${on?`onclick="bkPickSlot('${esc(sl.time)}')"`:''}>${esc(sl.time)}</div>`;
           }).join('')}</div>
-          <p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>`;
+          ${IS_MODE ? `` : `<p class="bk-hint">Only open slots are shown — availability follows our team's schedule for the day you pick.</p>`}`;
       } else {
         slotField=`<p class="bk-hint info">🕊️ No preset time slots for this date — our team will confirm the exact pickup time with you by text.</p>`;
       }
     }
-    return dateField + slotField +
-      `<p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`;
+    return dateField + slotField + (IS_MODE ? '' :
+      `<p class="bk-hint warn">⏰ Any item not picked up by <strong>10:00 PM</strong> will be brought back inside, and you'll need to reschedule your booking.</p>`);
   }
   // ── Sg Liang ───────────────────────────────────────────────────────────────
   // Closed by default, and presented like the delivery batches: every open date+time
@@ -773,7 +824,7 @@ function bkCollectHtml(avail, locName){
   });
   cards.sort((a,b)=> a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);   // soonest first; sheet order within a date
   bkState.sgCards = cards;
-  const sgNote = `<p class="bk-hint info">📅 Sg Liang collection runs on <strong>Fridays &amp; Sundays only</strong>, and each slot is <strong>subject to availability</strong> — only the dates and times we're open are shown here.</p>`;
+  const sgNote = IS_MODE ? '' : `<p class="bk-hint info">📅 Sg Liang collection runs on <strong>Fridays &amp; Sundays only</strong>, and each slot is <strong>subject to availability</strong> — only the dates and times we're open are shown here.</p>`;
   if(!cards.length){
     return `${sgNote}<p class="bk-hint info">🕊️ We don't have an open Sg Liang slot at the moment. Please message us and we'll arrange one with you — or choose <strong>Lambak Kanan</strong> or <strong>delivery</strong> above.</p>`;
   }
@@ -787,12 +838,26 @@ function bkCollectHtml(avail, locName){
   // No free-text time box here: the card the customer taps IS the slot. A sheet row left
   // without a Time simply reads "Time confirmed by text" and our team fixes it by message.
   return `<p class="bk-label">Choose a collection slot</p>${cardsHtml}${sgNote}
-    <p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so our team will confirm your slot by text before you head over — this makes sure someone is there to open the gate for you.</p>`;
+    ${IS_MODE ? `` : `<p class="bk-hint info">🔒 Our Sg Liang collection point is <strong>gated</strong>, so our team will confirm your slot by text before you head over — this makes sure someone is there to open the gate for you.</p>`}`;
 }
 
 function bkDeliveryHtml(avail){
   const batches = (avail.delivery||[]).filter(b=>b.ok!==false);
   const isReq = bkState.batch==='__request__';
+  const addressFields = `
+    <div class="bk-field"><label>${IS_MODE ? `Delivery address` : `Your delivery address`}</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
+    <div class="bk-field"><label>Location link${IS_MODE ? `` : ` <span class="bk-req">highly recommended</span>`}</label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>`;
+  // ADMIN "everyday" mode — no open batch rows on the Booking tab, so every day
+  // is a delivery day except the ones you've blocked out. Put batch rows back on
+  // the sheet and the batch cards return automatically.
+  if(IS_MODE && !batches.length){
+    if(bkState.batch) bkState.batch = '';
+    return `<p class="bk-label">Delivery date</p>
+      ${bkCalHtml(true)}
+      ${bkState.dateBlocked ? `<p class="bk-hint warn">You're marked as unavailable that day — pick another.</p>` : ''}
+      ${bkClosedNote()}
+      ${addressFields}`;
+  }
   let cards;
   if(batches.length){
     // Keep the '__request__' sentinel valid; otherwise fall back to the first real batch.
@@ -807,22 +872,24 @@ function bkDeliveryHtml(avail){
   const reqCard = `<div class="bk-batch req ${isReq?'active':''}" onclick="bkPickBatch('__request__')">
       <div class="bk-batch-tag">🗓️</div>
       <div class="bk-batch-info"><b>Request another date</b><span>None of the batches suit you? Pick your own preferred day</span></div></div>`;
-  const reqPanel = isReq ? `<div class="bk-field"><label>Your preferred delivery date</label>
-      ${bkCalHtml()}
-      <p class="bk-hint">📅 Choose any day that suits you — our team will text you to confirm a delivery slot for that date.</p>
-      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can arrange your delivery.</p></div>` : '';
+  const reqPanel = isReq ? `<div class="bk-field"><label>${IS_MODE ? `Delivery date` : `Your preferred delivery date`}</label>
+      ${bkCalHtml(true)}
+      ${IS_MODE ? `` : `<p class="bk-hint">📅 Choose any day that suits you — our team will text you to confirm a delivery slot for that date.</p>
+      <p class="bk-hint">⏱️ Please pick a date <strong>at least 12 hours ahead</strong> so we can arrange your delivery.</p>`}</div>` : '';
   return `<p class="bk-label">Choose a delivery batch</p>${cards}${reqCard}${reqPanel}
-    <p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>
-    <div class="bk-field"><label>Your delivery address</label><textarea placeholder="House no., street, Kampong / Simpang, district…" oninput="bkState.address=this.value">${esc(bkState.address)}</textarea></div>
-    <div class="bk-field"><label>Location link <span class="bk-req">highly recommended</span></label><input type="text" value="${esc(bkState.location)}" placeholder="Paste a Google Maps / live-location link" oninput="bkState.location=this.value"></div>
-    <p class="bk-hint">📍 A live location or Google Maps pin helps our runner reach you quickly — without one, deliveries are often delayed or missed.</p>`;
+    ${IS_MODE ? `` : `<p class="bk-hint">📍 Delivery rate is <strong>B$3–B$5</strong> depending on your area — share your address &amp; live location below and we'll confirm the exact rate.</p>`}
+    ${addressFields}
+    ${IS_MODE ? `` : `<p class="bk-hint">📍 A live location or Google Maps pin helps our runner reach you quickly — without one, deliveries are often delayed or missed.</p>`}`;
 }
 
-function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.sgSel=-1; bkState.dateWarn=false; bkRenderPanel(); }
+function bkPickMethod(k){ bkState.method=k; bkState.slot=''; bkState.date=''; bkState.batch=''; bkState.sgSel=-1; bkState.dateWarn=false; bkState.dateBlocked=false; bkRenderPanel(); }
 function bkPickDate(v){
   // Reject a too-soon ISO date the moment it's picked — some mobile date pickers ignore the min attribute.
   if(v && /^\d{4}-\d{2}-\d{2}$/.test(v) && v < bkMinDate()){ bkState.date=''; bkState.slot=''; bkState.dateWarn=true; bkRenderPanel(); return; }
-  bkState.dateWarn=false; bkState.date=v; bkState.slot=''; bkRenderPanel();
+  if(v && bkState.method==='delivery' && bkClosed(v)){
+    bkState.date=''; bkState.slot=''; bkState.dateBlocked=true; bkRenderPanel(); return;
+  }
+  bkState.dateWarn=false; bkState.dateBlocked=false; bkState.date=v; bkState.slot=''; bkRenderPanel();
 }
 function bkPickSlot(t){ bkState.slot=t; bkRenderPanel(); }
 function bkPickBatch(b){ bkState.batch=b; bkRenderPanel(); }
@@ -836,7 +903,7 @@ function bkPickSg(i){
 
 // In-page month calendar. Built from plain buttons so it behaves identically on every phone —
 // no reliance on the native <input type=date> picker, which opened-then-instantly-closed on mobile.
-function bkCalHtml(){
+function bkCalHtml(forDelivery){
   const min = bkMinDate();                     // ISO YYYY-MM-DD, earliest bookable date (tomorrow)
   const minY=+min.slice(0,4), minM=+min.slice(5,7)-1;
   if(!bkCalYM){                                // centre on the picked date, else on the earliest bookable month
@@ -850,7 +917,9 @@ function bkCalHtml(){
   let cells='';
   for(let i=0;i<startDow;i++) cells+='<span class="bk-cal-cell empty"></span>';
   for(let d=1; d<=days; d++){
-    const iso=`${y}-${pad(m+1)}-${pad(d)}`, disabled=iso<min, active=bkState.date===iso;
+    const iso=`${y}-${pad(m+1)}-${pad(d)}`, active=bkState.date===iso;
+    const shut=forDelivery ? bkClosed(iso) : null;                 // a day you're not available
+    const disabled = iso<min || !!shut;
     cells += disabled
       ? `<span class="bk-cal-cell disabled">${d}</span>`
       : `<button type="button" class="bk-cal-cell${active?' active':''}" onclick="bkPickDate('${iso}')">${d}</button>`;
@@ -877,25 +946,61 @@ function bkCalNav(delta){
 async function bkSubmit(){
   if(bkState.sending) return;
   const done = document.getElementById('bkDone'), m = bkState.method;
+  // Admin in-stock link: order no / name / item are typed in here instead of
+  // being looked up, because in-stock items never go through the tracker.
+  if(IS_MODE){
+    const on = ((document.getElementById('isOrder')||{}).value||'').trim();
+    const nm = ((document.getElementById('isName') ||{}).value||'').trim();
+    const it = ((document.getElementById('isItem') ||{}).value||'').trim();
+    if(!on){ done.innerHTML = `<p class="bk-hint warn">Order no. is missing.</p>`; isFocus('isOrder'); return; }
+    if(!nm){ done.innerHTML = `<p class="bk-hint warn">Name is missing.</p>`; isFocus('isName'); return; }
+    if(!it){ done.innerHTML = `<p class="bk-hint warn">Item is missing.</p>`; isFocus('isItem'); return; }
+    bkState.order = on; bkState.name = nm; bkState.item = it;
+  }
   const reqDate = m==='delivery' && bkState.batch==='__request__';
+  // Admin everyday mode: delivery is a plain dated booking, no batch involved.
+  const _av = await bkLoadAvail();
+  const everyday = IS_MODE && m==='delivery' && !((_av.delivery||[]).filter(b=>b.ok!==false).length);
+  if(everyday && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a delivery date.</p>`; return; }
+  if(everyday && bkClosed(bkState.date)){ done.innerHTML = `<p class="bk-hint warn">You're marked as unavailable that day — pick another.</p>`; return; }
   if(m==='delivery' && !(bkState.address||'').trim()){ done.innerHTML = `<p class="bk-hint warn">Please share your delivery address so we can confirm the rate.</p>`; return; }
   if(reqDate && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick your preferred delivery date first.</p>`; return; }
   // Belt-and-suspenders: reject too-soon ISO dates even if a mobile date picker ignored the min attribute.
-  if(((m!=='delivery') || reqDate) && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date) && bkState.date < bkMinDate()){
+  if(((m!=='delivery') || reqDate || everyday) && /^\d{4}-\d{2}-\d{2}$/.test(bkState.date) && bkState.date < bkMinDate()){
     done.innerHTML = `<p class="bk-hint warn">Please pick a date at least a day ahead (12+ hours) so we can prepare your item.</p>`; return;
   }
   if(m!=='delivery' && !bkState.date){ done.innerHTML = `<p class="bk-hint warn">Please pick a date first.</p>`; return; }
-  const batchOut = reqDate
-    ? ('Requested date: ' + (bkFmtDate(bkState.date||'') || '(unspecified)') + (bkState.slot ? (' · ' + bkState.slot) : ''))
-    : (bkState.batch||'');
+  const batchOut = everyday ? ''
+    : reqDate
+      ? ('Requested date: ' + (bkFmtDate(bkState.date||'') || '(unspecified)') + (bkState.slot ? (' · ' + bkState.slot) : ''))
+      : (bkState.batch||'');
+  // ADMIN LINK ONLY — date stamp for fixed delivery batches.
+  // A batch booking normally saves with an empty Date, so the digest has to resolve
+  // the batch LABEL against the Booking tab every single night — which means reusing
+  // a label ("Batch 1") for a new date can drag an old, long-delivered order back
+  // into the reminder. Stamping the batch's real date onto the row makes it behave
+  // like every other dated booking: it shows once, then drops off by itself.
+  let stampDate = bkState.date || '';
+  if(IS_MODE && m==='delivery' && !reqDate && !everyday && bkState.batch){
+    try{
+      const av = _av;
+      const hit = (av.delivery||[]).filter(b => b.loc === bkState.batch)[0];
+      if(hit && hit.date) stampDate = bkToISO(hit.date) || hit.date;
+    }catch(e){ /* no date on the Booking tab — fall back to the old behaviour */ }
+  }
   const payload = {
     order: bkState.order,
     method: m==='delivery' ? 'Delivery' : (m==='sgliang' ? 'Self-collect · Sg Liang' : 'Self-collect · Lambak Kanan'),
-    date: bkFmtDate(bkState.date||''), slot: bkState.slot||'',
+    date: bkFmtDate(stampDate||''), slot: bkState.slot||'',
     batch: m==='delivery' ? batchOut : '',
     address: m==='delivery' ? (bkState.address||'') : '',
     location: m==='delivery' ? (bkState.location||'') : '',
     page: location.href, submitted: new Date().toISOString(),
+    // In-stock extras — saved on the Bookings row itself, so the 9 PM digest
+    // knows the name and the item without any Tracking row to look them up in.
+    kind: IS_MODE ? 'instock' : 'preorder',
+    name: IS_MODE ? (bkState.name || '') : '',
+    item: IS_MODE ? (bkState.item || '') : '',
   };
   const btn = document.getElementById('bkSubmit');
   bkState.sending = true; btn.setAttribute('disabled','disabled'); btn.querySelector('span').innerHTML = '<span class="track-spinner"></span>Sending…';
@@ -906,6 +1011,23 @@ async function bkSubmit(){
   const when = m==='delivery'
     ? `<strong>${esc(payload.batch||'your chosen batch')}</strong>`
     : `<strong>${esc(payload.date)}${payload.slot?', '+esc(payload.slot):''}</strong> at <strong>${esc(payload.method.replace('Self-collect · ',''))}</strong>`;
+  if(IS_MODE){
+    // Show the stamped date back, so you can see at a glance that the batch
+    // resolved to a real day rather than saving as a bare label.
+    const whenIS = m==='delivery'
+      ? (payload.batch
+          ? `<strong>${esc(payload.batch)}</strong>${payload.date ? ` · ${esc(payload.date)}` : ''}`
+          : `<strong>${esc(payload.date||'—')}</strong>`)
+      : when;
+    document.getElementById('bkPanel').innerHTML =
+      `<div class="bk-banner"><b>✓ Saved to the Bookings sheet</b>
+         <p><span class="is-ref">${esc(payload.order)}</span> · ${esc(payload.name)} — ${esc(payload.item)}</p>
+         <p>${m==='delivery'?'Delivery':'Collection'}: ${whenIS}</p>
+         <button type="button" class="is-again" onclick="mountInstock()">+ Add another booking</button></div>`;
+    const f = document.getElementById('isFields'); if(f) f.classList.add('bk-hide');
+    document.getElementById('bkPanel').scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
   document.getElementById('bkPanel').innerHTML =
     `<div class="bk-banner"><b>✓ Your booking request is in!</b>
        <p>${m==='delivery'?'Delivery':'Collection'}: ${when}. Our team will <strong>text you to confirm the details</strong> shortly — please wait for that message before heading over 💕</p>
@@ -926,6 +1048,49 @@ function copyTrackLink(btn, orderNo, withBook){
   }
 }
 
+/* ============================================================
+   IN-STOCK BOOKING LINK   /book  ->  /track?instock=1
+   ------------------------------------------------------------
+   ADMIN USE ONLY. In-stock items are already here, so there is
+   nothing to track — this is just a quick way to log a booking
+   without opening the spreadsheet. It saves to the SAME
+   "Bookings" tab as every pre-order booking, so the tick-boxes
+   and the 9 PM Telegram list pick it up automatically.
+   ============================================================ */
+function isFocus(id){
+  const el = document.getElementById(id);
+  if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+}
+
+function mountInstock(){
+  IS_MODE = true;
+  const h1 = document.getElementById('trackHeroH1');
+  const hp = document.getElementById('trackHeroP');
+  if(h1) h1.innerHTML = 'Add a <em>Booking</em>';
+  if(hp) hp.textContent = 'In-stock orders \u2014 log a collection or delivery slot';
+  ['trackSearchBox','trackHintP','trackHelpP'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('bk-hide'); });
+  const bar = document.getElementById('isBar'); if(bar) bar.classList.remove('bk-hide');
+  const box = document.getElementById('trackResult');
+  if(!box) return;
+  box.innerHTML = `
+    <div class="track-card">
+      <div id="isFields">
+        <div class="bk-field"><label>Order no.</label>
+          <input type="text" id="isOrder" autocomplete="off" placeholder="e.g. IS0925"></div>
+        <div class="bk-field"><label>Name</label>
+          <input type="text" id="isName" autocomplete="off" placeholder="e.g. Nurul Aisyah"></div>
+        <div class="bk-field"><label>Item bought</label>
+          <input type="text" id="isItem" autocomplete="off" placeholder="e.g. Aisha Kurta \u2014 Ivory, size M"></div>
+      </div>
+      <div id="bookingArea"><div class="bk-panel" id="bkPanel"></div></div>
+    </div>`;
+  bkState = { order:'', method:'lambak', date:'', slot:'', batch:'', address:'', location:'',
+              sending:false, sgSel:-1, sgCards:[], name:'', item:'' };
+  bkCalYM = null;
+  bkRenderPanel();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
 // Wire up WhatsApp help links + allow ?order=AP-1042 deep links
 document.addEventListener('DOMContentLoaded',()=>{
   const wa = `https://wa.me/${TRACK_CONFIG.WHATSAPP}?text=${encodeURIComponent("Hi Anggun Pesona! I'd like to check on my pre-order 📦")}`;
@@ -935,6 +1100,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   // ?book=1 (or ?book) auto-opens the booking panel after the order loads —
   // paste this link into your "your item is ready" text to customers.
   if(params.has('book') && params.get('book') !== '0') AUTO_OPEN_BOOKING = true;
+  // /book (or /track?instock=1) -> the admin in-stock booking form.
+  if(params.has('instock') && params.get('instock') !== '0'){ mountInstock(); return; }
   if(pre){ document.getElementById('trackInput').value = pre; trackLookup(); }
 });
 </script>
