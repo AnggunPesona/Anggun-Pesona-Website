@@ -755,6 +755,14 @@ function sortProducts(list, sortKey) {
     /* Popular items float to the top; everything else keeps its original order. */
     return list.sort((a, b) => (isPopular(b) ? 1 : 0) - (isPopular(a) ? 1 : 0));
   }
+  if (sortKey === 'reviewed') {
+    /* Products with customer review photos float to the top. */
+    return list.sort((a, b) => (productHasReviews(b) ? 1 : 0) - (productHasReviews(a) ? 1 : 0));
+  }
+  if (sortKey === 'sourced') {
+    /* Products we have our own real-life ("sourced") photos for float to the top. */
+    return list.sort((a, b) => (hasProductRealLife(b) ? 1 : 0) - (hasProductRealLife(a) ? 1 : 0));
+  }
   return list;
 }
 function goPoPage(n) { poCurrentPage = n; setPageUrl(n); renderPreorders(); window.scrollTo({ top: document.querySelector('.products-section')?.offsetTop - 80 || 0, behavior: 'smooth' }); }
@@ -778,30 +786,19 @@ function renderPoHighlights() {
   const filtering = currentPoFilter.length || currentPoBrand.length || currentPoSize.length;
   if (searching || filtering) { $wrap.style.display = 'none'; return; }
 
-  /* Picks first, then sourced-only, then reviewed-only — a product is listed once,
-     in its highest-priority group, but carries every badge it qualifies for. */
-  const picks    = poProducts.filter(isPopular);
-  const sourced  = poProducts.filter(p => !isPopular(p) && hasProductRealLife(p));
-  const reviewed = poProducts.filter(p => !isPopular(p) && !hasProductRealLife(p) && productHasReviews(p));
-  const items    = [...picks, ...sourced, ...reviewed];
+  /* Picks only. Reviewed and real-life ("sourced") products are surfaced through
+     the Sort dropdown instead, so this strip stays a clean curated shelf. */
+  const items = poProducts.filter(isPopular);
 
   if (!items.length) { $wrap.style.display = 'none'; return; }
 
   $track.innerHTML = items.map(p => {
     const origIndex = poProducts.indexOf(p);
-    const pick = isPopular(p);
-    const real = hasProductRealLife(p);
-    const rev  = productHasReviews(p);
     const price = fmtPrice(p.price);
     const cat = parseCats(p.category)[0] || '';
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
     return `
     <div class="po-hl-card" onclick="openProduct(${origIndex}, 'preorders')">
-      <div class="po-hl-badges">
-        ${pick ? `<span class="po-hl-badge po-hl-badge-pick">Anggun's Pick</span>` : ''}
-        ${real ? `<span class="po-hl-badge po-hl-badge-real">★ Real photos</span>` : ''}
-        ${rev ? `<span class="po-hl-badge po-hl-badge-rev">★ Reviewed</span>` : ''}
-      </div>
       <div class="po-hl-img">${imgOrPlaceholder(firstPhoto)}</div>
       <div class="po-hl-info">
         ${cat ? `<div class="po-hl-cat">${cat}</div>` : ''}
@@ -827,9 +824,17 @@ function renderPreorders() {
   // SPA partial may have been swapped out while async load was in flight.
   if (!$grid || !$catChips) return;
 
-  /* Show "Most Popular" as a sort option only when at least one item is tagged. */
-  const $popularOpt = document.querySelector('#sortSelectPO option[value="popular"]');
-  if ($popularOpt) $popularOpt.style.display = poProducts.some(isPopular) ? '' : 'none';
+  /* Show the curated sort options only when at least one item qualifies, so the
+     dropdown never offers a choice that would change nothing. */
+  const setSortOpt = (val, ok) => {
+    const $o = document.querySelector('#sortSelectPO option[value="' + val + '"]');
+    if ($o) $o.style.display = ok ? '' : 'none';
+    /* If the hidden option was the active sort, fall back to Featured. */
+    if (!ok && currentPoSort === val) currentPoSort = 'default';
+  };
+  setSortOpt('popular',  poProducts.some(isPopular));
+  setSortOpt('reviewed', poProducts.some(productHasReviews));
+  setSortOpt('sourced',  poProducts.some(hasProductRealLife));
 
   const sheetCats   = [...new Set(poProducts.flatMap(p => parseCats(p.category)))];
   const orderedCats = [...sheetCats].sort((a, b) => a.localeCompare(b));
