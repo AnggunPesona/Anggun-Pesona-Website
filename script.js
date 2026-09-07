@@ -772,6 +772,28 @@ function hasProductRealLife(p) {
   return !!(p && p.name) && getRealLifeForProduct(p.name).some(r => getPhotoList(r).length);
 }
 
+/* ── Curated views ────────────────────────────────────────────────────────────
+   The three curated options in the Sort dropdown NARROW the grid to the pairs
+   that qualify, instead of only floating them to the top. Picking "Customer
+   Reviews" and still being shown the whole catalogue underneath was confusing.
+   Keyed by the same value as the <option> in preorders/index.html. */
+const CURATED_SORTS = {
+  popular:  { test: isPopular,          icon: '\u2b50', label: "hand-picked by Anggun" },
+  reviewed: { test: productHasReviews,  icon: '\u2605', label: "with customer reviews" },
+  sourced:  { test: hasProductRealLife, icon: '\ud83d\udcf8', label: "seen in real life" }
+};
+
+/* Small line above the grid explaining a curated view + a way back out. */
+function renderPoCuratedNote(curated, n) {
+  const $n = document.getElementById('po-curated-note');
+  if (!$n) return;
+  if (!curated) { $n.style.display = 'none'; $n.innerHTML = ''; return; }
+  $n.innerHTML =
+    `<span class="curated-note-txt">${curated.icon} Showing ${n} ${n === 1 ? 'pair' : 'pairs'} ${curated.label}</span>` +
+    `<button type="button" class="curated-note-clear" onclick="setPoSort('default')">Show all \u2192</button>`;
+  $n.style.display = 'flex';
+}
+
 /* Build the "Anggun's Picks & Just Sourced" highlight strip that sits above the
    grid. Shows products flagged Popular OR that have real-life photos. Hidden
    while a search/filter is active so it never fights the filtered view. */
@@ -784,7 +806,10 @@ function renderPoHighlights() {
   const searchEl = document.getElementById('poSearchInput');
   const searching = !!(searchEl && searchEl.value.trim());
   const filtering = currentPoFilter.length || currentPoBrand.length || currentPoSize.length;
-  if (searching || filtering) { $wrap.style.display = 'none'; return; }
+  /* A curated view (Most Popular / Customer Reviews / Seen In Real Life) already
+     shows exactly these pairs in the grid, so the strip would be a duplicate. */
+  const curatedView = !!CURATED_SORTS[currentPoSort];
+  if (searching || filtering || curatedView) { $wrap.style.display = 'none'; return; }
 
   /* Picks only. Reviewed and real-life ("sourced") products are surfaced through
      the Sort dropdown instead, so this strip stays a clean curated shelf. */
@@ -868,12 +893,18 @@ function renderPreorders() {
   const searchEl = document.getElementById('poSearchInput');
   const searchTerm = searchEl ? searchEl.value.trim().toLowerCase() : '';
 
-  const list = poProducts.filter(p =>
+  let list = poProducts.filter(p =>
     matchesCat(p, filter) &&
     (brandFilter.length === 0 || brandFilter.includes(p.brand)) &&
     matchesSize(p, sizeFilter) &&
     (!searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.brand || '').toLowerCase().includes(searchTerm) || (p.category || '').toLowerCase().includes(searchTerm))
   );
+
+  /* Curated views narrow the grid rather than just re-ordering it. */
+  const curated = CURATED_SORTS[currentPoSort];
+  if (curated) list = list.filter(curated.test);
+  renderPoCuratedNote(curated, list.length);
+
   if (!list.length) { $grid.innerHTML = ''; $empty.style.display = 'block'; document.getElementById('po-pagination') && (document.getElementById('po-pagination').innerHTML = ''); return; }
   $empty.style.display = 'none';
 
@@ -895,10 +926,14 @@ function renderPreorders() {
     const qt = qty <= 0 ? 'Sold Out' : qty <= 3 ? `Only ${qty} left` : `${qty} available`;
     const price = fmtPrice(p.price);
     const firstPhoto = (p.photos || p.photo || '').split(',')[0];
+    /* At most ONE badge per card, and never one the current view already implies
+       (every card in the Most Popular view is a pick — saying so six times is noise). */
+    const showPick   = isPopular(p) && currentPoSort !== 'popular';
+    const showReview = productHasReviews(p) && !showPick && currentPoSort !== 'reviewed';
     return `
-    <div class="product-card${isPopular(p) ? ' popular-pick' : ''}" onclick="openProduct(${origIndex}, 'preorders')">
-      ${isPopular(p) ? `<span class="popular-badge">Anggun's Pick</span>` : ''}
-      ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
+    <div class="product-card${showPick ? ' popular-pick' : ''}" onclick="openProduct(${origIndex}, 'preorders')">
+      ${showPick ? `<span class="popular-badge">Anggun's Pick</span>` : ''}
+      ${showReview ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto)}
       <div class="product-info">
         <div>${parseCats(p.category).map(c => `<span class="tag tag-cat">${c}</span>`).join('')}</div>
@@ -1045,7 +1080,7 @@ function renderInstocks() {
     return `
     <div class="product-card${isPopular(p) ? ' popular-pick' : ''}" onclick="openProduct(${origIndex}, 'instocks')">
       ${isPopular(p) ? `<span class="popular-badge">Anggun's Pick</span>` : ''}
-      ${productHasReviews(p) ? '<span class="review-badge">★ Reviewed</span>' : ''}
+      ${(!isPopular(p) && productHasReviews(p)) ? '<span class="review-badge">★ Reviewed</span>' : ''}
       ${imgOrPlaceholder(firstPhoto, '⚡')}
       <div class="product-info">
         ${parseCats(p.category).map(c => `<span class="tag tag-cat">${c}</span>`).join('')}

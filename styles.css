@@ -1325,6 +1325,12 @@
       grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
       gap: 1.25rem 0.85rem;
     }
+    /* Even card heights across a row: the photo, then the text block grows, and
+       the price + "View Details" always sit on the same line card-to-card,
+       however many category tags or however long the product name is. */
+    .products-grid .product-card { display: flex; flex-direction: column; height: 100%; }
+    .products-grid .product-info { flex: 1 1 auto; display: flex; flex-direction: column; }
+    .products-grid .product-footer { margin-top: auto; }
     .product-card {
       background: var(--cream);
       border-radius: 6px;
@@ -2707,6 +2713,44 @@
       transition: border-color 0.25s ease;
     }
     .pr-more-link:hover { border-color: var(--pink-hot); }
+    /* Curated-view note ("Showing 6 pairs hand-picked by Anggun · Show all") */
+    .curated-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.9rem;
+      max-width: 1200px;
+      margin: 0 auto 1.4rem;
+      padding: 0.6rem 1rem;
+      background: var(--pink-pale, #fce8ee);
+      border: 1px dashed var(--pink-soft, #f2a4bb);
+      border-radius: 999px;
+      text-align: center;
+    }
+    .curated-note-txt {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.2px;
+      color: var(--maroon, #7a2b3a);
+    }
+    .curated-note-clear {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--maroon, #7a2b3a);
+      background: none;
+      border: none;
+      border-bottom: 1.5px solid var(--pink-soft, #f2a4bb);
+      padding: 0 0 1px;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .curated-note-clear:hover { border-color: var(--maroon, #7a2b3a); }
+    @media (max-width: 600px) {
+      .curated-note { border-radius: 14px; margin-left: 1rem; margin-right: 1rem; }
+    }
+
     /* "★ Reviewed" badge on catalogue product cards */
     .review-badge {
       position: absolute;
